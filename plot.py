@@ -1,5 +1,6 @@
 import csv
-from matplotlib.pyplot import plot, show, legend, title
+import sys
+from matplotlib.pyplot import plot, show, legend, title, savefig, clf
 from dateutil import parser  # pip install python-dateutil
 
 PLOTS = [
@@ -23,14 +24,28 @@ for row in D:
             a.append(None)
     ROWS[row['']] = a
 
+save_to_file = '-s' in sys.argv
+c = 0
+
 dates = [parser.parse(d) for d in D.fieldnames[1:]]
 for name, keys in PLOTS:
     for key in keys:
         plot(dates, ROWS[key], 'o-', label=key)
     legend(loc=0)
     title(name)
-    show()
+    if save_to_file:
+        savefig('%02d - %s.png' % (c, name))
+        c += 1
+        clf()
+    else:
+        show()
+
 for key in SINGLE_PLOTS:
     plot(dates, ROWS[key], 'o-', label=key)
     title(key)
-    show()
+    if save_to_file:
+        savefig('%02d - %s.png' % (c, name))
+        c += 1
+        clf()
+    else:
+        show()
