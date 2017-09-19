@@ -44,7 +44,7 @@ for key in SINGLE_PLOTS:
     plot(dates, ROWS[key], 'o-', label=key)
     title(key)
     if save_to_file:
-        savefig('%02d - %s.png' % (c, name))
+        savefig('%02d - %s.png' % (c, key))
         c += 1
         clf()
     else:
