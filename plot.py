@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import csv
 import sys
 from matplotlib.pyplot import plot, show, legend, title, savefig, clf
@@ -11,7 +13,7 @@ PLOTS = [
     ('Wiki Stats', ['wiki pages', 'wiki page views']),
     ('ROS Answers Stats', ['Questions', 'Answered Questions']),
 ]
-SINGLE_PLOTS = ['Total Downloads', 'Unique IPSs', 'Papers Citing']
+SINGLE_PLOTS = ['Total Downloads', 'Unique IPs', 'Papers Citing']
 
 D = csv.DictReader(open('aggregated.csv'))
 ROWS = {}
