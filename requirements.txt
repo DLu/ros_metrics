@@ -1,0 +1,10 @@
+argparse
+beautifulsoup4
+gitpython
+google-api-python-client
+jinja2
+mailbox
+requests
+scholarly
+tabulate
+tqdm

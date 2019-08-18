@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <div class="all_time">
+            <h2>All Time Top</h2>
+            <ol>
+            {%- for pkg, hits in tops[0]: %}
+            <li><span class="top_item">{{pkg}}</span>
+                <span class="top_detail">({{'{0:,}'.format(hits)}})</span>
+            {%- endfor %}
+            </ol>
+        </div>
+        <table>
+        {%- for year_row in tops[1]|sort | batch(3) %}
+            <tr>
+            {%- for year in year_row %}
+                <td><div class="yearly">
+                    <h3>{{year}}</h3>
+                    <ol>
+                {%- for pkg, hits in tops[1][year]: %}
+                    <li><span class="top_item">{{pkg}}</span>
+                        <span class="top_detail">({{'{0:,}'.format(hits)}})</span>
+                {%- endfor %}
+                    </ol>
+                </div></td>
+                {%- endfor %}
+        {%- endfor %}
+        </table>
+        <div class="caption">{{ caption }}</div>
+{%- endblock %}

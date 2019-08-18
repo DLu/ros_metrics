@@ -1,0 +1,81 @@
+body {
+    font-family: 'Overpass', sans-serif;
+}
+
+.navbar {
+    overflow: hidden;
+    position: fixed;
+    left: 0;
+    width: 100%;
+}
+
+.navbar img {
+    height: 50px;
+    float: left;
+    display: block;
+}
+
+.navbar a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    vertical-align: center;
+    text-decoration: none;
+}
+
+.navbar0 {
+    background-color: #232e4a;
+    top: 0;
+}
+
+.navbar0 a {
+    padding: 14px 16px;
+}
+
+.navbar1 {
+    background-color: #38435F;
+    top: 50;
+}
+
+.navbar1 a {
+    padding: 8px 8px;
+}
+
+.nav_selected {
+    background: #515D7A;
+}
+
+.navbar a:hover {
+    background: white;
+    color: #232e4a;
+}
+
+.caption {
+    bottom: 0;
+    width: 100%;
+    padding: 18px 18px;
+    background: white;
+}
+
+canvas {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+tr {
+    vertical-align: top;
+}
+
+div.all_time {
+    padding: 20px;
+    height: 100%;
+    float: left;
+    font-size: x-large;
+    max-width: 30%;
+}
+
+span.top_detail {
+    font-size: 60%;
+}

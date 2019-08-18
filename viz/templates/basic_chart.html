@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption">{{ caption }}</div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {{ chart|tojson }});
+        </script>
+{%- block bonus %}{% endblock %}
+{%- endblock %}

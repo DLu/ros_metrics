@@ -1,0 +1,43 @@
+tables:
+  users:
+    - id
+    - username
+    - gold
+    - silver
+    - bronze
+    - reputation
+    - created_at
+    - last_seen_at
+    - last_crawl_at
+  questions:
+    - id
+    - title
+    - user_id
+    - summary
+    - url
+    - accepted_answer_id
+    - created_at
+    - last_activity_at
+    - view_count
+    - score
+    - last_crawl_at
+  tags:
+    - q_id
+    - tag
+  answers:
+    - id
+    - q_id
+    - votes
+    - created_at
+    - last_activity_at
+    - user_id
+    - accepted
+special_types:
+    url: text
+    username: text
+    tag: text
+    title: text
+    summary: text
+    accepted: bool
+
+default_type: int

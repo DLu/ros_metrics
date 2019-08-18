@@ -1,0 +1,40 @@
+tables:
+    profiles:
+    - id
+    - name
+    - start_year
+    - start_month
+    totals:
+    - profile_id
+    - year
+    - month
+    - pageviews
+    url_views:
+    - profile_id
+    - year
+    - pageviews
+    - url
+    cc_views:
+    - profile_id
+    - year
+    - pageviews
+    - cc
+    os_views:
+    - profile_id
+    - year
+    - pageviews
+    - os
+    - osv
+    updates:
+    - profile_id
+    - table_name
+    - last_updated_at
+special_types:
+    url: text
+    cc: text
+    name: text
+    table_name: text
+    os: text
+    osv: text
+
+default_type: int

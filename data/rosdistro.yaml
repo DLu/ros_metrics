@@ -1,0 +1,18 @@
+tables:
+    commits:
+        - id
+        - hash
+        - author
+        - email
+        - date
+    changes:
+        - commit_id
+        - change_index
+        - noun
+        - verb
+        - detail
+special_types:
+    id: int
+    commit_id: int
+    date: int
+    change_index: int

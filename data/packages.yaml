@@ -1,0 +1,31 @@
+tables:
+    traffic:
+    - visitors
+    - hits
+    - bw
+    - year
+    - month
+    os:
+    - os
+    - hits
+    - year
+    - month
+    countries:
+    - cc
+    - hits
+    - bw
+    - year
+    - month
+    urls:
+    - url
+    - hits
+    - size
+    - year
+    - month
+
+special_types:
+    url: text
+    cc: text
+    os: text
+
+default_type: int

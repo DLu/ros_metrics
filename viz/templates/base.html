@@ -1,0 +1,28 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>{{ name }} - ROS Metrics</title>
+    {%- block header %}{% endblock %}
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="metrics.png" alt="ros metrics" />
+        {%- for link, text in menu.items() %}
+        <a href="{{link}}" {% if link == level1 %}class="nav_selected"{% endif %}>{{text}}</a>
+        {%- endfor %}
+    </div>
+    {%- if submenu %}
+    <div class="navbar navbar1">
+        {%- for link, text in submenu.items() %}
+        <a href="{{link}}" {% if link == level2 %}class="nav_selected"{% endif %}>{{text}}</a>
+        {%- endfor %}
+    </div>
+    {%- endif %}
+    <div class="main" {% if submenu %}style="margin-top: 110px"{% else %}style="margin-top: 60px"{% endif %}>
+    {%- block content %}{% endblock %}
+    </div>
+</body>
+</html>

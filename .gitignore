@@ -1,0 +1,4 @@
+cache
+data/*.db
+data/*.db-journal
+keys.yaml

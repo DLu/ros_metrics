@@ -1,0 +1,53 @@
+tables:
+  users:
+      - id
+      - username
+      - name
+      - admin
+      - moderator
+      - trust_level
+      - created_at
+      - last_posted_at
+      - last_seen_at
+      - days_visited
+      - post_count
+      - posts_read
+      - likes_given
+      - likes_received
+      - time_read
+      - topics_entered
+      - topic_count
+      - last_updated
+  categories:
+      - id
+      - name
+      - color
+      - slug
+  posts:
+      - id
+      - user_id
+      - topic_id
+      - post_number
+      - raw
+      - created_at
+      - updated_at
+  topics:
+      - id
+      - name
+      - category_id
+      - slug
+      - views
+  topic_tags:
+      - t_id
+      - tag
+
+special_types:
+    username: text
+    name: text
+    admin: bool
+    moderator: bool
+    color: text
+    raw: text
+    slug: text
+
+default_type: int

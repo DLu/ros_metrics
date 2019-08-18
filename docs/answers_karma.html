@@ -1,0 +1,37 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>Karma - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="metrics.png" alt="ros metrics" />
+        <a href="index.html" >Users</a>
+        <a href="packages_top.html" >Packages</a>
+        <a href="ros distro_rosdistro.html" >ROS Distro</a>
+        <a href="answers_questions.html" class="nav_selected">Answers</a>
+        <a href="misc_analytics.html" >Misc</a>
+    </div>
+    <div class="navbar navbar1">
+        <a href="answers_questions.html" >Questions</a>
+        <a href="answers_karma.html" class="nav_selected">Karma</a>
+        <a href="answers_rosdistro.html" >ROS Distro</a>
+        <a href="answers_topanswerers.html" >Top Answerers</a>
+    </div>
+    <div class="main" style="margin-top: 110px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption">Distribution of karma among answers.ros.org users.</div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {"data": {"datasets": [{"backgroundColor": "#4dc9f6", "data": [25955, 6953, 939, 117, 73, 83], "label": "Number of users"}], "labels": ["\u003c= 10", "11 - 100", "101 - 500", "501 - 1000", "1001 - 2000", "2000+"]}, "options": {}, "type": "horizontalBar"});
+        </script>
+    </div>
+</body>
+</html>
