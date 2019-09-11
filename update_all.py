@@ -2,6 +2,7 @@ from ros_metrics.analytics import update_analytics
 from ros_metrics.answers import update_answers
 from ros_metrics.discourse import update_discourse
 from ros_metrics.packages import update_packages
+from ros_metrics.repos import update_repos
 from ros_metrics.rosdistro import update_rosdistro
 from ros_metrics.ros_users import update_ros_users
 from ros_metrics.scholar import update_scholar
@@ -13,6 +14,7 @@ if __name__ == '__main__':
         'answers': update_answers,
         'discourse': update_discourse,
         'packages': update_packages,
+        'repos': update_repos,
         'rosdistro': update_rosdistro,
         'ros_users': update_ros_users,
         'scholar': update_scholar,

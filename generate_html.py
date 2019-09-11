@@ -3,13 +3,13 @@ from jinja2 import Environment, FileSystemLoader
 import pathlib
 from ros_metrics import charts
 from ros_metrics.metric_db import MetricDB
-from ros_metrics import analytics, answers, packages
+from ros_metrics import analytics, answers, packages, repos
 from ros_metrics.constants import distros, os_list
 
 OUTPUT_FOLDER = pathlib.Path('docs')
 
 dbs = {}
-for name in ['discourse', 'answers', 'ros_users', 'packages', 'scholar', 'rosdistro', 'analytics']:
+for name in ['discourse', 'answers', 'ros_users', 'packages', 'scholar', 'rosdistro', 'analytics', 'repos']:
     dbs[name] = MetricDB(name)
 
 STRUCTURE = [
@@ -72,6 +72,16 @@ STRUCTURE = [
          {'name': 'Deps',
           'chart': charts.get_rosdistro_deps(dbs['rosdistro']),
           'caption': 'Types of dependencies added, measured by commits to ros/rosdistro.'},
+         {'name': 'Number of Repos',
+          'chart': charts.get_rosdistro_repos(dbs['rosdistro']),
+          'caption': 'Number of repos in ros/rosdistro'
+          },
+         {'name': 'Github',
+          'template': 'table.html',
+          'headers': ['rank', 'key', 'org', 'repo', 'forks', 'stars', 'subs'],
+          'table': repos.github_repos_report(dbs['repos']),
+          'caption': 'Github repos listed in ros/rosdistro, ranked by number of forks/stars/subscriptions'
+          }
      ]
      },
     {'name': 'Answers',

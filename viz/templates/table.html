@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block header %}
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"/>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+
+{% block content %}
+        <table id="myTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                {%- for head in headers %}
+                <th>{{ head }}</th>
+                {%- endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {%- for row in table %}
+            <tr>
+                {% for head in headers %}
+                <td>{{row[head]}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        <div class="caption">{{ caption }}</div>
+
+        <script>
+            $(document).ready( function () {
+                $('#myTable').DataTable();
+            } );
+        </script>
+{%- endblock %}

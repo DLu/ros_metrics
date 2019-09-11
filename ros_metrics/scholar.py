@@ -1,8 +1,7 @@
-import datetime
 import scholarly
 from scholarly.scholarly import _CITATIONPUB, _get_soup, _HOST
 from .metric_db import MetricDB
-from .util import now_epoch, year_month_to_datetime
+from .util import now_epoch, year_month_to_datetime, epoch_to_datetime
 
 
 paper_ids = {
@@ -51,12 +50,12 @@ def update_scholar():
 
 def get_report(db):
     series = []
-    today = datetime.datetime.now()
+    last_update = epoch_to_datetime(db.lookup('last_updated_at', 'updates'))
     running = 0
     for row in db.query('SELECT year, citations FROM citations ORDER BY year'):
         year = row['year']
-        if year == today.year:
-            dt = today
+        if year == last_update.year:
+            dt = last_update
         else:
             dt = year_month_to_datetime(year, 12, False)
         running += row['citations']

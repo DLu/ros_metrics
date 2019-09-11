@@ -11,8 +11,13 @@ tables:
         - noun
         - verb
         - detail
+    repo_count:
+        - commit_id
+        - distro
+        - count
 special_types:
     id: int
     commit_id: int
     date: int
     change_index: int
+    count: int

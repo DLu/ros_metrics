@@ -6,7 +6,7 @@ import re
 from tqdm import tqdm
 import yaml
 
-from .constants import distros
+from .constants import distros, ros1_distros
 from .metric_db import MetricDB
 from .people import get_canonical_email
 from .reports import get_datetime_from_dict, ONE_WEEK
@@ -327,6 +327,66 @@ def classify_commit(repo, main_path, commit, commit_id):
         return commit_dict, None
 
 
+def count_repos(db, commit_id, commit):
+    try:
+        db.execute('DELETE FROM repo_count WHERE commit_id={}'.format(commit_id))
+
+        name_map = collections.defaultdict(set)
+        for folder in commit.tree.trees:
+            if folder.name in distros:
+                distro = folder.name
+                for filename in ['distribution.yaml', 'release.yaml', 'doc.yaml', 'source.yaml']:
+                    try:
+                        path = folder[filename]
+                    except KeyError:
+                        continue
+                    distro_dict = yaml.load(blob_contents(path))
+                    if not distro_dict.get('repositories'):
+                        continue
+                    these_names = set(distro_dict['repositories'].keys())
+                    name_map[distro].update(these_names)
+            elif folder.name == 'releases':
+                for sub_blob in folder.blobs:
+                    p = pathlib.Path(sub_blob.name)
+                    stem = p.stem.replace('-devel', '')
+                    if stem in distros:
+                        distro = stem
+                        distro_dict = yaml.load(blob_contents(sub_blob))
+                        if 'repositories' in distro_dict:
+                            names = set(distro_dict['repositories'].keys())
+                            name_map[distro].update(names)
+                        elif 'gbp-repos' in distro_dict:
+                            gbp = distro_dict['gbp-repos']
+                            if type(gbp) == list:
+                                names = set([x['name'] for x in gbp])
+                            else:
+                                print(gbp)
+                                exit(0)
+                            name_map[distro].update(names)
+                        else:
+                            print(distro_dict)
+                            exit(0)
+            elif folder.name == 'doc':
+                for distro_folder in folder.trees:
+                    if distro_folder.name not in distros:
+                        continue
+                    distro = distro_folder.name
+                    for filename in distro_folder.blobs:
+                        p = pathlib.Path(filename.name)
+                        if p.suffix == '.rosinstall':
+                            name_map[distro].add(p.stem)
+
+        all_names = set()
+        for name, name_set in name_map.items():
+            all_names.update(name_set)
+            db.insert('repo_count', {'commit_id': commit_id, 'distro': name, 'count': len(name_set)})
+        if all_names and set(name_map.keys()).intersection(set(ros1_distros)):
+            db.insert('repo_count', {'commit_id': commit_id, 'distro': 'all', 'count': len(all_names)})
+
+    except Exception as e:
+        print(e)
+
+
 def update_rosdistro():
     # Clone or update the repo in the cache
     repo = get_rosdistro_repo()
@@ -340,6 +400,7 @@ def update_rosdistro():
     try:
         main_path = set()
         already_classified = set(db.lookup_all('commit_id', 'changes'))
+        already_counted = set(db.lookup_all('commit_id', 'repo_count'))
 
         for commit_id, commit in enumerate(tqdm(commits)):
             main_path.add(commit.hexsha)
@@ -347,16 +408,19 @@ def update_rosdistro():
             n += 1
 
             # Check if already classified
-            if commit_id in already_classified:
+            if commit_id not in already_classified:
+                commit_dict, classifications = classify_commit(repo, main_path, commit, commit_id)
+                db.update('commits', commit_dict)
+                if classifications:
+                    new_matches += 1
+                    for classification in classifications:
+                        db.insert('changes', classification)
+            else:
                 matched += 1
-                continue
 
-            commit_dict, classifications = classify_commit(repo, main_path, commit, commit_id)
-            db.update('commits', commit_dict)
-            if classifications:
-                new_matches += 1
-                for classification in classifications:
-                    db.insert('changes', classification)
+            if commit_id not in already_counted and commit_id % 100 == 0:
+                count_repos(db, commit_id, commit)
+
     except KeyboardInterrupt:
         pass
     finally:
@@ -461,3 +525,15 @@ def get_people_ratio(db):
         counts[email] += 1
     return counts
     # https://www.zingchart.com/docs/chart-types/treemap
+
+
+def get_repo_report(db, resolution=ONE_WEEK):
+    series = collections.defaultdict(list)
+
+    for commit in db.query('SELECT date, commit_id, distro, count FROM commits INNER JOIN repo_count'
+                           ' ON commits.id = repo_count.commit_id ORDER BY date'):
+        dt = get_datetime_from_dict(commit, 'date')
+        key = commit['distro']
+        if not series[key] or (series[key][-1][-1] != commit['count'] and dt - series[key][-1][0] > resolution):
+            series[key].append((dt, commit['count']))
+    return series

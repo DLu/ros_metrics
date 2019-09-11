@@ -236,3 +236,15 @@ def get_rosdistro_people(rosdistro_db):
     chart.add('Total', total)
     chart.add('Active (six month window)', active)
     return chart
+
+
+def get_rosdistro_repos(rosdistro_repo):
+    series = rosdistro.get_repo_report(rosdistro_repo)
+    chart = Chart('line')
+    chart.add('All', series['all'])
+    for distro in distros:
+        if not series.get(distro):
+            continue
+        chart.add(distro, series[distro])
+    return chart
+

@@ -1,0 +1,23 @@
+tables:
+    repos:
+        - id
+        - key
+        - server
+        - org
+        - repo
+        - url
+    github_stats:
+        - id
+        - forks
+        - stars
+        - subs
+        - last_updated_at
+
+special_types:
+    key: text
+    server: text
+    org: text
+    repo: text
+    url: text
+
+default_type: int
