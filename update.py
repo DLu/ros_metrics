@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from ros_metrics.analytics import update_analytics
 from ros_metrics.answers import update_answers
 from ros_metrics.discourse import update_discourse

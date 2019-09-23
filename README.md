@@ -19,10 +19,24 @@
 ### [rosdistro](https://github.com/ros/rosdistro/)
  * Examines Github repo
  * Determines type of change for each commit
+ * Counts the number of repositories contained in the distributions per commit
+
+### Multi-Repo Stats
+ * Statistics based on the repositories listed in the rosdistro
+ * Scores github repositories based on stars, forks and subscribers.
+ * Gathers information on the issues/pull requests opened and closed.
+ * TODO:
+     * [ ] Determine number of packages per repository/commit
+     * [ ] General git stats
+        * Number of commits
+        * lines of code
+        * authors
+        * languages
 
 ### [Google Scholar Citations](https://scholar.google.com/citations?view_op=view_citation&citation_for_view=fMDLYCUAAAAJ:u5HHmVD_uO8C)
  * Uses resources from [`scholarly` Python library](https://github.com/OrganicIrradiation/scholarly)
  * Counts citations per year
+
 
 
 ## Privately Available
@@ -54,13 +68,7 @@ The following data sources can only be crawled via use of an API key (or other s
  * [ ] number of users
  * [ ] num pages
  * [ ] num edits
- * [ ] num wiki page views
+ * [*] num wiki page views
  * [ ] How are wiki edits spread across users?
  * [ ] How big are wiki edits?
  * [ ] Number of wiki tutorial pages under in any package
-
-
-### MultiVCS Github stats
- * [ ] Count repositories, packages
- * [ ] How many commits were made?
- * [ ] How many tickets were opened/closed?

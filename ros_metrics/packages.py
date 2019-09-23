@@ -197,7 +197,9 @@ def package_url_filter(url):
     return None
 
 
-def top_report(db, all_time_count=15, yearly_count=15):
+def top_report(db=None, all_time_count=15, yearly_count=15):
+    if db is None:
+        db = MetricDB('packages')
     return get_top_by_year(db, 'urls', 'url', 'hits', all_time_count=all_time_count, yearly_count=yearly_count,
                            ident_tranformer=package_url_filter)
 

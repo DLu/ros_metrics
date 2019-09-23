@@ -52,10 +52,33 @@ class MetricDB:
             print(params)
             exit(0)
 
-    def reset(self):
+    def rename_column(self, table, old_col, new_col):
+        """ Rename a column in a table """
+        cols = self.db_structure['tables'][table]
+        old_fields = ', '.join(cols)
+        cols[cols.index(old_col)] = new_col
+        new_fields = ', '.join(cols)
+
+        self.execute('ALTER TABLE {} RENAME TO {}_x'.format(table, table))
+        types = []
+        for key in cols:
+            tt = self.get_field_type(key)
+            if key == 'id':
+                tt += ' PRIMARY KEY'
+            types.append('%s %s' % (key, tt))
+        create_cmd = 'CREATE TABLE %s (%s)' % (table, ', '.join(types))
+        self.execute(create_cmd)
+        self.execute('INSERT INTO {}({}) SELECT {} FROM {}_x'.format(table, new_fields, old_fields, table))
+        self.execute('DROP TABLE {}_x'.format(table))
+
+    def reset(self, table=None):
         """ Clear all of the data out of the database and recreate the tables """
         db = self.raw_db.cursor()
-        for table in self.db_structure['tables']:
+        if table is None:
+            tables = list(self.db_structure['tables'].keys())
+        else:
+            tables = [table]
+        for table in tables:
             db.execute('DROP TABLE IF EXISTS %s' % table)
         self._update_database_structure()
 
@@ -118,7 +141,10 @@ class MetricDB:
     def update(self, table, row_dict, replace_key='id'):
         """ If there is a row where the specified field matches the row_dict's value of the field, update it.
             Otherwise, just insert it. """
-        clause = 'WHERE {}={}'.format(replace_key, self.format_value(replace_key, row_dict[replace_key]))
+        if isinstance(replace_key, str):
+            clause = 'WHERE {}={}'.format(replace_key, self.format_value(replace_key, row_dict[replace_key]))
+        else:
+            clause = 'WHERE {}'.format(' and '.join(['{}={}'.format(key, row_dict[key]) for key in replace_key]))
         if self.count(table, clause) == 0:
             # If no matches, just insert
             self.insert(table, row_dict)

@@ -1,45 +1,46 @@
+#!/usr/bin/env python3
+
 import collections
 from jinja2 import Environment, FileSystemLoader
 import pathlib
 from ros_metrics import charts
-from ros_metrics.metric_db import MetricDB
 from ros_metrics import analytics, answers, packages, repos
 from ros_metrics.constants import distros, os_list
 
 OUTPUT_FOLDER = pathlib.Path('docs')
 
-dbs = {}
-for name in ['discourse', 'answers', 'ros_users', 'packages', 'scholar', 'rosdistro', 'analytics', 'repos']:
-    dbs[name] = MetricDB(name)
-
 STRUCTURE = [
     {'name': 'Users',
      'filename': 'index.html',
-     'chart': charts.get_users_plot(dbs['discourse'], dbs['answers'], dbs['ros_users'], dbs['rosdistro']),
+     'chart': charts.get_users_plot,
      'caption': 'A collection of different metrics for measuring the number of users in the ROS community.'
      },
     {'name': 'Packages',
      'subpages': [
          {'name': 'Top',
           'template': 'top.html',
-          'tops': packages.top_report(dbs['packages']),
+          'tops': packages.top_report,
           'caption': 'Most downloaded packages via packages.ros.org, '
                      'and the most downloaded packages introduced in each year.'},
          {'name': 'ROS Distro',
-          'chart': charts.get_package_ratio_chart(dbs['packages'], 'rosdistro', distros),
+          'chart': charts.get_package_ratio_chart,
+          'args': ['rosdistro', distros],
           'caption': 'Relative usage of each distro based on downloads from packages.ros.org. '
                      'Note that data after late 2018 is not complete.'
           },
          {'name': 'Architecture',
-          'chart': charts.get_package_ratio_chart(dbs['packages'], 'arch'),
+          'chart': charts.get_package_ratio_chart,
+          'args': ['arch'],
           'caption': 'Chip architecture usage by packages.ros.org downloads.'
           },
          {'name': 'AptRepo',
-          'chart': charts.get_package_ratio_chart(dbs['packages'], 'apt_repo'),
+          'chart': charts.get_package_ratio_chart,
+          'args': ['apt_repo'],
           'caption': 'Apt-repo usage based on packages.ros.org downloads.'
           },
          {'name': 'Linux',
-          'chart': charts.get_package_ratio_chart(dbs['packages'], 'distro', os_list, 0.5),
+          'chart': charts.get_package_ratio_chart,
+          'args': ['distro', os_list, 0.5],
           'caption': 'Linux distro usage based on packages.ros.org downloads.'
           },
          # {'name': 'Library',
@@ -47,8 +48,8 @@ STRUCTURE = [
          #  },
          {'name': 'Country',
           'template': 'countries.html',
-          'chart': charts.get_package_country_chart(dbs['packages']),
-          'rankings': charts.get_package_country_list(dbs['packages']),
+          'chart': charts.get_package_country_chart,
+          'rankings': charts.get_package_country_list,
           'caption': 'Top ROS-using countries based on packages.ros.org downloads.'
           },
          # {'name': 'OS',
@@ -59,27 +60,28 @@ STRUCTURE = [
     {'name': 'ROS Distro',
      'subpages': [
          # {'name': 'Classification',
-         # 'chart': charts.get_rosdistro_plot(dbs['rosdistro'])},
+         # 'chart': charts.get_rosdistro_plot},
          {'name': 'ROS Distro',
-          'chart': charts.get_rosdistro_distros(dbs['rosdistro']),
+          'chart': charts.get_rosdistro_distros,
           'caption': 'Relative usage of ROS distros by commits to ros/rosdistro.'},
          {'name': 'Verbs',
-          'chart': charts.get_rosdistro_verbs(dbs['rosdistro']),
+          'chart': charts.get_rosdistro_verbs,
           'caption': 'Commits to ros/rosdistro by action-type'},
          {'name': 'Version',
-          'chart': charts.get_rosdistro_versions(dbs['rosdistro']),
+          'chart': charts.get_rosdistro_versions,
           'caption': 'Types of version bumps, by ros/rosdistro commits.'},
          {'name': 'Deps',
-          'chart': charts.get_rosdistro_deps(dbs['rosdistro']),
+          'chart': charts.get_rosdistro_deps,
           'caption': 'Types of dependencies added, measured by commits to ros/rosdistro.'},
          {'name': 'Number of Repos',
-          'chart': charts.get_rosdistro_repos(dbs['rosdistro']),
+          'chart': charts.get_rosdistro_repos,
           'caption': 'Number of repos in ros/rosdistro'
           },
          {'name': 'Github',
           'template': 'table.html',
-          'headers': ['rank', 'key', 'org', 'repo', 'forks', 'stars', 'subs'],
-          'table': repos.github_repos_report(dbs['repos']),
+          'headers': ['rank_product', 'key', 'org', 'repo', 'forks', 'stars', 'subs', 'open issues', 'closed issues',
+                      'total issues', 'open prs', 'merged prs', 'closed prs', 'total prs'],
+          'table': repos.github_repos_report,
           'caption': 'Github repos listed in ros/rosdistro, ranked by number of forks/stars/subscriptions'
           }
      ]
@@ -87,20 +89,20 @@ STRUCTURE = [
     {'name': 'Answers',
      'subpages': [
          {'name': 'Questions',
-          'chart': charts.get_questions_plot(dbs['answers']),
+          'chart': charts.get_questions_plot,
           'caption': 'Total number of questions, answers, questions with an accepted answer on answers.ros.org, '
                      'and the percent of questions with an accepted answer.'},
          {'name': 'Karma',
-          'chart': charts.get_karma_chart(dbs['answers']),
+          'chart': charts.get_karma_chart,
           'caption': 'Distribution of karma among answers.ros.org users.',
           },
          {'name': 'ROS Distro',
-          'chart': charts.get_answers_distro_chart(dbs['answers']),
+          'chart': charts.get_answers_distro_chart,
           'caption': 'Relative usage of ROS distros by question tags on answers.ros.org.'
           },
          {'name': 'Top Answerers',
           'template': 'top.html',
-          'tops': answers.get_top_users(dbs['answers']),
+          'tops': answers.get_top_users,
           'caption': 'Top answerers of questions on answers.ros.org, overall and by year.'
           }
      ]
@@ -108,7 +110,7 @@ STRUCTURE = [
     {'name': 'Misc',
      'subpages': [
          {'name': 'Analytics',
-          'chart': charts.get_analytics_totals_chart(dbs['analytics'], dbs['packages']),
+          'chart': charts.get_analytics_totals_chart,
           'caption': 'Relative traffic to key ROS websites as reported by Google Analytics '
                      '(and Apache logs for packages.ros.org)'
           },
@@ -117,16 +119,16 @@ STRUCTURE = [
          # }
          {'name': 'Wiki',
           'template': 'top.html',
-          'tops': analytics.top_wiki_report(dbs['analytics']),
+          'tops': analytics.top_wiki_report,
           'caption': 'Top wiki pages, as measured by Google Analytics, both overall and by year created.'
           },
          {'name': 'Emails',
-          'chart': charts.get_emails_plot(dbs['discourse'], dbs['ros_users']),
+          'chart': charts.get_emails_plot,
           'caption': 'Number of posts/threads on the two email platforms. '
                      'Note that answers.ros.org was introduced in early 2011.'
           },
          {'name': 'Citations',
-          'chart': charts.get_scholar_plot(dbs['scholar']),
+          'chart': charts.get_scholar_plot,
           'caption': 'Number of citations to "ROS: an open-source Robot Operating System"'
           }
      ]
@@ -150,7 +152,7 @@ for blob in STRUCTURE:
     else:
         submenu = collections.OrderedDict()
         for subpage in blob['subpages']:
-            filename = name.lower() + '_' + subpage['name'].lower().replace(' ', '') + '.html'
+            filename = name.lower().replace(' ', '') + '_' + subpage['name'].lower().replace(' ', '') + '.html'
             subpage['filename'] = filename
             submenu[filename] = subpage['name']
         blob['submenu'] = submenu
@@ -166,6 +168,9 @@ for blob in STRUCTURE:
         blob['level1'] = level1
         blob['menu'] = menu
         print(level1)
+        for key, value in blob.items():
+            if hasattr(value, '__call__'):
+                blob[key] = value(*blob.get('args', []))
         with open(OUTPUT_FOLDER / level1, 'w') as f:
             f.write(template.render(**blob))
     else:
@@ -173,6 +178,10 @@ for blob in STRUCTURE:
             template = j2_env.get_template(subpage.get('template', 'basic_chart.html'))
             level2 = subpage['filename']
             print(level2)
+
+            for key, value in subpage.items():
+                if hasattr(value, '__call__'):
+                    subpage[key] = value(*subpage.get('args', []))
             subpage['level1'] = level1
             subpage['level2'] = level2
             subpage['menu'] = menu

@@ -1,7 +1,7 @@
 from .rosdistro import get_rosdistro_repo, REPO_PATH
 from .constants import distros
 from .metric_db import MetricDB
-from .util import get_github_api, now_epoch
+from .util import get_github_api, now_epoch, epoch_to_datetime, datetime_to_epoch
 import pathlib
 import git
 import github
@@ -126,16 +126,24 @@ def update(repos):
         repo.remotes.origin.pull()
 
 
+def get_github_repos(db):
+    repos = {}
+    for repo_dict in db.query('SELECT id, org, repo FROM repos WHERE server="github.com"'):
+        repos[repo_dict['id']] = repo_dict
+    return repos
+
+
 def get_github_stats(db):
     existing_stats = db.lookup_all('id', 'github_stats')
-    repos = []
-    for repo_dict in db.query('SELECT id, org, repo FROM repos WHERE server="github.com"'):
-        if repo_dict['id'] not in existing_stats:
-            repos.append(repo_dict)
+    repos = get_github_repos(db)
+    to_crawl = []
+    for repo_id, repo_dict in repos.items():
+        if repo_id not in existing_stats:
+            to_crawl.append(repo_dict)
 
     gh = get_github_api()
     now = now_epoch()
-    for repo_dict in tqdm(repos, 'github stats'):
+    for repo_dict in tqdm(to_crawl, 'github stats'):
         try:
             repo = gh.get_repo('{org}/{repo}'.format(**repo_dict))
         except github.GithubException:
@@ -149,13 +157,99 @@ def get_github_stats(db):
         db.update('github_stats', row)
 
 
-def update_repos():
+def get_github_repo_issues(db, gh, repo_dict, last_updated_at):
+    try:
+        repo_str = '{org}/{repo}'.format(**repo_dict)
+        repo = gh.get_repo(repo_str)
+    except github.GithubException:
+        return
+
+    repo_id = repo_dict['id']
+    progress = None
+
+    if last_updated_at:
+        last_updated_dt = epoch_to_datetime(last_updated_at)
+    else:
+        last_updated_dt = github.GithubObject.NotSet
+
+    now = now_epoch()
+
+    # Actually covers prs and issues
+    # Note: Some PRs might get returned repeatedly if they are timestamped in the future relative to our timezone
+    for issue in repo.get_issues(state='all', since=last_updated_dt):
+        if progress is None and last_updated_at is None:
+            progress = tqdm(total=issue.number, desc=repo_str)
+
+        if progress:
+            progress.update()
+
+        entry = {'repo_id': repo_id, 'number': issue.number, 'username': issue.user.login, 'title': issue.title}
+        entry['created_at'] = datetime_to_epoch(issue.created_at)
+        if issue.pull_request:
+            entry['is_pr'] = True
+            pr = issue.as_pull_request()
+            if pr.merged:
+                entry['status'] = 'merged'
+                entry['closed_at'] = datetime_to_epoch(pr.merged_at)
+                if pr.merged_by:
+                    entry['closer'] = pr.merged_by.login
+            elif pr.state == 'closed':
+                entry['status'] = issue.state
+                entry['closed_at'] = datetime_to_epoch(pr.closed_at)
+                if issue.closed_by:
+                    entry['closer'] = issue.closed_by.login
+            else:
+                entry['status'] = issue.state
+
+        else:
+            entry['is_pr'] = False
+            entry['status'] = issue.state
+            if issue.state == 'closed':
+                entry['closed_at'] = datetime_to_epoch(issue.closed_at)
+                if issue.closed_by:
+                    entry['closer'] = issue.closed_by.login
+        db.update('github_issues', entry, ['repo_id', 'number'])
+
+    db.update('github_issues_updates', {'id': repo_id, 'last_updated_at': now})
+    if progress:
+        progress.close()
+
+
+def get_github_issues(db):
+    repos = get_github_repos(db)
+    to_crawl = []
+    now = now_epoch()
+
+    for repo_id, repo_dict in sorted(repos.items(), key=lambda d: (d[1]['org'], d[1]['repo'])):
+        last_updated_at = db.lookup('last_updated_at', 'github_issues_updates', f'WHERE id={repo_id}')
+
+        if last_updated_at:
+            if now - last_updated_at < 300000:
+                continue
+
+        to_crawl.append((repo_dict, last_updated_at))
+
+    gh = get_github_api()
+    print(gh.get_rate_limit())
+    for repo_dict, last_updated_at in tqdm(to_crawl, desc='Repos: GithubIssues'):
+        try:
+            get_github_repo_issues(db, gh, repo_dict, last_updated_at)
+        except github.RateLimitExceededException:
+            print('Github limit')
+            print(gh.get_rate_limit())
+            return
+
+
+def update_repos(local_repos=False, github_repos=True):
     db = MetricDB('repos')
     try:
-        get_repo_list(db)
-        repos = clone(db)
-        update(repos)
-        get_github_stats(db)
+        if local_repos:
+            get_repo_list(db)
+            repos = clone(db)
+            update(repos)
+        if github_repos:
+            get_github_stats(db)
+            get_github_issues(db)
     except KeyboardInterrupt:
         pass
     finally:
@@ -164,6 +258,7 @@ def update_repos():
 def github_stat_report(db):
     report = {}
     ranks = collections.defaultdict(collections.Counter)
+
     for repo_dict in db.query('SELECT id, forks, stars, subs from github_stats'):
         id = repo_dict['id']
         del repo_dict['id']
@@ -187,18 +282,91 @@ def github_stat_report(db):
             product *= value
             new_key = key[:-1] + '_rank'
             repo_dict[new_key] = value
-        repo_dict['rank'] = product
+        repo_dict['rank_product'] = product
+
     return report
 
 
-def github_repos_report(db):
+def get_issue_report(db):
+    issue_report = {}
+    for name, value in [('issues', 0), ('prs', 1)]:
+        statuses = ['open', 'closed']
+        if value == 1:
+            statuses.append('merged')
+        totals = collections.Counter()
+        for status in statuses:
+            clause = f'WHERE is_pr={value} AND status="{status}" GROUP BY repo_id'
+            matches = db.dict_lookup('repo_id', 'count(*)', 'github_issues', clause)
+            issue_report[f'{status} {name}'] = matches
+            for repo_id, n in matches.items():
+                totals[repo_id] += n
+        issue_report[f'total {name}'] = dict(totals)
+    return issue_report
+
+
+def github_repos_report(db=None):
+    if db is None:
+        db = MetricDB('repos')
     report = github_stat_report(db)
+    issue_report = get_issue_report(db)
     lines = []
     for repo_dict in sorted(db.query('SELECT id, key, org, repo FROM repos WHERE server="github.com"'),
                             key=lambda d: report.get(d['id'], {}).get('rank', 0)):
         id = repo_dict['id']
         if id not in report:
             continue
-        repo_dict.update(report[id])
+        for key in ['forks', 'stars', 'subs']:
+            repo_dict[key] = '{:04d} ({})'.format(report[id][key], report[id][key[:-1] + '_rank'])
+        repo_dict['rank_product'] = report[id]['rank_product']
+        for key in issue_report:
+            repo_dict[key] = issue_report[key].get(id, '')
         lines.append(repo_dict)
     return lines
+
+
+def get_open_data(db, repo_id, is_pr):
+    opens = []
+    closes = []
+
+    for entry in db.query('SELECT created_at, status, closed_at FROM github_issues '
+                          f'WHERE repo_id={repo_id} and is_pr={is_pr}'):
+        opens.append(entry['created_at'])
+        closed = entry['closed_at']
+        if closed:
+            closes.append(closed)
+    opens.sort()
+    closes.sort()
+
+    series = []
+    running = 0
+
+    while opens or closes:
+        if opens:
+            if closes:
+                ep = min(opens[0], closes[0])
+            else:
+                ep = opens[0]
+        else:
+            ep = closes[0]
+
+        dt = epoch_to_datetime(ep)
+        series.append((dt, running))
+
+        while opens and opens[0] == ep:
+            running += 1
+            opens.pop(0)
+
+        while closes and closes[0] == ep:
+            running -= 1
+            closes.pop(0)
+
+        series.append((dt, running))
+
+    last_updated_at = db.lookup('last_updated_at', 'github_issues_updates', f'WHERE id={repo_id}')
+    series.append((epoch_to_datetime(last_updated_at), running))
+
+    return series
+
+
+def get_issues_and_prs(db, repo_id):
+    return get_open_data(db, repo_id, 0), get_open_data(db, repo_id, 1)

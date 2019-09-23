@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 from ros_metrics.metric_db import MetricDB
 from tabulate import tabulate

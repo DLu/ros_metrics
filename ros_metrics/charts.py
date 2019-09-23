@@ -3,9 +3,10 @@ import copy
 import datetime
 import yaml
 
+from .metric_db import MetricDB
 from .reports import get_aggregate_series, get_unique_series, time_buckets, normalize_timepoints, get_series
 from .reports import get_email_plots, buckets_to_plot
-from . import analytics, answers, scholar, packages, rosdistro
+from . import analytics, answers, scholar, packages, rosdistro, repos
 from .constants import countries, distros
 
 from .util import get_manual_stats, VERSIONS
@@ -86,7 +87,11 @@ def bucket_plot(buckets, values=None, other_limit=None):
     return chart
 
 
-def get_users_plot(discourse_db, answers_db, users_db, rosdistro_db):
+def get_users_plot():
+    discourse_db = MetricDB('discourse')
+    answers_db = MetricDB('answers')
+    users_db = MetricDB('ros_users')
+    rosdistro_db = MetricDB('rosdistro')
     chart = Chart('line')
 
     manual = get_manual_stats('users subscribers')
@@ -106,7 +111,9 @@ def get_users_plot(discourse_db, answers_db, users_db, rosdistro_db):
     return chart
 
 
-def get_emails_plot(discourse_db, users_db):
+def get_emails_plot():
+    discourse_db = MetricDB('discourse')
+    users_db = MetricDB('ros_users')
     r_total, r_unique = get_email_plots(users_db)
     d_total, d_unique = get_email_plots(discourse_db)
 
@@ -119,11 +126,13 @@ def get_emails_plot(discourse_db, users_db):
     return chart
 
 
-def get_package_ratio_chart(packages_db, field, values=None, other_limit=None):
+def get_package_ratio_chart(field, values=None, other_limit=None):
+    packages_db = MetricDB('packages')
     return bucket_plot(packages.package_ratios(packages_db, field, values), values=values, other_limit=other_limit)
 
 
-def get_package_country_chart(packages_db):
+def get_package_country_chart():
+    packages_db = MetricDB('packages')
     cc_list, buckets = packages.get_package_buckets(packages_db, 'countries', 'cc')
     chart = Chart('bar', STACKED_BAR_OPTIONS)
     for cc, d_series in buckets.items():
@@ -132,7 +141,8 @@ def get_package_country_chart(packages_db):
     return chart
 
 
-def get_package_os_chart(packages_db):
+def get_package_os_chart():
+    packages_db = MetricDB('packages')
     cc_list, buckets = packages.get_package_buckets(packages_db, 'os', 'os')
     chart = Chart('bar', STACKED_BAR_OPTIONS)
     for name, d_series in buckets.items():
@@ -140,7 +150,8 @@ def get_package_os_chart(packages_db):
     return chart
 
 
-def get_package_country_list(packages_db):
+def get_package_country_list():
+    packages_db = MetricDB('packages')
     cc_list, _ = packages.get_package_buckets(packages_db, 'countries', 'cc')
     buckets = time_buckets(packages_db, 'countries', cc_list, 'year, month', 'cc', 'hits', months=False)
     rankings = {}
@@ -152,13 +163,15 @@ def get_package_country_list(packages_db):
     return rankings
 
 
-def get_scholar_plot(scholar_db):
+def get_scholar_plot():
+    scholar_db = MetricDB('scholar')
     chart = Chart('line')
     chart.add('Citations', scholar.get_report(scholar_db), fill=True)
     return chart
 
 
-def get_questions_plot(answers_db):
+def get_questions_plot():
+    answers_db = MetricDB('answers')
     chart = Chart('line')
     chart.add('Total Questions', get_aggregate_series(answers_db, 'questions', 'created_at'))
     chart.add('Total Answers', get_aggregate_series(answers_db, 'answers', 'created_at'))
@@ -170,7 +183,8 @@ def get_questions_plot(answers_db):
     return chart
 
 
-def get_karma_chart(answers_db):
+def get_karma_chart():
+    answers_db = MetricDB('answers')
     karma = answers.karma_report(answers_db)
 
     chart = Chart('horizontalBar', {})
@@ -179,7 +193,8 @@ def get_karma_chart(answers_db):
     return chart
 
 
-def get_answers_distro_chart(answers_db):
+def get_answers_distro_chart():
+    answers_db = MetricDB('answers')
     buckets = time_buckets(answers_db, 'questions INNER JOIN tags on tags.q_id = questions.id', distros,
                            'created_at', 'tag')
 
@@ -189,7 +204,9 @@ def get_answers_distro_chart(answers_db):
     return chart
 
 
-def get_analytics_totals_chart(analytics_db, packages_db):
+def get_analytics_totals_chart():
+    analytics_db = MetricDB('analytics')
+    packages_db = MetricDB('packages')
     chart = Chart('line')
     for name, d_series in analytics.get_total_series(analytics_db).items():
         chart.add(name, d_series)
@@ -197,7 +214,8 @@ def get_analytics_totals_chart(analytics_db, packages_db):
     return chart
 
 
-def get_analytics_country_chart(analytics_db):
+def get_analytics_country_chart():
+    analytics_db = MetricDB('analytics')
     chart = Chart('line')
     data = analytics.get_country_traffic(analytics_db)
     for cc, d_series in sorted(data.items(), key=lambda k: k[1][-1]['y'], reverse=True)[:10]:
@@ -207,29 +225,35 @@ def get_analytics_country_chart(analytics_db):
     return chart
 
 
-def get_rosdistro_plot(rosdistro_db):
+def get_rosdistro_plot():
+    rosdistro_db = MetricDB('rosdistro')
     chart = Chart('line')
     chart.add('Known Types', rosdistro.get_classification_ratio(rosdistro_db))
     return chart
 
 
-def get_rosdistro_verbs(rosdistro_db):
+def get_rosdistro_verbs():
+    rosdistro_db = MetricDB('rosdistro')
     return bucket_plot(rosdistro.get_verbs_ratio(rosdistro_db))
 
 
-def get_rosdistro_distros(rosdistro_db):
+def get_rosdistro_distros():
+    rosdistro_db = MetricDB('rosdistro')
     return bucket_plot(rosdistro.get_distro_action(rosdistro_db), distros)
 
 
-def get_rosdistro_versions(rosdistro_db):
+def get_rosdistro_versions():
+    rosdistro_db = MetricDB('rosdistro')
     return bucket_plot(rosdistro.get_version_changes(rosdistro_db), VERSIONS + ['other'])
 
 
-def get_rosdistro_deps(rosdistro_db):
+def get_rosdistro_deps():
+    rosdistro_db = MetricDB('rosdistro')
     return bucket_plot(rosdistro.get_dep_changes(rosdistro_db), other_limit=2.0)
 
 
-def get_rosdistro_people(rosdistro_db):
+def get_rosdistro_people():
+    rosdistro_db = MetricDB('rosdistro')
     chart = Chart('line')
     delta = datetime.timedelta(180)
     total, active = rosdistro.get_people_data(rosdistro_db, delta)
@@ -238,8 +262,9 @@ def get_rosdistro_people(rosdistro_db):
     return chart
 
 
-def get_rosdistro_repos(rosdistro_repo):
-    series = rosdistro.get_repo_report(rosdistro_repo)
+def get_rosdistro_repos():
+    rosdistro_db = MetricDB('rosdistro')
+    series = rosdistro.get_repo_report(rosdistro_db)
     chart = Chart('line')
     chart.add('All', series['all'])
     for distro in distros:

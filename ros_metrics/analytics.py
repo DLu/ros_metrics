@@ -182,7 +182,7 @@ def get_stats(service, db, profile_id, table, start_date, end_date):
     # Flush existing data (if any)
     base_flush = 'DELETE FROM {} WHERE profile_id={} and year={}'.format(table, profile_id, year)
     if table in MONTHLY_REPORTS:
-        base_flush += ' and month={}'.format(start_date[6:8])
+        base_flush += ' and month={}'.format(int(start_date[5:7]))
     db.execute(base_flush)
 
     # n = len(results)
@@ -276,7 +276,9 @@ def wiki_url_filter(url):
     return url.replace('action/show/', '')
 
 
-def top_wiki_report(db):
+def top_wiki_report(db=None):
+    if db is None:
+        db = MetricDB('analytics')
     profile_id = db.lookup('id', 'profiles', 'WHERE name="wiki.ros.org"')
     return get_top_by_year(db, 'url_views', 'url', 'pageviews', 'WHERE profile_id={}'.format(profile_id),
                            ident_tranformer=wiki_url_filter)

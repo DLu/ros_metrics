@@ -51,6 +51,16 @@ body {
     color: #232e4a;
 }
 
+#gh {
+    padding: 0px 0px;
+    float: right;
+}
+
+#gh:hover {
+    background: #515D7A;
+}
+
+
 .caption {
     bottom: 0;
     width: 100%;

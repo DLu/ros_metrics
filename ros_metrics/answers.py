@@ -248,7 +248,9 @@ def karma_report(db):
     return report
 
 
-def get_top_users(db, all_time_count=15, yearly_count=15, by_votes=False):
+def get_top_users(db=None, all_time_count=15, yearly_count=15, by_votes=False):
+    if db is None:
+        db = MetricDB('answers')
     totals = collections.Counter()
     per_year = collections.defaultdict(collections.Counter)
 

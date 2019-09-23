@@ -13,6 +13,7 @@
         {%- for link, text in menu.items() %}
         <a href="{{link}}" {% if link == level1 %}class="nav_selected"{% endif %}>{{text}}</a>
         {%- endfor %}
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="ghw.png" alt="github" /></a>
     </div>
     {%- if submenu %}
     <div class="navbar navbar1">
