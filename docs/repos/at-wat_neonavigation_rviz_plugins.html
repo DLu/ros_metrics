@@ -1,0 +1,175 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>at-wat/neonavigation_rviz_plugins - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2018-12-20T22:19:36",
+"y": 0
+},
+{
+"x": "2018-12-20T22:19:36",
+"y": 1
+},
+{
+"x": "2019-01-06T21:48:23",
+"y": 1
+},
+{
+"x": "2019-01-06T21:48:23",
+"y": 2
+},
+{
+"x": "2019-01-07T00:20:46",
+"y": 2
+},
+{
+"x": "2019-01-07T00:20:46",
+"y": 1
+},
+{
+"x": "2019-01-16T06:03:58",
+"y": 1
+},
+{
+"x": "2019-01-16T06:03:58",
+"y": 0
+},
+{
+"x": "2019-09-28T11:51:28",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2018-12-10T02:54:49",
+"y": 0
+},
+{
+"x": "2018-12-10T02:54:49",
+"y": 1
+},
+{
+"x": "2018-12-20T23:18:22",
+"y": 1
+},
+{
+"x": "2018-12-20T23:18:22",
+"y": 0
+},
+{
+"x": "2018-12-20T23:23:02",
+"y": 0
+},
+{
+"x": "2018-12-20T23:23:02",
+"y": 1
+},
+{
+"x": "2018-12-21T01:44:47",
+"y": 1
+},
+{
+"x": "2018-12-21T01:44:47",
+"y": 0
+},
+{
+"x": "2019-01-06T22:25:46",
+"y": 0
+},
+{
+"x": "2019-01-06T22:25:46",
+"y": 1
+},
+{
+"x": "2019-01-07T00:20:46",
+"y": 1
+},
+{
+"x": "2019-01-07T00:20:46",
+"y": 0
+},
+{
+"x": "2019-06-07T21:55:06",
+"y": 0
+},
+{
+"x": "2019-06-07T21:55:06",
+"y": 1
+},
+{
+"x": "2019-06-07T22:18:56",
+"y": 1
+},
+{
+"x": "2019-06-07T22:18:56",
+"y": 0
+},
+{
+"x": "2019-09-28T11:51:28",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "at-wat/neonavigation_rviz_plugins Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

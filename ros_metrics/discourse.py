@@ -1,18 +1,21 @@
 import requests
 import time
 from tqdm import tqdm
-import yaml
 
 from .metric_db import MetricDB
-from .util import now_epoch, key_subset
+from .util import now_epoch, key_subset, get_keys
 
-
-config = yaml.load(open('keys.yaml'))['discourse']
+config = None
 
 
 def fetch_page(path, params=None, debug=False):
+    global config
     if params is None:
         params = {}
+
+    if config is None:
+        config = get_keys()['discourse']
+
     params['api_key'] = config['key']
     params['api_username'] = config['user']
     url = config['host'] + path

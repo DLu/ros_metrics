@@ -1,0 +1,199 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>pr2/pr2_self_test - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2013-07-24T01:09:08",
+"y": 0
+},
+{
+"x": "2013-07-24T01:09:08",
+"y": 1
+},
+{
+"x": "2013-07-24T01:12:50",
+"y": 1
+},
+{
+"x": "2013-07-24T01:12:50",
+"y": 2
+},
+{
+"x": "2013-09-09T14:18:05",
+"y": 2
+},
+{
+"x": "2013-09-09T14:18:05",
+"y": 1
+},
+{
+"x": "2014-11-28T01:48:09",
+"y": 1
+},
+{
+"x": "2014-11-28T01:48:09",
+"y": 0
+},
+{
+"x": "2014-11-28T02:06:16",
+"y": 0
+},
+{
+"x": "2014-11-28T02:06:16",
+"y": 1
+},
+{
+"x": "2014-11-28T02:06:19",
+"y": 1
+},
+{
+"x": "2014-11-28T02:06:19",
+"y": 0
+},
+{
+"x": "2019-02-20T21:08:53",
+"y": 0
+},
+{
+"x": "2019-02-20T21:08:53",
+"y": 1
+},
+{
+"x": "2019-09-27T08:45:40",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2017-10-27T18:01:27",
+"y": 0
+},
+{
+"x": "2017-10-27T18:01:27",
+"y": 1
+},
+{
+"x": "2017-10-27T22:51:15",
+"y": 1
+},
+{
+"x": "2017-10-27T22:51:15",
+"y": 0
+},
+{
+"x": "2018-03-10T00:55:04",
+"y": 0
+},
+{
+"x": "2018-03-10T00:55:04",
+"y": 1
+},
+{
+"x": "2018-09-19T15:17:31",
+"y": 1
+},
+{
+"x": "2018-09-19T15:17:31",
+"y": 0
+},
+{
+"x": "2019-04-02T01:28:51",
+"y": 0
+},
+{
+"x": "2019-04-02T01:28:51",
+"y": 1
+},
+{
+"x": "2019-04-02T06:47:29",
+"y": 1
+},
+{
+"x": "2019-04-02T06:47:29",
+"y": 0
+},
+{
+"x": "2019-04-05T08:55:23",
+"y": 0
+},
+{
+"x": "2019-04-05T08:55:23",
+"y": 1
+},
+{
+"x": "2019-04-24T07:47:46",
+"y": 1
+},
+{
+"x": "2019-04-24T07:47:46",
+"y": 0
+},
+{
+"x": "2019-09-27T08:45:40",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "pr2/pr2_self_test Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

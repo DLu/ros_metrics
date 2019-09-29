@@ -1,0 +1,127 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>cyborg-x1/x52_joyext - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2013-12-27T02:49:52",
+"y": 0
+},
+{
+"x": "2013-12-27T02:49:52",
+"y": 1
+},
+{
+"x": "2013-12-27T09:21:29",
+"y": 1
+},
+{
+"x": "2013-12-27T09:21:29",
+"y": 0
+},
+{
+"x": "2013-12-27T10:25:37",
+"y": 0
+},
+{
+"x": "2013-12-27T10:25:37",
+"y": 1
+},
+{
+"x": "2013-12-27T10:26:23",
+"y": 1
+},
+{
+"x": "2013-12-27T10:26:23",
+"y": 2
+},
+{
+"x": "2019-09-28T11:51:55",
+"y": 2
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2014-01-18T13:35:02",
+"y": 0
+},
+{
+"x": "2014-01-18T13:35:02",
+"y": 1
+},
+{
+"x": "2014-01-18T13:35:15",
+"y": 1
+},
+{
+"x": "2014-01-18T13:35:15",
+"y": 0
+},
+{
+"x": "2019-09-28T11:51:55",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "cyborg-x1/x52_joyext Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

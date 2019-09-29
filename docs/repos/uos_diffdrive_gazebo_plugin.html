@@ -1,0 +1,295 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>uos/diffdrive_gazebo_plugin - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2019-05-07T10:06:54",
+"y": 0
+},
+{
+"x": "2019-05-07T10:06:54",
+"y": 1
+},
+{
+"x": "2019-09-27T09:23:31",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2014-03-11T05:52:11",
+"y": 0
+},
+{
+"x": "2014-03-11T05:52:11",
+"y": 1
+},
+{
+"x": "2014-03-11T06:12:01",
+"y": 1
+},
+{
+"x": "2014-03-11T06:12:01",
+"y": 0
+},
+{
+"x": "2014-07-30T03:21:00",
+"y": 0
+},
+{
+"x": "2014-07-30T03:21:00",
+"y": 1
+},
+{
+"x": "2014-07-31T08:37:39",
+"y": 1
+},
+{
+"x": "2014-07-31T08:37:39",
+"y": 0
+},
+{
+"x": "2014-08-04T06:25:20",
+"y": 0
+},
+{
+"x": "2014-08-04T06:25:20",
+"y": 1
+},
+{
+"x": "2014-08-04T06:27:35",
+"y": 1
+},
+{
+"x": "2014-08-04T06:27:35",
+"y": 0
+},
+{
+"x": "2014-08-04T06:51:15",
+"y": 0
+},
+{
+"x": "2014-08-04T06:51:15",
+"y": 1
+},
+{
+"x": "2014-08-07T05:05:30",
+"y": 1
+},
+{
+"x": "2014-08-07T05:05:30",
+"y": 0
+},
+{
+"x": "2014-08-29T11:31:58",
+"y": 0
+},
+{
+"x": "2014-08-29T11:31:58",
+"y": 1
+},
+{
+"x": "2014-08-30T07:55:09",
+"y": 1
+},
+{
+"x": "2014-08-30T07:55:09",
+"y": 0
+},
+{
+"x": "2015-03-25T19:21:47",
+"y": 0
+},
+{
+"x": "2015-03-25T19:21:47",
+"y": 1
+},
+{
+"x": "2015-03-25T19:22:45",
+"y": 1
+},
+{
+"x": "2015-03-25T19:22:45",
+"y": 0
+},
+{
+"x": "2015-10-09T12:29:44",
+"y": 0
+},
+{
+"x": "2015-10-09T12:29:44",
+"y": 1
+},
+{
+"x": "2015-10-09T12:33:03",
+"y": 1
+},
+{
+"x": "2015-10-09T12:33:03",
+"y": 0
+},
+{
+"x": "2016-06-21T05:24:49",
+"y": 0
+},
+{
+"x": "2016-06-21T05:24:49",
+"y": 1
+},
+{
+"x": "2016-06-21T05:36:18",
+"y": 1
+},
+{
+"x": "2016-06-21T05:36:18",
+"y": 2
+},
+{
+"x": "2016-06-21T05:37:29",
+"y": 2
+},
+{
+"x": "2016-06-21T05:37:29",
+"y": 1
+},
+{
+"x": "2016-06-21T05:50:57",
+"y": 1
+},
+{
+"x": "2016-06-21T05:50:57",
+"y": 0
+},
+{
+"x": "2016-06-21T05:54:21",
+"y": 0
+},
+{
+"x": "2016-06-21T05:54:21",
+"y": 1
+},
+{
+"x": "2016-06-21T06:08:55",
+"y": 1
+},
+{
+"x": "2016-06-21T06:08:55",
+"y": 0
+},
+{
+"x": "2017-10-21T10:46:48",
+"y": 0
+},
+{
+"x": "2017-10-21T10:46:48",
+"y": 1
+},
+{
+"x": "2017-10-21T10:56:24",
+"y": 1
+},
+{
+"x": "2017-10-21T10:56:24",
+"y": 0
+},
+{
+"x": "2017-10-21T11:05:43",
+"y": 0
+},
+{
+"x": "2017-10-21T11:05:43",
+"y": 1
+},
+{
+"x": "2017-10-23T07:57:44",
+"y": 1
+},
+{
+"x": "2017-10-23T07:57:44",
+"y": 0
+},
+{
+"x": "2018-05-30T05:27:33",
+"y": 0
+},
+{
+"x": "2018-05-30T05:27:33",
+"y": 1
+},
+{
+"x": "2018-05-30T06:06:04",
+"y": 1
+},
+{
+"x": "2018-05-30T06:06:04",
+"y": 0
+},
+{
+"x": "2019-09-27T09:23:31",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "uos/diffdrive_gazebo_plugin Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

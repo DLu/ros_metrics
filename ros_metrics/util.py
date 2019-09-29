@@ -159,6 +159,16 @@ def get_manual_stats(field):
             return values
 
 
+KEYS = None
+
+
+def get_keys():
+    global KEYS
+    if KEYS is None:
+        KEYS = yaml.load(open('keys.yaml'))
+    return KEYS
+
+
 def get_github_api():
     github_token = None
     for filename in [os.path.expanduser('~/.git-tokens'), 'keys.yaml']:

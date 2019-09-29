@@ -1,0 +1,343 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>ros-visualization/oculus_rviz_plugins - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2013-07-11T14:21:46",
+"y": 0
+},
+{
+"x": "2013-07-11T14:21:46",
+"y": 1
+},
+{
+"x": "2013-07-11T14:22:51",
+"y": 1
+},
+{
+"x": "2013-07-11T14:22:51",
+"y": 2
+},
+{
+"x": "2013-07-11T14:24:07",
+"y": 2
+},
+{
+"x": "2013-07-11T14:24:07",
+"y": 3
+},
+{
+"x": "2013-07-11T14:26:04",
+"y": 3
+},
+{
+"x": "2013-07-11T14:26:04",
+"y": 4
+},
+{
+"x": "2013-07-11T14:28:51",
+"y": 4
+},
+{
+"x": "2013-07-11T14:28:51",
+"y": 5
+},
+{
+"x": "2013-07-11T18:34:59",
+"y": 5
+},
+{
+"x": "2013-07-11T18:34:59",
+"y": 6
+},
+{
+"x": "2013-07-11T18:36:11",
+"y": 6
+},
+{
+"x": "2013-07-11T18:36:11",
+"y": 7
+},
+{
+"x": "2013-07-12T20:53:06",
+"y": 7
+},
+{
+"x": "2013-07-12T20:53:06",
+"y": 8
+},
+{
+"x": "2013-08-04T04:33:04",
+"y": 8
+},
+{
+"x": "2013-08-04T04:33:04",
+"y": 9
+},
+{
+"x": "2013-08-12T17:43:59",
+"y": 9
+},
+{
+"x": "2013-08-12T17:43:59",
+"y": 10
+},
+{
+"x": "2013-08-12T19:17:54",
+"y": 10
+},
+{
+"x": "2013-08-12T19:17:54",
+"y": 9
+},
+{
+"x": "2013-08-12T19:18:05",
+"y": 9
+},
+{
+"x": "2013-08-12T19:18:05",
+"y": 8
+},
+{
+"x": "2013-08-12T19:29:12",
+"y": 8
+},
+{
+"x": "2013-08-12T19:29:12",
+"y": 7
+},
+{
+"x": "2013-08-12T19:29:32",
+"y": 7
+},
+{
+"x": "2013-08-12T19:29:32",
+"y": 6
+},
+{
+"x": "2013-08-12T19:29:55",
+"y": 6
+},
+{
+"x": "2013-08-12T19:29:55",
+"y": 5
+},
+{
+"x": "2013-08-14T00:20:57",
+"y": 5
+},
+{
+"x": "2013-08-14T00:20:57",
+"y": 6
+},
+{
+"x": "2013-08-14T02:43:57",
+"y": 6
+},
+{
+"x": "2013-08-14T02:43:57",
+"y": 5
+},
+{
+"x": "2014-02-14T13:10:09",
+"y": 5
+},
+{
+"x": "2014-02-14T13:10:09",
+"y": 6
+},
+{
+"x": "2014-02-26T18:05:23",
+"y": 6
+},
+{
+"x": "2014-02-26T18:05:23",
+"y": 7
+},
+{
+"x": "2014-03-19T05:42:40",
+"y": 7
+},
+{
+"x": "2014-03-19T05:42:40",
+"y": 6
+},
+{
+"x": "2014-06-12T14:27:09",
+"y": 6
+},
+{
+"x": "2014-06-12T14:27:09",
+"y": 7
+},
+{
+"x": "2014-10-04T16:05:37",
+"y": 7
+},
+{
+"x": "2014-10-04T16:05:37",
+"y": 8
+},
+{
+"x": "2014-10-31T15:02:10",
+"y": 8
+},
+{
+"x": "2014-10-31T15:02:10",
+"y": 7
+},
+{
+"x": "2014-11-26T03:46:27",
+"y": 7
+},
+{
+"x": "2014-11-26T03:46:27",
+"y": 8
+},
+{
+"x": "2014-12-12T08:07:41",
+"y": 8
+},
+{
+"x": "2014-12-12T08:07:41",
+"y": 9
+},
+{
+"x": "2015-02-11T12:52:31",
+"y": 9
+},
+{
+"x": "2015-02-11T12:52:31",
+"y": 10
+},
+{
+"x": "2019-05-22T06:31:00",
+"y": 10
+},
+{
+"x": "2019-05-22T06:31:00",
+"y": 5
+},
+{
+"x": "2019-09-27T09:19:49",
+"y": 5
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2013-08-07T05:22:53",
+"y": 0
+},
+{
+"x": "2013-08-07T05:22:53",
+"y": 1
+},
+{
+"x": "2013-08-12T14:29:40",
+"y": 1
+},
+{
+"x": "2013-08-12T14:29:40",
+"y": 0
+},
+{
+"x": "2014-03-01T11:21:40",
+"y": 0
+},
+{
+"x": "2014-03-01T11:21:40",
+"y": 1
+},
+{
+"x": "2014-03-19T05:42:40",
+"y": 1
+},
+{
+"x": "2014-03-19T05:42:40",
+"y": 0
+},
+{
+"x": "2014-09-02T09:53:58",
+"y": 0
+},
+{
+"x": "2014-09-02T09:53:58",
+"y": 1
+},
+{
+"x": "2014-09-09T15:53:58",
+"y": 1
+},
+{
+"x": "2014-09-09T15:53:58",
+"y": 0
+},
+{
+"x": "2019-09-27T09:19:49",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "ros-visualization/oculus_rviz_plugins Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

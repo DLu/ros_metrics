@@ -1,0 +1,335 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>robotis-git/robotis_manipulator - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2019-09-28T11:54:51",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2018-11-13T21:53:07",
+"y": 0
+},
+{
+"x": "2018-11-13T21:53:07",
+"y": 1
+},
+{
+"x": "2018-11-13T23:54:16",
+"y": 1
+},
+{
+"x": "2018-11-13T23:54:16",
+"y": 0
+},
+{
+"x": "2018-11-14T03:15:47",
+"y": 0
+},
+{
+"x": "2018-11-14T03:15:47",
+"y": 1
+},
+{
+"x": "2018-11-15T23:57:53",
+"y": 1
+},
+{
+"x": "2018-11-15T23:57:53",
+"y": 0
+},
+{
+"x": "2018-11-20T07:36:47",
+"y": 0
+},
+{
+"x": "2018-11-20T07:36:47",
+"y": 1
+},
+{
+"x": "2018-11-20T07:37:43",
+"y": 1
+},
+{
+"x": "2018-11-20T07:37:43",
+"y": 0
+},
+{
+"x": "2018-11-20T07:43:45",
+"y": 0
+},
+{
+"x": "2018-11-20T07:43:45",
+"y": 1
+},
+{
+"x": "2018-11-20T07:43:50",
+"y": 1
+},
+{
+"x": "2018-11-20T07:43:50",
+"y": 0
+},
+{
+"x": "2018-11-28T21:39:23",
+"y": 0
+},
+{
+"x": "2018-11-28T21:39:23",
+"y": 1
+},
+{
+"x": "2018-11-29T02:19:13",
+"y": 1
+},
+{
+"x": "2018-11-29T02:19:13",
+"y": 0
+},
+{
+"x": "2018-12-02T20:58:13",
+"y": 0
+},
+{
+"x": "2018-12-02T20:58:13",
+"y": 1
+},
+{
+"x": "2018-12-02T20:58:24",
+"y": 1
+},
+{
+"x": "2018-12-02T20:58:24",
+"y": 0
+},
+{
+"x": "2018-12-12T07:42:30",
+"y": 0
+},
+{
+"x": "2018-12-12T07:42:30",
+"y": 1
+},
+{
+"x": "2018-12-12T07:42:53",
+"y": 1
+},
+{
+"x": "2018-12-12T07:42:53",
+"y": 0
+},
+{
+"x": "2019-01-20T21:29:10",
+"y": 0
+},
+{
+"x": "2019-01-20T21:29:10",
+"y": 1
+},
+{
+"x": "2019-01-28T23:26:40",
+"y": 1
+},
+{
+"x": "2019-01-28T23:26:40",
+"y": 2
+},
+{
+"x": "2019-01-28T23:31:55",
+"y": 2
+},
+{
+"x": "2019-01-28T23:31:55",
+"y": 1
+},
+{
+"x": "2019-01-31T01:12:49",
+"y": 1
+},
+{
+"x": "2019-01-31T01:12:49",
+"y": 0
+},
+{
+"x": "2019-01-31T01:28:53",
+"y": 0
+},
+{
+"x": "2019-01-31T01:28:53",
+"y": 1
+},
+{
+"x": "2019-01-31T03:22:36",
+"y": 1
+},
+{
+"x": "2019-01-31T03:22:36",
+"y": 0
+},
+{
+"x": "2019-02-11T03:21:35",
+"y": 0
+},
+{
+"x": "2019-02-11T03:21:35",
+"y": 1
+},
+{
+"x": "2019-02-11T03:42:09",
+"y": 1
+},
+{
+"x": "2019-02-11T03:42:09",
+"y": 0
+},
+{
+"x": "2019-03-05T20:11:51",
+"y": 0
+},
+{
+"x": "2019-03-05T20:11:51",
+"y": 1
+},
+{
+"x": "2019-03-05T20:12:10",
+"y": 1
+},
+{
+"x": "2019-03-05T20:12:10",
+"y": 0
+},
+{
+"x": "2019-05-09T07:25:37",
+"y": 0
+},
+{
+"x": "2019-05-09T07:25:37",
+"y": 1
+},
+{
+"x": "2019-05-12T21:13:26",
+"y": 1
+},
+{
+"x": "2019-05-12T21:13:26",
+"y": 0
+},
+{
+"x": "2019-08-21T23:30:45",
+"y": 0
+},
+{
+"x": "2019-08-21T23:30:45",
+"y": 1
+},
+{
+"x": "2019-08-21T23:30:51",
+"y": 1
+},
+{
+"x": "2019-08-21T23:30:51",
+"y": 0
+},
+{
+"x": "2019-08-22T00:09:09",
+"y": 0
+},
+{
+"x": "2019-08-22T00:09:09",
+"y": 1
+},
+{
+"x": "2019-08-22T00:09:14",
+"y": 1
+},
+{
+"x": "2019-08-22T00:09:14",
+"y": 0
+},
+{
+"x": "2019-09-01T22:25:18",
+"y": 0
+},
+{
+"x": "2019-09-01T22:25:18",
+"y": 1
+},
+{
+"x": "2019-09-01T22:44:09",
+"y": 1
+},
+{
+"x": "2019-09-01T22:44:09",
+"y": 0
+},
+{
+"x": "2019-09-28T11:54:51",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "robotis-git/robotis_manipulator Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

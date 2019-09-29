@@ -1,0 +1,255 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>delftrobotics/camera_pose_calibration - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2016-02-16T03:42:56",
+"y": 0
+},
+{
+"x": "2016-02-16T03:42:56",
+"y": 1
+},
+{
+"x": "2016-02-22T07:47:49",
+"y": 1
+},
+{
+"x": "2016-02-22T07:47:49",
+"y": 0
+},
+{
+"x": "2016-06-22T12:52:58",
+"y": 0
+},
+{
+"x": "2016-06-22T12:52:58",
+"y": 1
+},
+{
+"x": "2016-06-22T13:03:57",
+"y": 1
+},
+{
+"x": "2016-06-22T13:03:57",
+"y": 0
+},
+{
+"x": "2017-03-29T10:32:24",
+"y": 0
+},
+{
+"x": "2017-03-29T10:32:24",
+"y": 1
+},
+{
+"x": "2017-04-05T11:22:46",
+"y": 1
+},
+{
+"x": "2017-04-05T11:22:46",
+"y": 2
+},
+{
+"x": "2017-04-25T15:54:55",
+"y": 2
+},
+{
+"x": "2017-04-25T15:54:55",
+"y": 1
+},
+{
+"x": "2017-11-22T03:36:08",
+"y": 1
+},
+{
+"x": "2017-11-22T03:36:08",
+"y": 2
+},
+{
+"x": "2017-11-26T21:25:21",
+"y": 2
+},
+{
+"x": "2017-11-26T21:25:21",
+"y": 1
+},
+{
+"x": "2019-01-29T15:23:13",
+"y": 1
+},
+{
+"x": "2019-01-29T15:23:13",
+"y": 2
+},
+{
+"x": "2019-06-11T08:57:40",
+"y": 2
+},
+{
+"x": "2019-06-11T08:57:40",
+"y": 3
+},
+{
+"x": "2019-06-12T07:29:17",
+"y": 3
+},
+{
+"x": "2019-06-12T07:29:17",
+"y": 2
+},
+{
+"x": "2019-09-28T11:51:59",
+"y": 2
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2017-02-07T10:21:09",
+"y": 0
+},
+{
+"x": "2017-02-07T10:21:09",
+"y": 1
+},
+{
+"x": "2017-02-08T09:35:43",
+"y": 1
+},
+{
+"x": "2017-02-08T09:35:43",
+"y": 0
+},
+{
+"x": "2017-03-30T07:59:13",
+"y": 0
+},
+{
+"x": "2017-03-30T07:59:13",
+"y": 1
+},
+{
+"x": "2017-04-10T20:02:48",
+"y": 1
+},
+{
+"x": "2017-04-10T20:02:48",
+"y": 2
+},
+{
+"x": "2017-04-25T15:51:28",
+"y": 2
+},
+{
+"x": "2017-04-25T15:51:28",
+"y": 1
+},
+{
+"x": "2017-10-30T06:37:24",
+"y": 1
+},
+{
+"x": "2017-10-30T06:37:24",
+"y": 2
+},
+{
+"x": "2017-10-30T10:23:07",
+"y": 2
+},
+{
+"x": "2017-10-30T10:23:07",
+"y": 1
+},
+{
+"x": "2019-04-26T08:53:08",
+"y": 1
+},
+{
+"x": "2019-04-26T08:53:08",
+"y": 0
+},
+{
+"x": "2019-09-07T01:47:19",
+"y": 0
+},
+{
+"x": "2019-09-07T01:47:19",
+"y": 1
+},
+{
+"x": "2019-09-09T05:21:39",
+"y": 1
+},
+{
+"x": "2019-09-09T05:21:39",
+"y": 0
+},
+{
+"x": "2019-09-28T11:51:59",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "delftrobotics/camera_pose_calibration Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

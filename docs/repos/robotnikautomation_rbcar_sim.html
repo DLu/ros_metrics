@@ -1,0 +1,223 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>robotnikautomation/rbcar_sim - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2016-09-28T07:52:16",
+"y": 0
+},
+{
+"x": "2016-09-28T07:52:16",
+"y": 1
+},
+{
+"x": "2017-03-09T17:05:13",
+"y": 1
+},
+{
+"x": "2017-03-09T17:05:13",
+"y": 2
+},
+{
+"x": "2017-06-05T22:24:28",
+"y": 2
+},
+{
+"x": "2017-06-05T22:24:28",
+"y": 3
+},
+{
+"x": "2017-06-14T07:30:20",
+"y": 3
+},
+{
+"x": "2017-06-14T07:30:20",
+"y": 2
+},
+{
+"x": "2017-06-14T14:56:30",
+"y": 2
+},
+{
+"x": "2017-06-14T14:56:30",
+"y": 1
+},
+{
+"x": "2017-06-15T17:50:25",
+"y": 1
+},
+{
+"x": "2017-06-15T17:50:25",
+"y": 2
+},
+{
+"x": "2017-07-04T23:15:16",
+"y": 2
+},
+{
+"x": "2017-07-04T23:15:16",
+"y": 3
+},
+{
+"x": "2018-02-03T21:20:28",
+"y": 3
+},
+{
+"x": "2018-02-03T21:20:28",
+"y": 4
+},
+{
+"x": "2018-05-11T05:34:09",
+"y": 4
+},
+{
+"x": "2018-05-11T05:34:09",
+"y": 5
+},
+{
+"x": "2019-01-03T06:14:34",
+"y": 5
+},
+{
+"x": "2019-01-03T06:14:34",
+"y": 6
+},
+{
+"x": "2019-02-12T09:22:29",
+"y": 6
+},
+{
+"x": "2019-02-12T09:22:29",
+"y": 7
+},
+{
+"x": "2019-09-28T11:54:57",
+"y": 7
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2016-07-13T03:53:05",
+"y": 0
+},
+{
+"x": "2016-07-13T03:53:05",
+"y": 1
+},
+{
+"x": "2016-07-13T03:53:09",
+"y": 1
+},
+{
+"x": "2016-07-13T03:53:09",
+"y": 0
+},
+{
+"x": "2016-07-15T01:39:25",
+"y": 0
+},
+{
+"x": "2016-07-15T01:39:25",
+"y": 1
+},
+{
+"x": "2016-07-15T01:39:28",
+"y": 1
+},
+{
+"x": "2016-07-15T01:39:28",
+"y": 0
+},
+{
+"x": "2017-06-06T20:03:14",
+"y": 0
+},
+{
+"x": "2017-06-06T20:03:14",
+"y": 1
+},
+{
+"x": "2017-06-14T07:18:07",
+"y": 1
+},
+{
+"x": "2017-06-14T07:18:07",
+"y": 0
+},
+{
+"x": "2018-11-15T04:43:56",
+"y": 0
+},
+{
+"x": "2018-11-15T04:43:56",
+"y": 1
+},
+{
+"x": "2019-09-28T11:54:57",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "robotnikautomation/rbcar_sim Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

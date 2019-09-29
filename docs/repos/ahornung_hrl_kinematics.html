@@ -1,0 +1,151 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>ahornung/hrl_kinematics - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2014-05-28T01:45:43",
+"y": 0
+},
+{
+"x": "2014-05-28T01:45:43",
+"y": 1
+},
+{
+"x": "2014-05-28T04:18:32",
+"y": 1
+},
+{
+"x": "2014-05-28T04:18:32",
+"y": 0
+},
+{
+"x": "2015-10-22T17:01:48",
+"y": 0
+},
+{
+"x": "2015-10-22T17:01:48",
+"y": 1
+},
+{
+"x": "2019-09-26T06:15:21",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2014-07-28T04:20:50",
+"y": 0
+},
+{
+"x": "2014-07-28T04:20:50",
+"y": 1
+},
+{
+"x": "2014-07-31T16:30:20",
+"y": 1
+},
+{
+"x": "2014-07-31T16:30:20",
+"y": 0
+},
+{
+"x": "2014-08-03T23:59:00",
+"y": 0
+},
+{
+"x": "2014-08-03T23:59:00",
+"y": 1
+},
+{
+"x": "2014-08-04T13:02:39",
+"y": 1
+},
+{
+"x": "2014-08-04T13:02:39",
+"y": 0
+},
+{
+"x": "2014-08-20T21:55:44",
+"y": 0
+},
+{
+"x": "2014-08-20T21:55:44",
+"y": 1
+},
+{
+"x": "2014-08-24T11:06:07",
+"y": 1
+},
+{
+"x": "2014-08-24T11:06:07",
+"y": 0
+},
+{
+"x": "2019-09-26T06:15:21",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "ahornung/hrl_kinematics Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

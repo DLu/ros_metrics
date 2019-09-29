@@ -3,15 +3,12 @@ import oauth2client.service_account
 import sys
 from tqdm import tqdm
 import collections
-import yaml
 import datetime
 from urllib.parse import urlparse
 
 from .metric_db import MetricDB
 from .reports import get_top_by_year
-from .util import get_year_month_date_range, year_month_to_datetime, clean_dict, epoch_to_datetime, now_epoch
-
-api_key = yaml.load(open('keys.yaml'))['analytics']
+from .util import get_year_month_date_range, year_month_to_datetime, clean_dict, epoch_to_datetime, now_epoch, get_keys
 
 MONTHLY_REPORTS = {'totals': {}}
 YEARLY_REPORTS = {
@@ -23,8 +20,15 @@ REPORT_DATA = dict()
 REPORT_DATA.update(MONTHLY_REPORTS)
 REPORT_DATA.update(YEARLY_REPORTS)
 
+DOMAINS = [
+    'answers.ros.org',
+    'wiki.ros.org',
+    'discourse.ros.org'
+]
+
 
 def get_api_service():
+    api_key = get_keys()['analytics']
     scopes = ['https://www.googleapis.com/auth/analytics.readonly']
     credentials = oauth2client.service_account.ServiceAccountCredentials.from_json_keyfile_dict(api_key, scopes=scopes)
     return apiclient.discovery.build('analytics', 'v3', credentials=credentials)
@@ -224,18 +228,21 @@ def update_analytics():
 
     db = MetricDB('analytics')
 
+    queries = []
+    for profile_name in DOMAINS:
+        profile_id = lookup_profile(service, db, profile_name)
+        if profile_id is None:
+            continue
+
+        start_year, start_month = get_start_point(service, db, profile_id)
+        if start_year is None:
+            continue
+        queries += get_missing_data(db, profile_id, start_year, start_month)
+
+    if not queries:
+        return
+
     try:
-        queries = []
-        for profile_name in api_key.get('domains', []):
-            profile_id = lookup_profile(service, db, profile_name)
-            if profile_id is None:
-                continue
-
-            start_year, start_month = get_start_point(service, db, profile_id)
-            if start_year is None:
-                continue
-            queries += get_missing_data(db, profile_id, start_year, start_month)
-
         for start_date, end_date, profile_id, table in tqdm(sorted(queries), desc='Analytics updates'):
             get_stats(service, db, profile_id, table, start_date, end_date)
     finally:

@@ -1,0 +1,319 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>ros-naoqi/pepper_virtual - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2016-06-25T00:33:34",
+"y": 0
+},
+{
+"x": "2016-06-25T00:33:34",
+"y": 1
+},
+{
+"x": "2016-07-06T12:28:29",
+"y": 1
+},
+{
+"x": "2016-07-06T12:28:29",
+"y": 0
+},
+{
+"x": "2016-10-13T02:49:36",
+"y": 0
+},
+{
+"x": "2016-10-13T02:49:36",
+"y": 1
+},
+{
+"x": "2016-10-15T02:42:34",
+"y": 1
+},
+{
+"x": "2016-10-15T02:42:34",
+"y": 0
+},
+{
+"x": "2016-12-21T10:10:08",
+"y": 0
+},
+{
+"x": "2016-12-21T10:10:08",
+"y": 1
+},
+{
+"x": "2017-01-17T13:25:16",
+"y": 1
+},
+{
+"x": "2017-01-17T13:25:16",
+"y": 0
+},
+{
+"x": "2017-01-18T08:45:51",
+"y": 0
+},
+{
+"x": "2017-01-18T08:45:51",
+"y": 1
+},
+{
+"x": "2017-01-23T08:39:55",
+"y": 1
+},
+{
+"x": "2017-01-23T08:39:55",
+"y": 2
+},
+{
+"x": "2017-02-17T10:07:33",
+"y": 2
+},
+{
+"x": "2017-02-17T10:07:33",
+"y": 3
+},
+{
+"x": "2017-02-17T11:07:38",
+"y": 3
+},
+{
+"x": "2017-02-17T11:07:38",
+"y": 2
+},
+{
+"x": "2017-07-05T06:58:25",
+"y": 2
+},
+{
+"x": "2017-07-05T06:58:25",
+"y": 1
+},
+{
+"x": "2018-02-23T07:08:16",
+"y": 1
+},
+{
+"x": "2018-02-23T07:08:16",
+"y": 2
+},
+{
+"x": "2019-02-03T03:31:42",
+"y": 2
+},
+{
+"x": "2019-02-03T03:31:42",
+"y": 3
+},
+{
+"x": "2019-06-12T22:45:33",
+"y": 3
+},
+{
+"x": "2019-06-12T22:45:33",
+"y": 4
+},
+{
+"x": "2019-08-01T11:09:34",
+"y": 4
+},
+{
+"x": "2019-08-01T11:09:34",
+"y": 3
+},
+{
+"x": "2019-09-27T09:18:54",
+"y": 3
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2016-07-06T11:27:57",
+"y": 0
+},
+{
+"x": "2016-07-06T11:27:57",
+"y": 1
+},
+{
+"x": "2016-07-06T12:27:53",
+"y": 1
+},
+{
+"x": "2016-07-06T12:27:53",
+"y": 0
+},
+{
+"x": "2016-08-17T00:31:27",
+"y": 0
+},
+{
+"x": "2016-08-17T00:31:27",
+"y": 1
+},
+{
+"x": "2016-08-17T00:35:35",
+"y": 1
+},
+{
+"x": "2016-08-17T00:35:35",
+"y": 0
+},
+{
+"x": "2016-10-02T22:46:44",
+"y": 0
+},
+{
+"x": "2016-10-02T22:46:44",
+"y": 1
+},
+{
+"x": "2016-10-02T22:55:43",
+"y": 1
+},
+{
+"x": "2016-10-02T22:55:43",
+"y": 0
+},
+{
+"x": "2016-10-12T21:15:45",
+"y": 0
+},
+{
+"x": "2016-10-12T21:15:45",
+"y": 1
+},
+{
+"x": "2016-10-13T03:42:59",
+"y": 1
+},
+{
+"x": "2016-10-13T03:42:59",
+"y": 0
+},
+{
+"x": "2016-11-30T23:29:27",
+"y": 0
+},
+{
+"x": "2016-11-30T23:29:27",
+"y": 1
+},
+{
+"x": "2016-12-29T09:26:51",
+"y": 1
+},
+{
+"x": "2016-12-29T09:26:51",
+"y": 2
+},
+{
+"x": "2017-01-12T04:59:33",
+"y": 2
+},
+{
+"x": "2017-01-12T04:59:33",
+"y": 1
+},
+{
+"x": "2017-02-06T10:08:25",
+"y": 1
+},
+{
+"x": "2017-02-06T10:08:25",
+"y": 0
+},
+{
+"x": "2017-07-05T06:50:27",
+"y": 0
+},
+{
+"x": "2017-07-05T06:50:27",
+"y": 1
+},
+{
+"x": "2017-07-06T03:19:27",
+"y": 1
+},
+{
+"x": "2017-07-06T03:19:27",
+"y": 0
+},
+{
+"x": "2018-05-19T19:46:44",
+"y": 0
+},
+{
+"x": "2018-05-19T19:46:44",
+"y": 1
+},
+{
+"x": "2019-09-27T09:18:54",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "ros-naoqi/pepper_virtual Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

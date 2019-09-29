@@ -1,0 +1,263 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>leggedrobotics/xpp - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2017-12-22T08:13:53",
+"y": 0
+},
+{
+"x": "2017-12-22T08:13:53",
+"y": 1
+},
+{
+"x": "2018-02-01T09:45:40",
+"y": 1
+},
+{
+"x": "2018-02-01T09:45:40",
+"y": 0
+},
+{
+"x": "2018-02-07T05:29:59",
+"y": 0
+},
+{
+"x": "2018-02-07T05:29:59",
+"y": 1
+},
+{
+"x": "2018-02-10T04:24:03",
+"y": 1
+},
+{
+"x": "2018-02-10T04:24:03",
+"y": 0
+},
+{
+"x": "2018-06-13T16:14:36",
+"y": 0
+},
+{
+"x": "2018-06-13T16:14:36",
+"y": 1
+},
+{
+"x": "2018-07-02T10:08:04",
+"y": 1
+},
+{
+"x": "2018-07-02T10:08:04",
+"y": 0
+},
+{
+"x": "2019-02-11T23:32:27",
+"y": 0
+},
+{
+"x": "2019-02-11T23:32:27",
+"y": 1
+},
+{
+"x": "2019-02-13T04:25:35",
+"y": 1
+},
+{
+"x": "2019-02-13T04:25:35",
+"y": 0
+},
+{
+"x": "2019-04-03T05:14:27",
+"y": 0
+},
+{
+"x": "2019-04-03T05:14:27",
+"y": 1
+},
+{
+"x": "2019-08-15T13:34:40",
+"y": 1
+},
+{
+"x": "2019-08-15T13:34:40",
+"y": 2
+},
+{
+"x": "2019-08-17T08:24:29",
+"y": 2
+},
+{
+"x": "2019-08-17T08:24:29",
+"y": 1
+},
+{
+"x": "2019-09-28T11:53:21",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2017-10-27T19:51:19",
+"y": 0
+},
+{
+"x": "2017-10-27T19:51:19",
+"y": 1
+},
+{
+"x": "2017-10-28T03:47:37",
+"y": 1
+},
+{
+"x": "2017-10-28T03:47:37",
+"y": 0
+},
+{
+"x": "2018-01-03T06:15:10",
+"y": 0
+},
+{
+"x": "2018-01-03T06:15:10",
+"y": 1
+},
+{
+"x": "2018-01-03T06:36:00",
+"y": 1
+},
+{
+"x": "2018-01-03T06:36:00",
+"y": 0
+},
+{
+"x": "2018-02-13T20:25:01",
+"y": 0
+},
+{
+"x": "2018-02-13T20:25:01",
+"y": 1
+},
+{
+"x": "2018-07-09T03:45:17",
+"y": 1
+},
+{
+"x": "2018-07-09T03:45:17",
+"y": 2
+},
+{
+"x": "2018-07-10T03:23:47",
+"y": 2
+},
+{
+"x": "2018-07-10T03:23:47",
+"y": 1
+},
+{
+"x": "2018-07-18T08:46:17",
+"y": 1
+},
+{
+"x": "2018-07-18T08:46:17",
+"y": 2
+},
+{
+"x": "2018-07-18T08:46:29",
+"y": 2
+},
+{
+"x": "2018-07-18T08:46:29",
+"y": 1
+},
+{
+"x": "2018-07-27T18:07:34",
+"y": 1
+},
+{
+"x": "2018-07-27T18:07:34",
+"y": 0
+},
+{
+"x": "2019-02-13T08:12:24",
+"y": 0
+},
+{
+"x": "2019-02-13T08:12:24",
+"y": 1
+},
+{
+"x": "2019-02-13T08:33:08",
+"y": 1
+},
+{
+"x": "2019-02-13T08:33:08",
+"y": 0
+},
+{
+"x": "2019-09-28T11:53:21",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "leggedrobotics/xpp Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

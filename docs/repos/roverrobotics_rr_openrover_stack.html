@@ -1,0 +1,335 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>roverrobotics/rr_openrover_stack - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2019-09-27T09:20:34",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2019-07-01T11:08:55",
+"y": 0
+},
+{
+"x": "2019-07-01T11:08:55",
+"y": 1
+},
+{
+"x": "2019-07-01T11:09:17",
+"y": 1
+},
+{
+"x": "2019-07-01T11:09:17",
+"y": 0
+},
+{
+"x": "2019-07-01T11:10:14",
+"y": 0
+},
+{
+"x": "2019-07-01T11:10:14",
+"y": 1
+},
+{
+"x": "2019-07-09T11:47:25",
+"y": 1
+},
+{
+"x": "2019-07-09T11:47:25",
+"y": 0
+},
+{
+"x": "2019-07-09T18:18:51",
+"y": 0
+},
+{
+"x": "2019-07-09T18:18:51",
+"y": 1
+},
+{
+"x": "2019-07-09T18:19:00",
+"y": 1
+},
+{
+"x": "2019-07-09T18:19:00",
+"y": 0
+},
+{
+"x": "2019-07-11T10:31:52",
+"y": 0
+},
+{
+"x": "2019-07-11T10:31:52",
+"y": 1
+},
+{
+"x": "2019-07-11T10:32:07",
+"y": 1
+},
+{
+"x": "2019-07-11T10:32:07",
+"y": 0
+},
+{
+"x": "2019-07-11T12:31:37",
+"y": 0
+},
+{
+"x": "2019-07-11T12:31:37",
+"y": 1
+},
+{
+"x": "2019-07-11T12:31:52",
+"y": 1
+},
+{
+"x": "2019-07-11T12:31:52",
+"y": 0
+},
+{
+"x": "2019-07-11T12:34:34",
+"y": 0
+},
+{
+"x": "2019-07-11T12:34:34",
+"y": 1
+},
+{
+"x": "2019-07-11T12:34:44",
+"y": 1
+},
+{
+"x": "2019-07-11T12:34:44",
+"y": 0
+},
+{
+"x": "2019-07-17T16:53:42",
+"y": 0
+},
+{
+"x": "2019-07-17T16:53:42",
+"y": 1
+},
+{
+"x": "2019-07-17T16:53:53",
+"y": 1
+},
+{
+"x": "2019-07-17T16:53:53",
+"y": 0
+},
+{
+"x": "2019-07-17T16:54:03",
+"y": 0
+},
+{
+"x": "2019-07-17T16:54:03",
+"y": 1
+},
+{
+"x": "2019-07-17T16:54:31",
+"y": 1
+},
+{
+"x": "2019-07-17T16:54:31",
+"y": 0
+},
+{
+"x": "2019-07-17T16:54:46",
+"y": 0
+},
+{
+"x": "2019-07-17T16:54:46",
+"y": 1
+},
+{
+"x": "2019-07-17T16:54:53",
+"y": 1
+},
+{
+"x": "2019-07-17T16:54:53",
+"y": 0
+},
+{
+"x": "2019-07-18T15:15:49",
+"y": 0
+},
+{
+"x": "2019-07-18T15:15:49",
+"y": 1
+},
+{
+"x": "2019-07-18T15:15:58",
+"y": 1
+},
+{
+"x": "2019-07-18T15:15:58",
+"y": 0
+},
+{
+"x": "2019-07-18T15:54:07",
+"y": 0
+},
+{
+"x": "2019-07-18T15:54:07",
+"y": 1
+},
+{
+"x": "2019-07-18T15:54:41",
+"y": 1
+},
+{
+"x": "2019-07-18T15:54:41",
+"y": 0
+},
+{
+"x": "2019-07-18T18:03:16",
+"y": 0
+},
+{
+"x": "2019-07-18T18:03:16",
+"y": 1
+},
+{
+"x": "2019-07-18T18:06:32",
+"y": 1
+},
+{
+"x": "2019-07-18T18:06:32",
+"y": 0
+},
+{
+"x": "2019-07-18T18:46:35",
+"y": 0
+},
+{
+"x": "2019-07-18T18:46:35",
+"y": 1
+},
+{
+"x": "2019-07-18T18:46:52",
+"y": 1
+},
+{
+"x": "2019-07-18T18:46:52",
+"y": 0
+},
+{
+"x": "2019-07-18T18:47:47",
+"y": 0
+},
+{
+"x": "2019-07-18T18:47:47",
+"y": 1
+},
+{
+"x": "2019-07-18T18:47:54",
+"y": 1
+},
+{
+"x": "2019-07-18T18:47:54",
+"y": 0
+},
+{
+"x": "2019-07-19T12:55:41",
+"y": 0
+},
+{
+"x": "2019-07-19T12:55:41",
+"y": 1
+},
+{
+"x": "2019-07-19T12:56:56",
+"y": 1
+},
+{
+"x": "2019-07-19T12:56:56",
+"y": 0
+},
+{
+"x": "2019-07-19T12:57:19",
+"y": 0
+},
+{
+"x": "2019-07-19T12:57:19",
+"y": 1
+},
+{
+"x": "2019-07-19T12:57:27",
+"y": 1
+},
+{
+"x": "2019-07-19T12:57:27",
+"y": 0
+},
+{
+"x": "2019-09-27T09:20:34",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "roverrobotics/rr_openrover_stack Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

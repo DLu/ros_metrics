@@ -1,0 +1,167 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>ros-visualization/rqt_py_console - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2018-11-12T16:50:45",
+"y": 0
+},
+{
+"x": "2018-11-12T16:50:45",
+"y": 1
+},
+{
+"x": "2018-12-18T14:56:02",
+"y": 1
+},
+{
+"x": "2018-12-18T14:56:02",
+"y": 2
+},
+{
+"x": "2018-12-26T13:47:16",
+"y": 2
+},
+{
+"x": "2018-12-26T13:47:16",
+"y": 1
+},
+{
+"x": "2019-09-27T09:19:58",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2017-04-24T17:41:37",
+"y": 0
+},
+{
+"x": "2017-04-24T17:41:37",
+"y": 1
+},
+{
+"x": "2017-04-28T11:00:33",
+"y": 1
+},
+{
+"x": "2017-04-28T11:00:33",
+"y": 0
+},
+{
+"x": "2018-10-16T19:28:38",
+"y": 0
+},
+{
+"x": "2018-10-16T19:28:38",
+"y": 1
+},
+{
+"x": "2018-10-23T12:27:44",
+"y": 1
+},
+{
+"x": "2018-10-23T12:27:44",
+"y": 0
+},
+{
+"x": "2018-11-09T22:13:03",
+"y": 0
+},
+{
+"x": "2018-11-09T22:13:03",
+"y": 1
+},
+{
+"x": "2018-11-13T16:31:16",
+"y": 1
+},
+{
+"x": "2018-11-13T16:31:16",
+"y": 0
+},
+{
+"x": "2018-11-14T17:28:50",
+"y": 0
+},
+{
+"x": "2018-11-14T17:28:50",
+"y": 1
+},
+{
+"x": "2018-12-05T12:40:37",
+"y": 1
+},
+{
+"x": "2018-12-05T12:40:37",
+"y": 0
+},
+{
+"x": "2019-09-27T09:19:58",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "ros-visualization/rqt_py_console Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

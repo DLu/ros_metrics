@@ -1,0 +1,287 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>pal-robotics/pal_msgs - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2019-09-28T11:54:18",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2014-02-26T04:56:39",
+"y": 0
+},
+{
+"x": "2014-02-26T04:56:39",
+"y": 1
+},
+{
+"x": "2014-03-05T10:00:38",
+"y": 1
+},
+{
+"x": "2014-03-05T10:00:38",
+"y": 2
+},
+{
+"x": "2014-03-05T11:50:28",
+"y": 2
+},
+{
+"x": "2014-03-05T11:50:28",
+"y": 1
+},
+{
+"x": "2014-04-09T04:33:56",
+"y": 1
+},
+{
+"x": "2014-04-09T04:33:56",
+"y": 2
+},
+{
+"x": "2014-04-09T06:07:42",
+"y": 2
+},
+{
+"x": "2014-04-09T06:07:42",
+"y": 1
+},
+{
+"x": "2014-04-10T07:56:03",
+"y": 1
+},
+{
+"x": "2014-04-10T07:56:03",
+"y": 0
+},
+{
+"x": "2014-04-30T06:24:01",
+"y": 0
+},
+{
+"x": "2014-04-30T06:24:01",
+"y": 1
+},
+{
+"x": "2014-04-30T09:48:03",
+"y": 1
+},
+{
+"x": "2014-04-30T09:48:03",
+"y": 0
+},
+{
+"x": "2014-05-07T09:01:20",
+"y": 0
+},
+{
+"x": "2014-05-07T09:01:20",
+"y": 1
+},
+{
+"x": "2014-05-07T09:09:30",
+"y": 1
+},
+{
+"x": "2014-05-07T09:09:30",
+"y": 0
+},
+{
+"x": "2014-05-09T07:19:52",
+"y": 0
+},
+{
+"x": "2014-05-09T07:19:52",
+"y": 1
+},
+{
+"x": "2014-05-09T07:28:15",
+"y": 1
+},
+{
+"x": "2014-05-09T07:28:15",
+"y": 0
+},
+{
+"x": "2014-06-19T06:18:20",
+"y": 0
+},
+{
+"x": "2014-06-19T06:18:20",
+"y": 1
+},
+{
+"x": "2014-06-19T09:40:41",
+"y": 1
+},
+{
+"x": "2014-06-19T09:40:41",
+"y": 0
+},
+{
+"x": "2014-06-25T06:46:56",
+"y": 0
+},
+{
+"x": "2014-06-25T06:46:56",
+"y": 1
+},
+{
+"x": "2014-06-25T06:51:25",
+"y": 1
+},
+{
+"x": "2014-06-25T06:51:25",
+"y": 0
+},
+{
+"x": "2014-06-26T05:14:45",
+"y": 0
+},
+{
+"x": "2014-06-26T05:14:45",
+"y": 1
+},
+{
+"x": "2014-06-26T06:40:06",
+"y": 1
+},
+{
+"x": "2014-06-26T06:40:06",
+"y": 0
+},
+{
+"x": "2014-06-27T10:09:33",
+"y": 0
+},
+{
+"x": "2014-06-27T10:09:33",
+"y": 1
+},
+{
+"x": "2014-06-27T11:06:58",
+"y": 1
+},
+{
+"x": "2014-06-27T11:06:58",
+"y": 0
+},
+{
+"x": "2014-06-30T12:33:31",
+"y": 0
+},
+{
+"x": "2014-06-30T12:33:31",
+"y": 1
+},
+{
+"x": "2014-08-06T03:25:56",
+"y": 1
+},
+{
+"x": "2014-08-06T03:25:56",
+"y": 0
+},
+{
+"x": "2014-08-06T09:05:29",
+"y": 0
+},
+{
+"x": "2014-08-06T09:05:29",
+"y": 1
+},
+{
+"x": "2015-10-01T05:29:17",
+"y": 1
+},
+{
+"x": "2015-10-01T05:29:17",
+"y": 2
+},
+{
+"x": "2016-05-25T01:16:03",
+"y": 2
+},
+{
+"x": "2016-05-25T01:16:03",
+"y": 3
+},
+{
+"x": "2016-05-25T01:16:09",
+"y": 3
+},
+{
+"x": "2016-05-25T01:16:09",
+"y": 1
+},
+{
+"x": "2019-09-28T11:54:18",
+"y": 1
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "pal-robotics/pal_msgs Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

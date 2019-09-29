@@ -9,7 +9,7 @@
         <script>
             Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
             var ctx = document.getElementById('chart').getContext('2d');
-            var myChart = new Chart(ctx, {{ chart|tojson }});
+            var myChart = new Chart(ctx, {{ chart|tojson(0) }});
         </script>
 {%- block bonus %}{% endblock %}
 {%- endblock %}

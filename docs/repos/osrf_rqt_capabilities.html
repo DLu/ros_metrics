@@ -1,0 +1,231 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>osrf/rqt_capabilities - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2013-09-10T19:52:52",
+"y": 0
+},
+{
+"x": "2013-09-10T19:52:52",
+"y": 1
+},
+{
+"x": "2013-10-10T03:31:46",
+"y": 1
+},
+{
+"x": "2013-10-10T03:31:46",
+"y": 2
+},
+{
+"x": "2013-10-10T03:46:42",
+"y": 2
+},
+{
+"x": "2013-10-10T03:46:42",
+"y": 3
+},
+{
+"x": "2013-10-10T05:16:22",
+"y": 3
+},
+{
+"x": "2013-10-10T05:16:22",
+"y": 4
+},
+{
+"x": "2013-11-04T20:34:44",
+"y": 4
+},
+{
+"x": "2013-11-04T20:34:44",
+"y": 5
+},
+{
+"x": "2013-11-04T21:01:45",
+"y": 5
+},
+{
+"x": "2013-11-04T21:01:45",
+"y": 4
+},
+{
+"x": "2013-11-06T21:11:40",
+"y": 4
+},
+{
+"x": "2013-11-06T21:11:40",
+"y": 5
+},
+{
+"x": "2013-12-16T08:08:07",
+"y": 5
+},
+{
+"x": "2013-12-16T08:08:07",
+"y": 4
+},
+{
+"x": "2014-04-23T05:53:57",
+"y": 4
+},
+{
+"x": "2014-04-23T05:53:57",
+"y": 5
+},
+{
+"x": "2014-04-29T19:53:49",
+"y": 5
+},
+{
+"x": "2014-04-29T19:53:49",
+"y": 4
+},
+{
+"x": "2014-05-03T09:39:18",
+"y": 4
+},
+{
+"x": "2014-05-03T09:39:18",
+"y": 5
+},
+{
+"x": "2014-05-03T09:43:11",
+"y": 5
+},
+{
+"x": "2014-05-03T09:43:11",
+"y": 6
+},
+{
+"x": "2014-05-05T13:37:36",
+"y": 6
+},
+{
+"x": "2014-05-05T13:37:36",
+"y": 5
+},
+{
+"x": "2014-05-21T11:51:32",
+"y": 5
+},
+{
+"x": "2014-05-21T11:51:32",
+"y": 6
+},
+{
+"x": "2014-05-21T16:34:29",
+"y": 6
+},
+{
+"x": "2014-05-21T16:34:29",
+"y": 5
+},
+{
+"x": "2019-09-28T11:54:13",
+"y": 5
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2013-09-12T20:16:02",
+"y": 0
+},
+{
+"x": "2013-09-12T20:16:02",
+"y": 1
+},
+{
+"x": "2013-09-12T20:17:31",
+"y": 1
+},
+{
+"x": "2013-09-12T20:17:31",
+"y": 0
+},
+{
+"x": "2013-10-10T05:18:19",
+"y": 0
+},
+{
+"x": "2013-10-10T05:18:19",
+"y": 1
+},
+{
+"x": "2013-10-16T23:11:17",
+"y": 1
+},
+{
+"x": "2013-10-16T23:11:17",
+"y": 0
+},
+{
+"x": "2019-09-28T11:54:13",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "osrf/rqt_capabilities Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>

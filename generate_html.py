@@ -5,7 +5,10 @@ from jinja2 import Environment, FileSystemLoader
 import pathlib
 from ros_metrics import charts
 from ros_metrics import analytics, answers, packages, repos
+from ros_metrics.metric_db import MetricDB
 from ros_metrics.constants import distros, os_list
+from tqdm import tqdm
+
 
 OUTPUT_FOLDER = pathlib.Path('docs')
 
@@ -24,23 +27,23 @@ STRUCTURE = [
                      'and the most downloaded packages introduced in each year.'},
          {'name': 'ROS Distro',
           'chart': charts.get_package_ratio_chart,
-          'args': ['rosdistro', distros],
+          'args': ['rosdistro', 'ROS Distro Usage by packages.ros.org traffic', distros],
           'caption': 'Relative usage of each distro based on downloads from packages.ros.org. '
                      'Note that data after late 2018 is not complete.'
           },
          {'name': 'Architecture',
           'chart': charts.get_package_ratio_chart,
-          'args': ['arch'],
+          'args': ['arch', 'Architecture Usage by packages.ros.org traffic'],
           'caption': 'Chip architecture usage by packages.ros.org downloads.'
           },
          {'name': 'AptRepo',
           'chart': charts.get_package_ratio_chart,
-          'args': ['apt_repo'],
+          'args': ['apt_repo', 'Apt-repo Usage by packages.ros.org traffic'],
           'caption': 'Apt-repo usage based on packages.ros.org downloads.'
           },
          {'name': 'Linux',
           'chart': charts.get_package_ratio_chart,
-          'args': ['distro', os_list, 0.5],
+          'args': ['distro', 'Linux Distro Usage by packages.ros.org traffic', os_list, 0.5],
           'caption': 'Linux distro usage based on packages.ros.org downloads.'
           },
          # {'name': 'Library',
@@ -63,7 +66,7 @@ STRUCTURE = [
          # 'chart': charts.get_rosdistro_plot},
          {'name': 'ROS Distro',
           'chart': charts.get_rosdistro_distros,
-          'caption': 'Relative usage of ROS distros by commits to ros/rosdistro.'},
+          'caption': 'Relative maintenance of ROS distros by commits to ros/rosdistro.'},
          {'name': 'Verbs',
           'chart': charts.get_rosdistro_verbs,
           'caption': 'Commits to ros/rosdistro by action-type'},
@@ -77,14 +80,14 @@ STRUCTURE = [
           'chart': charts.get_rosdistro_repos,
           'caption': 'Number of repos in ros/rosdistro'
           },
-         {'name': 'Github',
-          'template': 'table.html',
-          'headers': ['rank_product', 'key', 'org', 'repo', 'forks', 'stars', 'subs', 'open issues', 'closed issues',
-                      'total issues', 'open prs', 'merged prs', 'closed prs', 'total prs'],
-          'table': repos.github_repos_report,
-          'caption': 'Github repos listed in ros/rosdistro, ranked by number of forks/stars/subscriptions'
-          }
      ]
+     },
+    {'name': 'Repos',
+     'template': 'table.html',
+     'headers': ['rank_product', 'org', 'repo', 'forks', 'stars', 'subs', 'open issues', 'closed issues',
+                 'total issues', 'open prs', 'merged prs', 'closed prs', 'total prs'],
+     'table': repos.github_repos_report,
+     'caption': 'Github repos listed in ros/rosdistro, ranked by number of forks/stars/subscriptions'
      },
     {'name': 'Answers',
      'subpages': [
@@ -188,3 +191,19 @@ for blob in STRUCTURE:
             subpage['submenu'] = blob['submenu']
             with open(OUTPUT_FOLDER / level2, 'w') as f:
                 f.write(template.render(**subpage))
+
+repos_db = MetricDB('repos')
+REPOS_FOLDER = OUTPUT_FOLDER / 'repos'
+REPOS_FOLDER.mkdir(exist_ok=True)
+for repo_dict in tqdm(repos_db.query('SELECT * FROM repos WHERE server="github.com" and status is null')):
+    name = '{org}/{repo}'.format(**repo_dict)
+    template = j2_env.get_template(subpage.get('template', 'basic_chart.html'))
+    filename = '{org}_{repo}.html'.format(**repo_dict)
+
+    repo_page = {'name': name, 'chart': charts.get_repo_issues(repos_db, name, repo_dict['id'])}
+
+    repo_page['level1'] = 'repos.html'
+    repo_page['menu'] = menu
+    repo_page['prefix'] = '../'
+    with open(REPOS_FOLDER / filename, 'w') as f:
+        f.write(template.render(**repo_page))

@@ -16,8 +16,9 @@ FORBIDDEN_KEYS = ['-release', 'ros.org', 'svn', 'code.google.com']
 GITHUB_HTTP_PATTERN = re.compile('https?://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+)\.git')
 GITHUB_SSH_PATTERN = re.compile('git@(?P<server>github\.com):(?P<org>[^/]+)/(?P<repo>.+)\.git')
 BB_PATTERN = re.compile('https://(?P<server>bitbucket\.org)/(?P<org>.*)/(?P<repo>.+)')
-GITLAB_PATTERN = re.compile('https?://(?P<server>gitlab\.[^/]+)/(?P<org>[^/]+)/(?P<repo>.+).git')
-PATTERNS = [GITHUB_HTTP_PATTERN, GITHUB_SSH_PATTERN, BB_PATTERN, GITLAB_PATTERN]
+GITLAB_HTTP_PATTERN = re.compile('https?://(?P<server>gitlab\.[^/]+)/(?P<org>[^/]+)/(?P<repo>.+).git')
+GITLAB_SSH_PATTERN = re.compile('git@(?P<server>gitlab\.[^/]+):(?P<org>[^/]+)/(?P<repo>.+)\.git')
+PATTERNS = [GITHUB_HTTP_PATTERN, GITHUB_SSH_PATTERN, BB_PATTERN, GITLAB_HTTP_PATTERN, GITLAB_SSH_PATTERN]
 
 
 def match_git_host(url):
@@ -33,6 +34,7 @@ def get_raw_distro_dict(update=False):
     rosdistro_path = pathlib.Path(REPO_PATH)
 
     all_repos = collections.defaultdict(dict)
+    CACHE_PATH.mkdir(exist_ok=True)
 
     for distro in tqdm(distros, 'updating distros'):
         distro_path = rosdistro_path / distro / 'distribution.yaml'
@@ -44,8 +46,28 @@ def get_raw_distro_dict(update=False):
         for name, repo in sorted(repos.items()):
             url = repo.get('source', repo.get('doc', {})).get('url')
             if not url:
-                # TODO: Resolve the release repo to a source repo
-                continue
+                release_url = repo.get('release', {}).get('url')
+                if not release_url:
+                    continue
+                repo_dict = match_git_host(release_url)
+                if not repo_dict:
+                    continue
+
+                folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
+                if not folder.exists():
+                    try:
+                        git.Repo.clone_from(release_url, str(folder))
+                    except Exception as e:
+                        continue
+
+                tracks_file = folder / 'tracks.yaml'
+                if not tracks_file.exists():
+                    continue
+                tracks = yaml.load(open(tracks_file))
+                if distro in tracks['tracks']:
+                    url = tracks['tracks'][distro]['vcs_uri']
+                else:
+                    continue
             url = url.lower()
             all_repos[name][distro] = url
     return all_repos
@@ -90,7 +112,7 @@ def get_repo_list(db):
         for url in clean_urls:
             d = match_git_host(url)
             if not d:
-                print(url)
+                # print(url)
                 continue
             id = db.lookup('id', 'repos', 'WHERE key="{}" and url="{}"'.format(name, url))
             if id is None:
@@ -101,21 +123,40 @@ def get_repo_list(db):
                 db.insert('repos', d)
 
 
+CLONE_MESSAGES = [
+    ('mercurial', 'Mercurial (hg) is required'),
+    ('no_access', 'HTTP Basic: Access denied'),
+    ('no_access', 'Permission denied'),
+    ('no_access', 'Connection refused'),
+    ('missing', 'not found'),
+]
+
+
 def clone(db, debug=False):
     repos = []
     to_clone = []
 
     CACHE_PATH.mkdir(exist_ok=True)
-    for repo_dict in db.query('SELECT org, repo, url FROM repos ORDER BY id'):
+    for repo_dict in db.query('SELECT id, org, repo, url, status FROM repos ORDER BY id'):
+        if repo_dict['status'] is not None:
+            continue
         folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
         if folder.exists():
             repos.append(git.Repo(str(folder)))
         else:
-            to_clone.append((folder, repo_dict['url']))
-    for folder, url in tqdm(sorted(to_clone), 'cloning repos'):
+            to_clone.append((folder, repo_dict))
+    if not to_clone:
+        return repos
+    for folder, repo_dict in tqdm(sorted(to_clone), 'cloning repos'):
         try:
-            repos.append(git.Repo.clone_from(url, str(folder)))
-        except Exception as e:
+            repos.append(git.Repo.clone_from(repo_dict['url'], str(folder)))
+        except git.GitCommandError as e:
+            for status, msg in CLONE_MESSAGES:
+                if msg in e.stderr:
+                    repo_dict['status'] = status
+                    db.update('repos', repo_dict)
+                    break
+
             if debug:
                 print(e)
     return repos
@@ -126,28 +167,68 @@ def update(repos):
         repo.remotes.origin.pull()
 
 
+def check_statuses(db):
+    for repo_dict in tqdm(db.query('SELECT id, org, repo, url FROM repos WHERE status is null ORDER BY id'),
+                          desc='checking repo status'):
+        # Check for duplicates
+        url = repo_dict['url']
+        matches = db.lookup_all('id', 'repos', f'WHERE url="{url}" and status is null')
+        if len(matches) > 1 and matches[0] == repo_dict['id']:
+            for match in matches[1:]:
+                repo_dict = db.query(f'SELECT * from REPOS WHERE id={match}')[0]
+                repo_dict['status'] = 'dupe'
+                db.update('repos', repo_dict)
+
+        # Count packages
+        folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
+        xml = list(folder.rglob('package.xml')) + list(folder.rglob('manifest.xml'))
+        if len(xml) > 0:
+            continue
+        repo_dict['status'] = 'not_ros'
+        db.update('repos', repo_dict)
+
+
 def get_github_repos(db):
     repos = {}
-    for repo_dict in db.query('SELECT id, org, repo FROM repos WHERE server="github.com"'):
+    for repo_dict in db.query('SELECT id, org, repo, status FROM repos WHERE server="github.com"'):
+        if repo_dict['status'] is not None:
+            continue
+        del repo_dict['status']
         repos[repo_dict['id']] = repo_dict
     return repos
 
 
-def get_github_stats(db):
-    existing_stats = db.lookup_all('id', 'github_stats')
+def get_github_stats(db, limit=3000000):  # ~1 month
+    existing_stats = db.dict_lookup('id', 'last_updated_at', 'github_stats')
     repos = get_github_repos(db)
+    now = now_epoch()
     to_crawl = []
     for repo_id, repo_dict in repos.items():
         if repo_id not in existing_stats:
             to_crawl.append(repo_dict)
+        elif now - existing_stats[repo_id] > limit:
+            to_crawl.append(repo_dict)
+
+    if not to_crawl:
+        return
 
     gh = get_github_api()
-    now = now_epoch()
     for repo_dict in tqdm(to_crawl, 'github stats'):
         try:
             repo = gh.get_repo('{org}/{repo}'.format(**repo_dict))
-        except github.GithubException:
-            continue
+        except github.GithubException as e:
+            if e.status == 404:
+                repo_dict['status'] = 'missing'
+                db.update('repos', repo_dict)
+                continue
+            else:
+                raise e
+
+        if repo.stargazers_count != repo.watchers_count:
+            print(repo)
+            print(repo.watchers_count)
+            print(repo.stargazers_count)
+            break
 
         row = {'id': repo_dict['id'],
                'forks': repo.network_count,
@@ -229,6 +310,9 @@ def get_github_issues(db):
 
         to_crawl.append((repo_dict, last_updated_at))
 
+    if not to_crawl:
+        return
+
     gh = get_github_api()
     print(gh.get_rate_limit())
     for repo_dict, last_updated_at in tqdm(to_crawl, desc='Repos: GithubIssues'):
@@ -243,10 +327,11 @@ def get_github_issues(db):
 def update_repos(local_repos=False, github_repos=True):
     db = MetricDB('repos')
     try:
+        get_repo_list(db)
         if local_repos:
-            get_repo_list(db)
             repos = clone(db)
             update(repos)
+            check_statuses(db)
         if github_repos:
             get_github_stats(db)
             get_github_issues(db)
@@ -259,8 +344,12 @@ def github_stat_report(db):
     report = {}
     ranks = collections.defaultdict(collections.Counter)
 
+    exclude = db.lookup_all('id', 'repos', 'WHERE status is not null')
+
     for repo_dict in db.query('SELECT id, forks, stars, subs from github_stats'):
         id = repo_dict['id']
+        if id in exclude:
+            continue
         del repo_dict['id']
         for key in repo_dict:
             ranks[key][repo_dict[key]] += 1
@@ -310,8 +399,8 @@ def github_repos_report(db=None):
     report = github_stat_report(db)
     issue_report = get_issue_report(db)
     lines = []
-    for repo_dict in sorted(db.query('SELECT id, key, org, repo FROM repos WHERE server="github.com"'),
-                            key=lambda d: report.get(d['id'], {}).get('rank', 0)):
+    for repo_dict in sorted(db.query('SELECT * FROM repos WHERE server="github.com" and status is null'),
+                            key=lambda d: report.get(d['id'], {}).get('rank_product', 0)):
         id = repo_dict['id']
         if id not in report:
             continue
@@ -320,6 +409,10 @@ def github_repos_report(db=None):
         repo_dict['rank_product'] = report[id]['rank_product']
         for key in issue_report:
             repo_dict[key] = issue_report[key].get(id, '')
+
+        # Hack to insert link
+        repo_dict['repo'] = '<a href="repos/{org}_{repo}.html">{repo}</a>'.format(**repo_dict)
+
         lines.append(repo_dict)
     return lines
 

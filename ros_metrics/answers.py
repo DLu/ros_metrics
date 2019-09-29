@@ -36,7 +36,8 @@ def fetch_user(db, user_id):
         contents = fetch_page('users/{}'.format(user_id))
         update_user(db, contents)
     except Exception as e:
-        print(e)
+        # Likely the user was deleted
+        db.update('users', {'id': user_id, 'last_crawl_at': -1})
 
 
 def fetch_user_list(db, force=False):
@@ -96,6 +97,11 @@ def process_question(db, item):
     db.update('questions', item)
 
 
+def fetch_question(db, qid):
+    page = fetch_page(f'questions/{qid}')
+    process_question(db, page)
+
+
 def fetch_questions(db, forward=False):
     if forward:
         page = max(db.count('questions') // 50 + 1, 1)
@@ -146,8 +152,6 @@ def fetch_questions(db, forward=False):
         if forward and page >= response['pages']:
             break
     bar.close()
-    if not forward:
-        print('answers.ros.org {} new questions'.format(new_qs))
 
 
 def fetch_answer(db, aid, initial_dict=None):
@@ -188,6 +192,9 @@ def update_users(db, limit=50):
 
     to_crawl = sorted(missing) + sorted(no_crawl)
     to_crawl = to_crawl[:limit]
+
+    if not to_crawl:
+        return
 
     for user in tqdm(to_crawl, desc='answers.ros.org user updates'):
         fetch_user(db, user)
@@ -237,6 +244,8 @@ def karma_report(db):
     karma_buckets = collections.Counter()
     for user_row in db.query('SELECT reputation from users'):
         reputation = user_row['reputation']
+        if reputation is None:
+            continue
         for k, v in karma_ranges.items():
             if v is None or reputation <= v:
                 karma_buckets[k] += 1

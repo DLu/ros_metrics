@@ -6,6 +6,7 @@ tables:
         - org
         - repo
         - url
+        - status
     github_stats:
         - id
         - forks

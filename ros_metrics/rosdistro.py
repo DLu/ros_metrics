@@ -382,7 +382,8 @@ def count_repos(db, commit_id, commit):
             db.insert('repo_count', {'commit_id': commit_id, 'distro': name, 'count': len(name_set)})
         if all_names and set(name_map.keys()).intersection(set(ros1_distros)):
             db.insert('repo_count', {'commit_id': commit_id, 'distro': 'all', 'count': len(all_names)})
-
+    except yaml.YAMLError:
+        return
     except Exception as e:
         print(e)
 

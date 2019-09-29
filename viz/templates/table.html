@@ -18,11 +18,11 @@
         <tbody>
             {%- for row in table %}
             <tr>
-                {% for head in headers %}
+                {%- for head in headers %}
                 <td>{{row[head]}}</td>
-                {% endfor %}
+                {%- endfor %}
             </tr>
-            {% endfor %}
+            {%- endfor %}
         </tbody>
     </table>
         <div class="caption">{{ caption }}</div>

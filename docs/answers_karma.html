@@ -12,6 +12,7 @@
         <a href="index.html" >Users</a>
         <a href="packages_top.html" >Packages</a>
         <a href="rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="repos.html" >Repos</a>
         <a href="answers_questions.html" class="nav_selected">Answers</a>
         <a href="misc_analytics.html" >Misc</a>
         <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="ghw.png" alt="github" /></a>
@@ -31,7 +32,40 @@
         <script>
             Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
             var ctx = document.getElementById('chart').getContext('2d');
-            var myChart = new Chart(ctx, {"data": {"datasets": [{"backgroundColor": "#4dc9f6", "data": [26057, 6956, 939, 117, 73, 83], "label": "Number of users"}], "labels": ["\u003c= 10", "11 - 100", "101 - 500", "501 - 1000", "1001 - 2000", "2000+"]}, "options": {}, "type": "horizontalBar"});
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+25960,
+7073,
+949,
+120,
+74,
+83
+],
+"label": "Number of users"
+}
+],
+"labels": [
+"\u003c= 10",
+"11 - 100",
+"101 - 500",
+"501 - 1000",
+"1001 - 2000",
+"2000+"
+]
+},
+"options": {
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "answers.ros.org Karma Distribution"
+}
+},
+"type": "horizontalBar"
+});
         </script>
     </div>
 </body>

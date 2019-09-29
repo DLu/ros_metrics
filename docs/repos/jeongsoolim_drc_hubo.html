@@ -1,0 +1,271 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>jeongsoolim/drc_hubo - ROS Metrics</title>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos.html" class="nav_selected">Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../misc_analytics.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2017-02-27T23:38:13",
+"y": 0
+},
+{
+"x": "2017-02-27T23:38:13",
+"y": 1
+},
+{
+"x": "2017-03-01T19:18:59",
+"y": 1
+},
+{
+"x": "2017-03-01T19:18:59",
+"y": 0
+},
+{
+"x": "2017-03-01T20:38:34",
+"y": 0
+},
+{
+"x": "2017-03-01T20:38:34",
+"y": 1
+},
+{
+"x": "2017-03-02T20:46:11",
+"y": 1
+},
+{
+"x": "2017-03-02T20:46:11",
+"y": 0
+},
+{
+"x": "2017-06-03T23:43:51",
+"y": 0
+},
+{
+"x": "2017-06-03T23:43:51",
+"y": 1
+},
+{
+"x": "2017-06-07T22:24:18",
+"y": 1
+},
+{
+"x": "2017-06-07T22:24:18",
+"y": 0
+},
+{
+"x": "2017-06-07T22:39:42",
+"y": 0
+},
+{
+"x": "2017-06-07T22:39:42",
+"y": 1
+},
+{
+"x": "2017-06-08T17:07:54",
+"y": 1
+},
+{
+"x": "2017-06-08T17:07:54",
+"y": 2
+},
+{
+"x": "2017-06-08T19:35:19",
+"y": 2
+},
+{
+"x": "2017-06-08T19:35:19",
+"y": 3
+},
+{
+"x": "2017-06-08T19:42:41",
+"y": 3
+},
+{
+"x": "2017-06-08T19:42:41",
+"y": 2
+},
+{
+"x": "2017-06-17T06:40:20",
+"y": 2
+},
+{
+"x": "2017-06-17T06:40:20",
+"y": 3
+},
+{
+"x": "2017-06-19T20:17:47",
+"y": 3
+},
+{
+"x": "2017-06-19T20:17:47",
+"y": 2
+},
+{
+"x": "2019-09-28T11:53:09",
+"y": 2
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2016-04-11T02:59:47",
+"y": 0
+},
+{
+"x": "2016-04-11T02:59:47",
+"y": 1
+},
+{
+"x": "2016-04-11T03:00:08",
+"y": 1
+},
+{
+"x": "2016-04-11T03:00:08",
+"y": 0
+},
+{
+"x": "2016-04-11T07:00:45",
+"y": 0
+},
+{
+"x": "2016-04-11T07:00:45",
+"y": 1
+},
+{
+"x": "2016-04-11T07:00:49",
+"y": 1
+},
+{
+"x": "2016-04-11T07:00:49",
+"y": 0
+},
+{
+"x": "2016-04-11T08:03:33",
+"y": 0
+},
+{
+"x": "2016-04-11T08:03:33",
+"y": 1
+},
+{
+"x": "2016-04-11T08:03:38",
+"y": 1
+},
+{
+"x": "2016-04-11T08:03:38",
+"y": 0
+},
+{
+"x": "2016-08-25T18:26:30",
+"y": 0
+},
+{
+"x": "2016-08-25T18:26:30",
+"y": 1
+},
+{
+"x": "2016-08-25T19:56:48",
+"y": 1
+},
+{
+"x": "2016-08-25T19:56:48",
+"y": 0
+},
+{
+"x": "2017-03-02T20:45:39",
+"y": 0
+},
+{
+"x": "2017-03-02T20:45:39",
+"y": 1
+},
+{
+"x": "2017-03-02T21:01:59",
+"y": 1
+},
+{
+"x": "2017-03-02T21:01:59",
+"y": 0
+},
+{
+"x": "2017-07-04T04:22:41",
+"y": 0
+},
+{
+"x": "2017-07-04T04:22:41",
+"y": 1
+},
+{
+"x": "2017-07-04T04:33:59",
+"y": 1
+},
+{
+"x": "2017-07-04T04:33:59",
+"y": 0
+},
+{
+"x": "2019-09-28T11:53:09",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "jeongsoolim/drc_hubo Backlog Size"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>
