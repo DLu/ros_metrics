@@ -13,7 +13,8 @@ BASE_URL = 'https://awstats.osuosl.org/reports/packages.ros.org/{year}/{month:02
 PAGES = {
     'root': 'awstats.packages.ros.org.html',
     'countries': 'awstats.packages.ros.org.alldomains.html',
-    'urls': 'awstats.packages.ros.org.urldetail.html'
+    'urls': 'awstats.packages.ros.org.urldetail.html',
+    'downloads': 'awstats.packages.ros.org.downloads.html'
 }
 CACHE_FOLDER = pathlib.Path('cache/packages')
 
@@ -63,7 +64,7 @@ def to_array(table, header=None, skip=0):
     for tr in table.find_all('tr'):
         row = []
         for cell in tr.find_all(['td', 'th']):
-            if len(row) == 0 and cell.find('a'):
+            if len(row) <= skip and cell.find('a'):
                 row.append(cell.find('a')['href'].replace('http://packages.ros.org/', ''))
             else:
                 row.append(interpret_data(cell.text))
@@ -163,6 +164,29 @@ def parse_urls(db, year, month):
         db.insert('urls', row)
 
 
+def parse_downloads(db, year, month):
+    soup = BeautifulParser(open(CACHE_FOLDER / get_filename('downloads', year, month)))
+    if soup.find('title').text == '404 Not Found':
+        parse_urls(db, year, month)
+        return
+
+    table = soup.find_all_by_class('table', 'aws_border')[1]
+    sub_table = table.find('table')
+    data_table = to_array(sub_table, ['URL', 'Hits', '206 Hits', 'Bandwidth', 'Average Size'], 1)
+
+    if not data_table:
+        parse_urls(db, year, month)
+        return
+
+    for row in data_table:
+        clean_dict(row, {'URL': 'url', 'Hits': 'hits', '206 Hits': None, 'Average Size': 'size', 'Entry': None,
+                         'Exit': None, 'Bandwidth': None})
+        row['size'] = string_to_bytes(row['size'])
+        row['year'] = year
+        row['month'] = month
+        db.insert('urls', row)
+
+
 def update_packages(force=False):
     # Start at beginning of logs
     dates = get_year_month_date_range(2014, 1)
@@ -182,7 +206,7 @@ def update_packages(force=False):
         for year, month in tqdm(dates, 'Packages parse'):
             parse_root(db, year, month)
             parse_countries(db, year, month)
-            parse_urls(db, year, month)
+            parse_downloads(db, year, month)
     finally:
         db.close()
 
