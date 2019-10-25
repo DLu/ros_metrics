@@ -58,9 +58,10 @@ The following data sources can only be crawled via use of an API key (or other s
     * [wiki.ros.org](http://wiki.ros.org)
     * [answers.ros.org](http://answers.ros.org)
     * [discourse.ros.org](https://discourse.ros.org)
+    * [index.ros.org](http://index.ros.org)
  * Uses [Google Analytics API](https://developers.google.com/analytics/devguides/reporting/core/v4/quickstart/installed-py)
- * Overall traffic gathered by month/year.
- * Traffic breakdown by [url, country and operating system](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/) done by year.
+ * Overall number of unique pageviews, users and sessions gathered by month/year.
+ * Pageviews breakdown by [url, country and operating system](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/) done by year.
 
 ## TODO
 

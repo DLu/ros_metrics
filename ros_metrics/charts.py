@@ -212,13 +212,14 @@ def get_answers_distro_chart():
     return chart
 
 
-def get_analytics_totals_chart():
+def get_analytics_totals_chart(metric='pageviews', packages=True):
     analytics_db = MetricDB('analytics')
-    packages_db = MetricDB('packages')
     chart = Chart('line', title='Overall Traffic to ROS sites')
-    for name, d_series in analytics.get_total_series(analytics_db).items():
+    for name, d_series in analytics.get_total_series(analytics_db, metric).items():
         chart.add(name, d_series)
-    chart.add('packages.ros.org', get_series(packages_db, 'traffic', 'year, month', 'visitors'))
+    if packages:
+        packages_db = MetricDB('packages')
+        chart.add('packages.ros.org', get_series(packages_db, 'traffic', 'year, month', 'visitors'))
     return chart
 
 

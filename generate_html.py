@@ -110,16 +110,30 @@ STRUCTURE = [
           }
      ]
      },
-    {'name': 'Misc',
+    {'name': 'Analytics',
      'subpages': [
-         {'name': 'Analytics',
+         {'name': 'Pageviews',
           'chart': charts.get_analytics_totals_chart,
-          'caption': 'Relative traffic to key ROS websites as reported by Google Analytics '
+          'caption': 'Pageviews to key ROS websites as reported by Google Analytics '
                      '(and Apache logs for packages.ros.org)'
+          },
+         {'name': 'Users',
+          'chart': charts.get_analytics_totals_chart,
+          'args': ['users', False],
+          'caption': 'Users to key ROS websites as reported by Google Analytics'
+          },
+         {'name': 'Sessions',
+          'chart': charts.get_analytics_totals_chart,
+          'args': ['sessions', False],
+          'caption': 'Number of sessions to key ROS websites as reported by Google Analytics'
           },
          # {'name': 'By Country',
          # 'chart': charts.get_analytics_country_chart(dbs['analytics'])
          # }
+     ]
+     },
+    {'name': 'Misc',
+     'subpages': [
          {'name': 'Wiki',
           'template': 'top.html',
           'tops': analytics.top_wiki_report,
