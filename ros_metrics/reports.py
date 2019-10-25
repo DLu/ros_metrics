@@ -1,6 +1,6 @@
 import collections
 import datetime
-from ros_metrics.util import year_month_to_datetime, epoch_to_datetime
+from .util import year_month_to_datetime, epoch_to_datetime
 
 ONE_WEEK = datetime.timedelta(days=7)
 
@@ -86,7 +86,7 @@ def time_buckets(db, table, values, time_field, ident_field, value_field=None, m
     return buckets
 
 
-def normalize_timepoints(series_dict, values=None):
+def normalize_timepoints(series_dict, values=None, round_places=4):
     plots = collections.defaultdict(list)
     totals = collections.defaultdict(int)
 
@@ -104,6 +104,8 @@ def normalize_timepoints(series_dict, values=None):
 
         for value in values:
             v = line.get(value, 0) / total
+            if round_places is not None:
+                v = round(v, round_places)
             plots[value].append((dt, v))
             totals[value] += v
 
