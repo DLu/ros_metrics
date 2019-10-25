@@ -23,7 +23,8 @@ REPORT_DATA.update(YEARLY_REPORTS)
 DOMAINS = [
     'answers.ros.org',
     'wiki.ros.org',
-    'discourse.ros.org'
+    'discourse.ros.org',
+    'index.ros.org'
 ]
 
 
@@ -105,7 +106,7 @@ def lookup_profile(service, db, profile_name):
         if saved is None:
             print('Cannot find profile id for {}. Existing profiles:'.format(profile_name), file=sys.stderr)
             for p_dict in db.query('SELECT * from profiles'):
-                print('\t{id:8d} {name}'.format(**p_dict), file=sys.stderr)
+                print('\t{id:9d} {name}'.format(**p_dict), file=sys.stderr)
             return None
         return saved
 
@@ -140,14 +141,12 @@ def add_prefix(datum):
         return 'ga:' + datum
 
 
-now = datetime.datetime.now()
-
-
 def get_missing_data(db, profile_id, start_year, start_month):
+    now = datetime.datetime.now()
     queries = []
     for table in MONTHLY_REPORTS:
         for year, month in get_year_month_date_range(start_year, start_month):
-            hits = db.lookup('SUM(pageviews)', table,
+            hits = db.lookup('SUM(sessions)', table,
                              'WHERE profile_id={} AND year={} AND month={}'.format(profile_id, year, month))
             if hits is None:
                 start_date = year_month_to_datetime(year, month).strftime('%Y-%m-%d')
@@ -178,9 +177,12 @@ def get_missing_data(db, profile_id, start_year, start_month):
 
 def get_stats(service, db, profile_id, table, start_date, end_date):
     dimensions = ['year'] + list(REPORT_DATA[table].keys())
+    metrics = ['uniquePageviews']
     if table in MONTHLY_REPORTS:
         dimensions.append('month')
-    results = query(service, profile_id, 'uniquePageviews', dimensions, start_date, end_date)
+        metrics.append('users')
+        metrics.append('sessions')
+    results = query(service, profile_id, metrics, dimensions, start_date, end_date)
     year = int(start_date[0:4])
 
     # Flush existing data (if any)
@@ -193,6 +195,8 @@ def get_stats(service, db, profile_id, table, start_date, end_date):
     # print('\t{profile_id} {table} {start_date} {n}'.format(**locals()))
     remapping = dict(REPORT_DATA[table])
     remapping['uniquePageviews'] = 'pageviews'
+    remapping['users'] = 'users'
+    remapping['sessions'] = 'sessions'
 
     if not results:
         row = {'profile_id': profile_id, 'year': year, 'pageviews': 0}
@@ -249,13 +253,14 @@ def update_analytics():
         db.close()
 
 
-def get_total_series(db):
+def get_total_series(db, metric='pageviews'):
     profiles = dict([(row['id'], row['name']) for row in db.query('SELECT * FROM profiles')])
     series = collections.defaultdict(list)
     for row in db.query('SELECT * FROM totals ORDER BY year, month'):
         dt = year_month_to_datetime(row['year'], row['month'])
         name = profiles.get(row['profile_id'])
-        series[name].append({'x': dt.isoformat(), 'y': row['pageviews']})
+        if row[metric] or series[name]:
+            series[name].append({'x': dt.isoformat(), 'y': row[metric]})
     return series
 
 

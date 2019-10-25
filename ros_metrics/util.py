@@ -82,7 +82,9 @@ def clean_dict(d, mappings, convert_ats=True):
         if convert_ats and key.endswith('_at') and isinstance(d[key], str):
             d[key] = string_to_epoch(d[key])
         dest = mappings[key]
-        if dest is not None:
+        if dest == key:
+            continue
+        elif dest is not None:
             d[dest] = d[key]
         del d[key]
 

@@ -9,6 +9,8 @@ tables:
     - year
     - month
     - pageviews
+    - users
+    - sessions
     url_views:
     - profile_id
     - year
