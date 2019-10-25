@@ -105,6 +105,9 @@ def get_users_plot():
     chart.add('ros-users subscribers', sorted(manual.items()))
     chart.add('ros-users posters', get_unique_series(users_db, 'posts', 'created_at', 'user_id'))
 
+    manual_wiki = get_manual_stats('wiki.ros.org users')
+    chart.add('wiki.ros.org users', sorted(manual_wiki.items()))
+
     chart.add('answers.ros.org users', get_aggregate_series(answers_db, 'users', 'created_at'))
     chart.add('answers.ros.org questioners', get_unique_series(answers_db, 'questions', 'created_at', 'user_id'))
     chart.add('answers.ros.org answerers', get_unique_series(answers_db, 'answers', 'created_at', 'user_id'))
