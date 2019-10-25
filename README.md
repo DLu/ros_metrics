@@ -66,7 +66,7 @@ The following data sources can only be crawled via use of an API key (or other s
 ## TODO
 
 ### [ROS Wiki](https://wiki.ros.org)
- * [ ] number of users
+ * [*] number of users
  * [ ] num pages
  * [ ] num edits
  * [*] num wiki page views
