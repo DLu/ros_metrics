@@ -36,6 +36,9 @@ ubuntu:
   - zesty
   - artful
   - bionic
+  - cosmic
+  - disco
+  - eoan
 debian:
   - stretch
   - jessie

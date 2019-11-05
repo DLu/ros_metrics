@@ -23,7 +23,7 @@
 
 ### Multi-Repo Stats
  * Statistics based on the repositories listed in the rosdistro
- * Scores github repositories based on stars, forks and subscribers.
+ * Scores [Github repositories](https://developer.github.com/v3/) based on stars, forks and subscribers.
  * Gathers information on the issues/pull requests opened and closed.
  * TODO:
      * [ ] Determine number of packages per repository/commit
