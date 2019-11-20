@@ -155,10 +155,14 @@ def classify_modification(diff):
         elif type_ == 'dry-doc':
             type_ = 'doc'
         elif type_ in ['dependencies', 'ci-jobs']:
-            yield None
+            yield 'update', 'misc', distro
             return
         diffs = 0
-        for left, right, path in yaml_diff(diff):
+        diff_parts = list(yaml_diff(diff))
+        if len(diff_parts) == 0:
+            yield 'update', type_, distro
+            return
+        for left, right, path in diff_parts:
             if not left and right:
                 verb = 'add'
             elif not right and left:
@@ -252,6 +256,8 @@ def classify_modification(diff):
                 yield verb, 'release_packages', folder
             elif wild_array_compare(path, ['repositories', '*', 'tags'], False):
                 yield verb, 'release', folder
+            elif path == ['version']:
+                yield verb, 'misc', folder
             else:
                 yield None
         if diffs == 0:
@@ -260,6 +266,9 @@ def classify_modification(diff):
     else:
         if path == 'fuerte.yaml':
             yield 'update', 'release', 'fuerte'
+            return
+        elif path in ['releases/backports.yaml', 'releases/targets.yaml', 'targets.yaml', 'backports.yaml']:
+            yield 'update', 'release', None
             return
 
         # Unknown Case
@@ -329,7 +338,7 @@ def classify_commit(repo, main_path, commit, commit_id):
 
 def count_repos(db, commit_id, commit):
     try:
-        db.execute('DELETE FROM repo_count WHERE commit_id={}'.format(commit_id))
+        db.execute(f'DELETE FROM repo_count WHERE commit_id={commit_id}')
 
         name_map = collections.defaultdict(set)
         for folder in commit.tree.trees:
@@ -390,7 +399,7 @@ def count_repos(db, commit_id, commit):
 
 def update_rosdistro():
     # Clone or update the repo in the cache
-    repo = get_rosdistro_repo()
+    repo = get_rosdistro_repo(update=True)
 
     commits = list(reversed(list(repo.iter_commits())))
 
@@ -432,8 +441,8 @@ def update_rosdistro():
 
 
 def commit_query(db, fields, clause=''):
-    for commit in db.query('SELECT date, {} FROM commits INNER JOIN changes'.format(fields) +
-                           ' ON commits.id = changes.commit_id {} ORDER BY date'.format(clause)):
+    for commit in db.query(f'SELECT date, {fields} FROM commits INNER JOIN changes' +
+                           f' ON commits.id = changes.commit_id {clause} ORDER BY date'):
         dt = get_datetime_from_dict(commit, 'date')
         yield dt, commit
 
@@ -525,7 +534,6 @@ def get_people_ratio(db):
         email = get_canonical_email(commit_d['email'])
         counts[email] += 1
     return counts
-    # https://www.zingchart.com/docs/chart-types/treemap
 
 
 def get_repo_report(db, resolution=ONE_WEEK):

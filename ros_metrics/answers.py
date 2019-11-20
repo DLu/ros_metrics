@@ -10,19 +10,19 @@ SERVER = 'https://answers.ros.org'
 
 
 def fetch_page(name, page=None, sort=None):
-    url = '%s/api/v1/%s/?' % (SERVER, name)
+    url = f'{SERVER}/api/v1/{name}/?'
     params = []
     if page:
-        params.append('page=%d' % page)
+        params.append(f'page={page}')
     if sort:
-        params.append('sort=%s' % sort)
+        params.append(f'sort={sort}')
     url += '&'.join(params)
     req = requests.get(url)
     content_type = req.headers.get('content-type')
     if content_type == 'application/json':
         return req.json()
     else:
-        raise Exception('Bad Content Type "{}" for {}'.format(content_type, url))
+        raise Exception(f'Bad Content Type "{content_type}" for {url}')
 
 
 def update_user(db, item):
@@ -33,7 +33,7 @@ def update_user(db, item):
 
 def fetch_user(db, user_id):
     try:
-        contents = fetch_page('users/{}'.format(user_id))
+        contents = fetch_page(f'users/{user_id}')
         update_user(db, contents)
     except Exception as e:
         # Likely the user was deleted
@@ -62,7 +62,7 @@ def process_question(db, item):
     qid = item['id']
 
     # Process Tags
-    existing_tags = [x['tag'] for x in db.query('SELECT tag FROM tags WHERE q_id="{}"'.format(qid))]
+    existing_tags = [x['tag'] for x in db.query(f'SELECT tag FROM tags WHERE q_id="{qid}"')]
     for value in item['tags']:
         if value not in existing_tags:
             db.insert('tags', {'q_id': qid, 'tag': value})
@@ -162,7 +162,7 @@ def fetch_answer(db, aid, initial_dict=None):
         answer_dict['id'] = aid
 
     try:
-        contents = fetch_page('answers/{}'.format(aid))
+        contents = fetch_page(f'answers/{aid}')
         answer_dict['votes'] = contents['score']
         answer_dict['created_at'] = int(contents['added_at'])
         answer_dict['user_id'] = contents['author']['id']
@@ -182,7 +182,7 @@ def update_users(db, limit=50):
     for user in users:
         if user is None:
             continue
-        results = db.query('SELECT last_crawl_at FROM users WHERE id={}'.format(user))
+        results = db.query(f'SELECT last_crawl_at FROM users WHERE id={user}')
         if not results:
             missing.append(user)
         else:
@@ -198,6 +198,18 @@ def update_users(db, limit=50):
 
     for user in tqdm(to_crawl, desc='answers.ros.org user updates'):
         fetch_user(db, user)
+
+
+def manual_closing_check(db):
+    for d in tqdm(db.query('SELECT id FROM questions WHERE accepted_answer_id is null ORDER BY created_at')):
+        id = d['id']
+        try:
+            fetch_question(db, id)
+        except KeyboardInterrupt:
+            break
+        except Exception as e:
+            db.update('questions', {'id': id, 'accepted_answer_id': -1})
+            continue
 
 
 def update_answers():
@@ -273,7 +285,7 @@ def get_top_users(db=None, all_time_count=15, yearly_count=15, by_votes=False):
 
         uid = answer['user_id']
         if uid not in users:
-            users[uid] = db.lookup('username', 'users', 'WHERE id={}'.format(uid))
+            users[uid] = db.lookup('username', 'users', f'WHERE id={uid}')
 
         author = users[uid]
         points = 1 + answer['votes'] if by_votes else 1

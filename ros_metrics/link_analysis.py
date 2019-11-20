@@ -14,7 +14,7 @@ ROS_PKG_PREFIX = re.compile(r'^ros\-(\w+)\-([^_]+)_' + version + distro + '(.*)'
 ARCH_LIBRARY_PREFIX = re.compile(r'([^_]+)_.+_' + short_arch + '(.*)$')
 LIBRARY_PREFIX = re.compile(r'([^_]+)_' + version + '(\..*)$')
 
-PACKAGE_SUFFIX = re.compile('([^/]*\.deb|\.dsc|\.debian\.tar\.xz)$')
+PACKAGE_SUFFIX = re.compile('([^/]*\.deb|\.dsc|\.debian\.tar\.[xg]z|\.orig\.tar\.gz)$')
 
 ARCH_INFO = re.compile(r'main/' + arch + '/(Packages(.gz)?|Release|Sources.gz)$')
 META_INFO = re.compile(r'(In)?Release(\.gpg)?$')

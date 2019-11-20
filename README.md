@@ -49,9 +49,6 @@ The following data sources can only be crawled via use of an API key (or other s
     * categories
     * topics
     * posts
- * TODO:
-    * Periodically scan user_list
-    * Periodically rescan user data
 
 ### Web Traffic
  * Analytics available for

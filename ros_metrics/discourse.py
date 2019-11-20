@@ -6,6 +6,8 @@ from .metric_db import MetricDB
 from .util import now_epoch, key_subset, get_keys
 
 config = None
+USER_CRAWL_FREQUENCY = 60 * 60 * 24 * 7
+USER_DATA_FREQUENCY = 60 * 60 * 24 * 30
 
 
 def fetch_page(path, params=None, debug=False):
@@ -29,12 +31,12 @@ def fetch_page(path, params=None, debug=False):
     if response_dict.get('error_type') == 'rate_limit':
         s = max(5, response_dict['extras']['wait_seconds'] + 1)
         if debug:
-            print('Waiting %d seconds' % s)
+            print(f'Waiting {s} seconds')
         time.sleep(s)
         # Recurse
         return fetch_page(path, params)
     else:
-        raise Exception('Invalid response from {}: {}'.format(url, response.text))
+        raise Exception(f'Invalid response from {url}: {response.text}')
 
 
 def fetch_user_list(db):
@@ -72,21 +74,40 @@ def fetch_user_list(db):
         bar.close()
 
 
-def fetch_user_data(db):
-    results = db.query('SELECT username, id FROM users WHERE created_at IS NULL ORDER BY id')
-    if not results:
+def fetch_user_data(db, limit=500):
+    now = now_epoch()
+    unseen = db.query('SELECT username, id FROM users WHERE created_at IS NULL AND username IS NOT NULL ORDER BY id')
+
+    cutoff_date = now - USER_DATA_FREQUENCY
+    old = db.query(f'SELECT username, id FROM users WHERE last_updated < {cutoff_date} ORDER BY last_updated')
+
+    to_crawl = unseen + old
+    to_crawl = to_crawl[:limit]
+
+    if not to_crawl:
         return
-    for user_dict in tqdm(results, desc='Discourse user data'):
-        data = fetch_page('/users/%s.json' % user_dict['username'])
+    for user_dict in tqdm(to_crawl, desc='Discourse user data'):
+        try:
+            username = user_dict['username']
+            data = fetch_page(f'/users/{username}.json')
+        except Exception as e:
+            user_dict['username'] = None
+            user_dict['last_updated'] = now
+            db.update('users', user_dict)
+            continue
         entry = key_subset(data['user'], ['id', 'admin', 'created_at', 'last_posted_at', 'last_seen_at',
                                           'moderator', 'trust_level', 'time_read'])
-        entry['last_updated'] = now_epoch()
+        entry['last_updated'] = now
         db.update('users', entry)
 
 
 def process_post(db, post, process_topic=True):
     post_d = key_subset(post, db.db_structure['tables']['posts'])
     db.update('posts', post_d)
+
+    # Process User
+    user_d = {'id': post['user_id'], 'username': post['username']}
+    db.update('users', user_d)
 
     if not process_topic:
         return
@@ -97,6 +118,15 @@ def process_post(db, post, process_topic=True):
         if key in post and post[key]:
             topic_info[new_key] = post[key]
     db.update('topics', topic_info)
+
+
+def fetch_post(db, id):
+    try:
+        data = fetch_page(f'/posts/{id}.json')
+    except Exception:
+        return
+
+    process_post(db, data, False)
 
 
 def full_refresh(db):
@@ -135,6 +165,10 @@ def fetch_recent_posts(db):
     max_id = db.lookup('max(id)', 'posts')
     running = True
     min_id = None
+    bar = tqdm(total=100, desc='Discourse Recent Posts')
+    id_span = None
+    last_percent = 0
+    new_posts = 0
 
     while running:
         params = {}
@@ -144,9 +178,18 @@ def fetch_recent_posts(db):
         if len(posts) == 0:
             break
 
-        new_posts = 0
         min_id = None
         for post in posts:
+            if post['id'] >= max_id:
+                if id_span is None:
+                    id_span = post['id'] - max_id
+                if id_span == 0:
+                    percent = 100
+                else:
+                    percent = int(100.0 * (id_span - (post['id'] - max_id)) / id_span)
+                if percent > last_percent:
+                    bar.update(percent - last_percent)
+                    last_percent = percent
             process_post(db, post)
 
             if min_id is None:
@@ -160,7 +203,8 @@ def fetch_recent_posts(db):
             if running:
                 new_posts += 1
 
-        print('Discourse - Fetched {} new posts'.format(new_posts))
+    bar.close()
+    print(f'Discourse - Fetched {new_posts} new posts')
 
 
 def update_discourse(full=False):
@@ -170,7 +214,14 @@ def update_discourse(full=False):
         if full:
             full_refresh(db)
         else:
-            fetch_user_data(db)
             fetch_recent_posts(db)
+
+            now = now_epoch()
+            last_updated_at = db.lookup('last_updated_at', 'user_crawl')
+            if last_updated_at is None or now - last_updated_at > USER_CRAWL_FREQUENCY:
+                fetch_user_list(db)
+                db.execute('DELETE from user_crawl')
+                db.insert('user_crawl', {'last_updated_at': now})
+            fetch_user_data(db)
     finally:
         db.close()

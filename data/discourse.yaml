@@ -40,6 +40,8 @@ tables:
   topic_tags:
       - t_id
       - tag
+  user_crawl:
+      - last_updated_at
 
 special_types:
     username: text

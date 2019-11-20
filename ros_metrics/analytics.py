@@ -73,7 +73,7 @@ def query(service, profile_id, metrics, dimensions=None, start_date='7daysAgo', 
                                           metrics=metrics_s,
                                           start_index=start_index).execute()
         if bar is None:
-            bar = tqdm(total=results['totalResults'], desc='{} {} {}'.format(profile_id, start_date, dimensions_s))
+            bar = tqdm(total=results['totalResults'], desc=f'{profile_id} {start_date} {dimensions_s}')
         # print(yaml.dump(results))
 
         for row in results.get('rows', []):
@@ -94,7 +94,7 @@ def query(service, profile_id, metrics, dimensions=None, start_date='7daysAgo', 
 
 
 def lookup_profile(service, db, profile_name):
-    profile_id = db.lookup('id', 'profiles', 'WHERE name=="{}"'.format(profile_name))
+    profile_id = db.lookup('id', 'profiles', f'WHERE name=="{profile_name}"')
     if profile_id is not None:
         return profile_id
     else:
@@ -104,7 +104,7 @@ def lookup_profile(service, db, profile_name):
             if name == profile_name:
                 saved = int(id_s)
         if saved is None:
-            print('Cannot find profile id for {}. Existing profiles:'.format(profile_name), file=sys.stderr)
+            print(f'Cannot find profile id for {profile_name}. Existing profiles:', file=sys.stderr)
             for p_dict in db.query('SELECT * from profiles'):
                 print('\t{id:9d} {name}'.format(**p_dict), file=sys.stderr)
             return None
@@ -112,7 +112,7 @@ def lookup_profile(service, db, profile_name):
 
 
 def get_start_point(service, db, profile_id):
-    profiles = db.query('SELECT * from profiles WHERE id={}'.format(profile_id))
+    profiles = db.query(f'SELECT * from profiles WHERE id={profile_id}')
     if len(profiles) != 1:
         return None, None
     profile = profiles[0]
@@ -147,7 +147,7 @@ def get_missing_data(db, profile_id, start_year, start_month):
     for table in MONTHLY_REPORTS:
         for year, month in get_year_month_date_range(start_year, start_month):
             hits = db.lookup('SUM(sessions)', table,
-                             'WHERE profile_id={} AND year={} AND month={}'.format(profile_id, year, month))
+                             f'WHERE profile_id={profile_id} AND year={year} AND month={month}')
             if hits is None:
                 start_date = year_month_to_datetime(year, month).strftime('%Y-%m-%d')
                 end_date = year_month_to_datetime(year, month, beginning=False).strftime('%Y-%m-%d')
@@ -155,13 +155,13 @@ def get_missing_data(db, profile_id, start_year, start_month):
     for table in YEARLY_REPORTS:
         for year in range(start_year, now.year + 1):
             hits = db.lookup('SUM(pageviews)', table,
-                             'WHERE profile_id={} AND year={}'.format(profile_id, year))
+                             f'WHERE profile_id={profile_id} AND year={year}')
 
             if hits is not None:
                 if year == now.year:
                     # Skip if already run this month
                     last_updated_at = db.lookup('last_updated_at', 'updates',
-                                                'WHERE profile_id={} and table_name="{}"'.format(profile_id, table))
+                                                f'WHERE profile_id={profile_id} and table_name="{table}"')
                     if last_updated_at is not None:
                         last_updated_at = epoch_to_datetime(last_updated_at)
                     if last_updated_at and last_updated_at.year == now.year and last_updated_at.month == now.month:
@@ -186,13 +186,13 @@ def get_stats(service, db, profile_id, table, start_date, end_date):
     year = int(start_date[0:4])
 
     # Flush existing data (if any)
-    base_flush = 'DELETE FROM {} WHERE profile_id={} and year={}'.format(table, profile_id, year)
+    base_flush = f'DELETE FROM {table} WHERE profile_id={profile_id} and year={year}'
     if table in MONTHLY_REPORTS:
         base_flush += ' and month={}'.format(int(start_date[5:7]))
     db.execute(base_flush)
 
     # n = len(results)
-    # print('\t{profile_id} {table} {start_date} {n}'.format(**locals()))
+    # print(f'\t{profile_id} {table} {start_date} {n}')
     remapping = dict(REPORT_DATA[table])
     remapping['uniquePageviews'] = 'pageviews'
     remapping['users'] = 'users'
@@ -223,7 +223,7 @@ def get_stats(service, db, profile_id, table, start_date, end_date):
             row['profile_id'] = profile_id
             db.insert(table, row)
 
-    db.execute('DELETE FROM updates WHERE profile_id={} and table_name="{}"'.format(profile_id, table))
+    db.execute(f'DELETE FROM updates WHERE profile_id={profile_id} and table_name="{table}"')
     db.insert('updates', {'profile_id': profile_id, 'table_name': table, 'last_updated_at': now_epoch()})
 
 
@@ -275,9 +275,9 @@ def get_country_traffic(db, key='wiki'):
     ccs = [x['cc'] for x in db.query('SELECT DISTINCT cc from cc_views') if x['cc']]
 
     series = collections.defaultdict(list)
-    base_query = 'SELECT year, pageviews FROM cc_views WHERE profile_id={}'.format(profile_id)
+    base_query = f'SELECT year, pageviews FROM cc_views WHERE profile_id={profile_id}'
     for country in ccs:
-        for row in db.query(base_query + ' and cc="{}" ORDER BY year'.format(country)):
+        for row in db.query(base_query + f' and cc="{country}" ORDER BY year'):
             dt = year_month_to_datetime(row['year'], 1)
             series[country].append({'x': dt.isoformat(), 'y': row['pageviews']})
 
@@ -292,5 +292,5 @@ def top_wiki_report(db=None):
     if db is None:
         db = MetricDB('analytics')
     profile_id = db.lookup('id', 'profiles', 'WHERE name="wiki.ros.org"')
-    return get_top_by_year(db, 'url_views', 'url', 'pageviews', 'WHERE profile_id={}'.format(profile_id),
+    return get_top_by_year(db, 'url_views', 'url', 'pageviews', f'WHERE profile_id={profile_id}',
                            ident_tranformer=wiki_url_filter)

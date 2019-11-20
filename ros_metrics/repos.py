@@ -333,8 +333,11 @@ def update_repos(local_repos=False, github_repos=True):
             update(repos)
             check_statuses(db)
         if github_repos:
-            get_github_stats(db)
-            get_github_issues(db)
+            try:
+                get_github_stats(db)
+                get_github_issues(db)
+            except RuntimeError as e:
+                print(e)
     except KeyboardInterrupt:
         pass
     finally:
