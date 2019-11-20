@@ -4,6 +4,8 @@ gitpython
 google-api-python-client
 jinja2
 mailbox
+oauth2client
+PyGithub
 requests
 scholarly
 tabulate
