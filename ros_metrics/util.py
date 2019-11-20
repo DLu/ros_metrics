@@ -5,6 +5,7 @@ import datetime
 import dateutil.parser
 import github
 import os
+import pathlib
 import re
 import yaml
 
@@ -173,11 +174,13 @@ def get_keys():
 
 def get_github_api():
     github_token = None
-    for filename in [os.path.expanduser('~/.git-tokens'), 'keys.yaml']:
-        values = yaml.load(open(filename))
+    for path in [pathlib.Path.home() / '.git-tokens', pathlib.Path('keys.yaml')]:
+        if not path.exists():
+            continue
+        values = yaml.load(open(path))
         if 'github' in values:
             github_token = values['github']
             break
     if not github_token:
-        raise Exception('Cannot find github token')
+        raise RuntimeError('Cannot find github token')
     return github.Github(github_token)

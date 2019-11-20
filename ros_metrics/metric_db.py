@@ -36,7 +36,7 @@ class MetricDB:
         except sqlite3.OperationalError as e:
             print(e)
             print(query)
-            exit(0)
+            raise
 
     def execute(self, command, params=None):
         """ Execute the given command with the parameters. Return nothing """
@@ -50,7 +50,7 @@ class MetricDB:
             print(e)
             print(command)
             print(params)
-            exit(0)
+            raise
 
     def rename_column(self, table, old_col, new_col):
         """ Rename a column in a table """
@@ -141,9 +141,12 @@ class MetricDB:
         """ If there is a row where the specified field matches the row_dict's value of the field, update it.
             Otherwise, just insert it. """
         if isinstance(replace_key, str):
-            clause = 'WHERE {}={}'.format(replace_key, self.format_value(replace_key, row_dict[replace_key]))
+            clause = 'WHERE {}={}'.format(replace_key,
+                                          self.format_value(replace_key, row_dict[replace_key]))
         else:
-            clause = 'WHERE {}'.format(' and '.join(['{}={}'.format(key, row_dict[key]) for key in replace_key]))
+            clause = 'WHERE {}'.format(' and '.join(['{}={}'.format(key,
+                                                                    self.format_value(key, row_dict[key]))
+                                                     for key in replace_key]))
         if self.count(table, clause) == 0:
             # If no matches, just insert
             self.insert(table, row_dict)

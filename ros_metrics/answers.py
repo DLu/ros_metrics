@@ -200,6 +200,18 @@ def update_users(db, limit=50):
         fetch_user(db, user)
 
 
+def manual_closing_check(db):
+    for d in tqdm(db.query('SELECT id FROM questions WHERE accepted_answer_id is null ORDER BY created_at')):
+        id = d['id']
+        try:
+            fetch_question(db, id)
+        except KeyboardInterrupt:
+            break
+        except Exception as e:
+            db.update('questions', {'id': id, 'accepted_answer_id': -1})
+            continue
+
+
 def update_answers():
     db = MetricDB('answers')
 

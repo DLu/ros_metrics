@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import collections
 from jinja2 import Environment, FileSystemLoader
 import pathlib
@@ -9,6 +10,9 @@ from ros_metrics.metric_db import MetricDB
 from ros_metrics.constants import distros, os_list
 from tqdm import tqdm
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--filter')
+args = parser.parse_args()
 
 OUTPUT_FOLDER = pathlib.Path('docs')
 
@@ -169,8 +173,11 @@ for blob in STRUCTURE:
     else:
         submenu = collections.OrderedDict()
         for subpage in blob['subpages']:
-            filename = name.lower().replace(' ', '') + '_' + subpage['name'].lower().replace(' ', '') + '.html'
-            subpage['filename'] = filename
+            if 'filename' not in subpage:
+                filename = name.lower().replace(' ', '') + '_' + subpage['name'].lower().replace(' ', '') + '.html'
+                subpage['filename'] = filename
+            else:
+                filename = subpage['filename']
             submenu[filename] = subpage['name']
         blob['submenu'] = submenu
         chosen = blob['subpages'][0]['filename']
@@ -184,6 +191,8 @@ for blob in STRUCTURE:
         template = j2_env.get_template(blob.get('template', 'basic_chart.html'))
         blob['level1'] = level1
         blob['menu'] = menu
+        if args.filter and args.filter not in level1:
+            continue
         print(level1)
         for key, value in blob.items():
             if hasattr(value, '__call__'):
@@ -194,6 +203,8 @@ for blob in STRUCTURE:
         for subpage in blob['subpages']:
             template = j2_env.get_template(subpage.get('template', 'basic_chart.html'))
             level2 = subpage['filename']
+            if args.filter and args.filter not in level2:
+                continue
             print(level2)
 
             for key, value in subpage.items():
@@ -205,6 +216,9 @@ for blob in STRUCTURE:
             subpage['submenu'] = blob['submenu']
             with open(OUTPUT_FOLDER / level2, 'w') as f:
                 f.write(template.render(**subpage))
+
+if args.filter and args.filter != 'repos':
+    exit(0)
 
 repos_db = MetricDB('repos')
 REPOS_FOLDER = OUTPUT_FOLDER / 'repos'

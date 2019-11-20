@@ -399,7 +399,7 @@ def count_repos(db, commit_id, commit):
 
 def update_rosdistro():
     # Clone or update the repo in the cache
-    repo = get_rosdistro_repo()
+    repo = get_rosdistro_repo(update=True)
 
     commits = list(reversed(list(repo.iter_commits())))
 
@@ -534,7 +534,6 @@ def get_people_ratio(db):
         email = get_canonical_email(commit_d['email'])
         counts[email] += 1
     return counts
-    # https://www.zingchart.com/docs/chart-types/treemap
 
 
 def get_repo_report(db, resolution=ONE_WEEK):
