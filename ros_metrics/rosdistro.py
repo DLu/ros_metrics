@@ -155,10 +155,14 @@ def classify_modification(diff):
         elif type_ == 'dry-doc':
             type_ = 'doc'
         elif type_ in ['dependencies', 'ci-jobs']:
-            yield None
+            yield 'update', 'misc', distro
             return
         diffs = 0
-        for left, right, path in yaml_diff(diff):
+        diff_parts = list(yaml_diff(diff))
+        if len(diff_parts) == 0:
+            yield 'update', type_, distro
+            return
+        for left, right, path in diff_parts:
             if not left and right:
                 verb = 'add'
             elif not right and left:
@@ -252,6 +256,8 @@ def classify_modification(diff):
                 yield verb, 'release_packages', folder
             elif wild_array_compare(path, ['repositories', '*', 'tags'], False):
                 yield verb, 'release', folder
+            elif path == ['version']:
+                yield verb, 'misc', folder
             else:
                 yield None
         if diffs == 0:
@@ -260,6 +266,9 @@ def classify_modification(diff):
     else:
         if path == 'fuerte.yaml':
             yield 'update', 'release', 'fuerte'
+            return
+        elif path in ['releases/backports.yaml', 'releases/targets.yaml', 'targets.yaml', 'backports.yaml']:
+            yield 'update', 'release', None
             return
 
         # Unknown Case
