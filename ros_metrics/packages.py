@@ -20,7 +20,7 @@ CACHE_FOLDER = pathlib.Path('cache/packages')
 
 
 def get_filename(name, year, month):
-    return '{name}_{year}_{month:02d}.html'.format(name=name, year=year, month=month)
+    return f'{name}_{year}_{month:02d}.html'
 
 
 def get_filename_url_pairs(dates):

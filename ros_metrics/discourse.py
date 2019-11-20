@@ -29,12 +29,12 @@ def fetch_page(path, params=None, debug=False):
     if response_dict.get('error_type') == 'rate_limit':
         s = max(5, response_dict['extras']['wait_seconds'] + 1)
         if debug:
-            print('Waiting %d seconds' % s)
+            print(f'Waiting {s} seconds')
         time.sleep(s)
         # Recurse
         return fetch_page(path, params)
     else:
-        raise Exception('Invalid response from {}: {}'.format(url, response.text))
+        raise Exception(f'Invalid response from {url}: {response.text}')
 
 
 def fetch_user_list(db):

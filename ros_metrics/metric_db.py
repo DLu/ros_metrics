@@ -17,13 +17,13 @@ class MetricDB:
        Custom wrapper around an sqlite database with a plausibly easier-to-use API
     """
     def __init__(self, key):
-        filepath = data_folder / '{}.db'.format(key)
+        filepath = data_folder / f'{key}.db'
         self.raw_db = sqlite3.connect(str(filepath), detect_types=sqlite3.PARSE_DECLTYPES)
         sqlite3.register_adapter(bool, int)
         sqlite3.register_converter("bool", lambda v: bool(int(v)))
         self.raw_db.row_factory = dict_factory
 
-        structure_filepath = data_folder / '{}.yaml'.format(key)
+        structure_filepath = data_folder / f'{key}.yaml'
         self.db_structure = yaml.load(open(str(structure_filepath)))
         self._update_database_structure()
 
@@ -59,17 +59,17 @@ class MetricDB:
         cols[cols.index(old_col)] = new_col
         new_fields = ', '.join(cols)
 
-        self.execute('ALTER TABLE {} RENAME TO {}_x'.format(table, table))
+        self.execute(f'ALTER TABLE {table} RENAME TO {table}_x')
         types = []
         for key in cols:
             tt = self.get_field_type(key)
             if key == 'id':
                 tt += ' PRIMARY KEY'
-            types.append('%s %s' % (key, tt))
-        create_cmd = 'CREATE TABLE %s (%s)' % (table, ', '.join(types))
-        self.execute(create_cmd)
-        self.execute('INSERT INTO {}({}) SELECT {} FROM {}_x'.format(table, new_fields, old_fields, table))
-        self.execute('DROP TABLE {}_x'.format(table))
+            types.append(f'{key} {tt}')
+        type_s = ', '.join(types)
+        self.execute(f'CREATE TABLE {table} ({type_s})')
+        self.execute(f'INSERT INTO {table}({new_fields}) SELECT {old_fields} FROM {table}_x')
+        self.execute(f'DROP TABLE {table}_x')
 
     def reset(self, table=None):
         """ Clear all of the data out of the database and recreate the tables """
@@ -79,7 +79,7 @@ class MetricDB:
         else:
             tables = [table]
         for table in tables:
-            db.execute('DROP TABLE IF EXISTS %s' % table)
+            db.execute(f'DROP TABLE IF EXISTS {table}')
         self._update_database_structure()
 
     def close(self, print_table_sizes=True):
@@ -94,7 +94,7 @@ class MetricDB:
     def lookup_all(self, field, table, clause=''):
         """ Run a SELECT command with the specified field, table and clause, return an array of the matching values """
         values = []
-        for row in self.query('SELECT {} from {} {}'.format(field, table, clause)):
+        for row in self.query(f'SELECT {field} from {table} {clause}'):
             values.append(row[field])
         return values
 
@@ -111,7 +111,7 @@ class MetricDB:
 
     def dict_lookup(self, key_field, value_field, table, clause=''):
         """ Return a dictionary mapping the key_field to the value_field for some query """
-        results = self.query('SELECT {}, {} from {} {}'.format(key_field, value_field, table, clause))
+        results = self.query(f'SELECT {key_field}, {value_field} FROM {table} {clause}')
         return dict([(d[key_field], d[value_field]) for d in results])
 
     def unique_counts(self, table, ident_field):
@@ -121,7 +121,7 @@ class MetricDB:
     def sum_counts(self, table, value_field, ident_field):
         """ Return a dictionary mapping the different values of the ident_field column to the sum of the value_field
             column in rows that match the key"""
-        return self.dict_lookup(ident_field, 'sum({})'.format(value_field), table, 'GROUP BY ' + ident_field)
+        return self.dict_lookup(ident_field, f'sum({value_field})', table, 'GROUP BY ' + ident_field)
 
     # Convenience interfaces for inserting or updating a dictionary row into the table
     def insert(self, table, row_dict, replace_key=None):
@@ -132,11 +132,10 @@ class MetricDB:
         for k in keys:
             value = row_dict.get(k)
             values.append(value)
-        query = 'INSERT INTO %s (%s) VALUES(%s)' % (table,
-                                                    ', '.join(keys),
-                                                    ', '.join(['?'] * len(values))
-                                                    )
-        self.execute(query, values)
+        key_s = ', '.join(keys)
+        q_s = ', '.join(['?'] * len(values))
+
+        self.execute(f'INSERT INTO {table} ({key_s}) VALUES({q_s})', values)
 
     def update(self, table, row_dict, replace_key='id'):
         """ If there is a row where the specified field matches the row_dict's value of the field, update it.
@@ -155,9 +154,9 @@ class MetricDB:
             if k == replace_key:
                 continue
             values.append(row_dict[k])
-            v_query.append('{}=?'.format(k))
+            v_query.append(f'{k}=?')
         value_str = ', '.join(v_query)
-        query = 'UPDATE {} SET {} '.format(table, value_str) + clause
+        query = f'UPDATE {table} SET {value_str} ' + clause
         self.execute(query, values)
 
     # DB Structure Operations
@@ -168,13 +167,13 @@ class MetricDB:
     def format_value(self, field, value):
         """ If the field's type is text, surround with quotes """
         if self.get_field_type(field) == 'text':
-            return '"{}"'.format(value)
+            return f'"{value}"'
         else:
             return value
 
     def _table_exists(self, table):
         """ Returns a boolean of whether the table exists """
-        return self.count('sqlite_master', "WHERE type='table' AND name='{}'".format(table)) > 0
+        return self.count('sqlite_master', f"WHERE type='table' AND name='{table}'") > 0
 
     def _create_table(self, table):
         """ Creates the table based on the db_structure """
@@ -183,14 +182,14 @@ class MetricDB:
             tt = self.get_field_type(key)
             if key == 'id':
                 tt += ' PRIMARY KEY'
-            types.append('%s %s' % (key, tt))
-        create_cmd = 'CREATE TABLE %s (%s)' % (table, ', '.join(types))
-        self.execute(create_cmd)
+            types.append(f'{key} {tt}')
+        type_s = ', '.join(types)
+        self.execute(f'CREATE TABLE {table} ({type_s})')
 
     def _table_types(self, table):
         """ Return a dictionary mapping the name of each field in a table to its type (according to the db) """
         type_map = {}
-        for row in self.query('PRAGMA table_info("{}")'.format(table)):
+        for row in self.query(f'PRAGMA table_info("{table}")'):
             type_map[row['name']] = row['type']
         return type_map
 
@@ -200,7 +199,7 @@ class MetricDB:
         for key in self.db_structure['tables'][table]:
             tt = self.get_field_type(key)
             if key not in type_map:
-                self.execute('ALTER TABLE {} ADD COLUMN {} {}'.format(table, key, tt))
+                self.execute(f'ALTER TABLE {table} ADD COLUMN {key} {tt}')
 
     def _update_database_structure(self):
         """ Create or update the structure of all tables """

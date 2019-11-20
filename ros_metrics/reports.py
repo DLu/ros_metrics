@@ -14,8 +14,7 @@ def get_datetime_from_dict(row, time_field):
 
 def get_series(db, table, time_field, value_field, clause=''):
     series = []
-    query = 'SELECT {value_field}, {time_field} from {table}'.format(**locals())
-    query += ' {clause} ORDER BY {time_field}'.format(clause=clause, time_field=time_field)
+    query = f'SELECT {value_field}, {time_field} FROM {table} {clause} ORDER BY {time_field}'
     for row in db.query(query):
         series.append((get_datetime_from_dict(row, time_field), row[value_field]))
     return series
@@ -23,8 +22,7 @@ def get_series(db, table, time_field, value_field, clause=''):
 
 def get_aggregate_series(db, table, time_field, resolution=ONE_WEEK):
     series = []
-    query = 'SELECT {time_field} FROM {table}'.format(time_field=time_field, table=table)
-    query += ' WHERE {time_field} is not NULL ORDER BY {time_field}'.format(time_field=time_field)
+    query = f'SELECT {time_field} FROM {table} WHERE {time_field} is not NULL ORDER BY {time_field}'
     last_time = None
     count = 0
     for row in db.query(query):
@@ -39,8 +37,7 @@ def get_aggregate_series(db, table, time_field, resolution=ONE_WEEK):
 def get_unique_series(db, table, time_field, ident_field, resolution=ONE_WEEK):
     series = []
     seen = set()
-    query = 'SELECT {time_field}, {ident_field} FROM {table}'.format(**locals())
-    query += ' WHERE {time_field} is not NULL ORDER BY {time_field}'.format(time_field=time_field)
+    query = f'SELECT {time_field}, {ident_field} FROM {table} WHERE {time_field} is not NULL ORDER BY {time_field}'
     last_time = None
     for row in db.query(query):
         ident = row[ident_field]
@@ -71,8 +68,8 @@ def time_buckets(db, table, values, time_field, ident_field, value_field=None, m
             select_field += ', ' + value_field
 
         one_time_field = time_field.split(',')[0]
-        results = db.query('SELECT {} FROM {} WHERE {} = "{}" AND {} IS NOT NULL ORDER BY {}'
-                           .format(select_field, table, ident_field, value, one_time_field, time_field))
+        results = db.query(f'SELECT {select_field} FROM {table} ' +
+                           f'WHERE {ident_field} = \'{value}\' AND {one_time_field} IS NOT NULL ORDER BY {time_field}')
         for result in results:
             dt = get_datetime_from_dict(result, time_field)
             if months:
@@ -152,7 +149,7 @@ def get_top_by_year(db, table, ident_field, value_field, clause='', yearly_count
     earliest = {}
     total = collections.Counter()
 
-    for row in db.query('SELECT {}, {}, year from {} {}'.format(ident_field, value_field, table, clause)):
+    for row in db.query(f'SELECT {ident_field}, {value_field}, year FROM {table} {clause}'):
         ident = row[ident_field]
         if ident_tranformer:
             ident = ident_tranformer(ident)

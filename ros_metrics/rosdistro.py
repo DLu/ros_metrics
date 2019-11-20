@@ -329,7 +329,7 @@ def classify_commit(repo, main_path, commit, commit_id):
 
 def count_repos(db, commit_id, commit):
     try:
-        db.execute('DELETE FROM repo_count WHERE commit_id={}'.format(commit_id))
+        db.execute(f'DELETE FROM repo_count WHERE commit_id={commit_id}')
 
         name_map = collections.defaultdict(set)
         for folder in commit.tree.trees:
@@ -432,8 +432,8 @@ def update_rosdistro():
 
 
 def commit_query(db, fields, clause=''):
-    for commit in db.query('SELECT date, {} FROM commits INNER JOIN changes'.format(fields) +
-                           ' ON commits.id = changes.commit_id {} ORDER BY date'.format(clause)):
+    for commit in db.query(f'SELECT date, {fields} FROM commits INNER JOIN changes' +
+                           f' ON commits.id = changes.commit_id {clause} ORDER BY date'):
         dt = get_datetime_from_dict(commit, 'date')
         yield dt, commit
 

@@ -29,7 +29,7 @@ def download_archives():
         output_filename = FOLDER / href
         if output_filename.exists():
             continue
-        print('Getting {}...'.format(href))
+        print(f'Getting {href}...')
 
         req = requests.get(BASE_URL + href)
         with open(output_filename, 'wb') as f:
