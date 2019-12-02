@@ -4,7 +4,7 @@ import argparse
 import collections
 from jinja2 import Environment, FileSystemLoader
 import pathlib
-from ros_metrics import charts
+from ros_metrics import charts, tables
 from ros_metrics import analytics, answers, packages, repos
 from ros_metrics.metric_db import MetricDB
 from ros_metrics.constants import distros, os_list
@@ -88,9 +88,7 @@ STRUCTURE = [
      },
     {'name': 'Repos',
      'template': 'table.html',
-     'headers': ['rank_product', 'org', 'repo', 'forks', 'stars', 'subs', 'open issues', 'closed issues',
-                 'total issues', 'open prs', 'merged prs', 'closed prs', 'total prs'],
-     'table': repos.github_repos_report,
+     'table': tables.github_repos_report,
      'caption': 'Github repos listed in ros/rosdistro, ranked by number of forks/stars/subscriptions'
      },
     {'name': 'Answers',
