@@ -18,6 +18,7 @@ ros2:
   - crystal
   - dashing
   - eloquent
+  - foxy
 ubuntu:
   - lucid
   - maverick
