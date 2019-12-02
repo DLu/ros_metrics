@@ -89,3 +89,16 @@ div.all_time {
 span.top_detail {
     font-size: 60%;
 }
+
+span.rank_column {
+    font-size: 80%;
+}
+
+span.rank_column::before {
+    content: "\A(#";
+    white-space: pre-line;
+}
+
+span.rank_column::after {
+    content: ")"
+}

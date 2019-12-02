@@ -413,9 +413,6 @@ def github_repos_report(db=None):
         for key in issue_report:
             repo_dict[key] = issue_report[key].get(id, '')
 
-        # Hack to insert link
-        repo_dict['repo'] = '<a href="repos/{org}_{repo}.html">{repo}</a>'.format(**repo_dict)
-
         lines.append(repo_dict)
     return lines
 

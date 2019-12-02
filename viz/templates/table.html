@@ -4,21 +4,22 @@
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"/>
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="table.js"></script>
 {% endblock %}
 
 {% block content %}
         <table id="myTable" class="display" style="width:100%">
         <thead>
             <tr>
-                {%- for head in headers %}
+                {%- for head in table.headers %}
                 <th>{{ head }}</th>
                 {%- endfor %}
             </tr>
         </thead>
         <tbody>
-            {%- for row in table %}
+            {%- for row in table.data %}
             <tr>
-                {%- for head in headers %}
+                {%- for head in table.headers %}
                 <td>{{row[head]}}</td>
                 {%- endfor %}
             </tr>
@@ -29,7 +30,24 @@
 
         <script>
             $(document).ready( function () {
-                $('#myTable').DataTable();
+                $('#myTable').DataTable({
+                {%- if table.column_defs %}
+                "columnDefs": [
+                {%- for def in table.column_defs %}
+                {
+                  {%- for key in def %}
+                    "{{key}}":
+                    {%- if key in ['render'] -%}
+                      {{ def[key] }},
+                    {%- else -%}
+                      {{ def[key] | tojson }},
+                    {%- endif %}
+                  {%- endfor %}
+                },
+                {%- endfor %}
+                ]
+                {%- endif %}
+                });
             } );
         </script>
 {%- endblock %}
