@@ -299,9 +299,29 @@ def get_rosdistro_repos():
     return chart
 
 
-def get_repo_issues(repos_db, repo_name, repo_id):
-    chart = Chart('line', title=f'{repo_name} Backlog Size')
-    issues, prs = repos.get_issues_and_prs(repos_db, repo_id)
-    chart.add('Open Issues', issues, lineTension=0)
-    chart.add('Open PRs', prs, lineTension=0)
+def get_repo_issues(repos_db=None, repo_name=None, repo_id=None, mode='month'):
+    if repos_db is None:
+        repos_db = MetricDB('repos')
+
+    if repo_name is None:
+        title = 'Overall Backlog Size'
+        simplified = True
+    else:
+        title = f'{repo_name} Backlog Size'
+        simplified = False
+
+    chart = Chart('line', title=title)
+    issues, prs = repos.get_issues_and_prs(repos_db, repo_id, simplified)
+    chart.add('Open Issues', round_series(issues, mode), lineTension=0)
+    chart.add('Open PRs', round_series(prs, mode), lineTension=0)
+    return chart
+
+
+def get_ticket_totals(repos_db=None):
+    if repos_db is None:
+        repos_db = MetricDB('repos')
+
+    chart = Chart('line', title='')
+    for key, line in repos.get_total_issues_and_prs(repos_db, simplified=True).items():
+        chart.add(key, round_series(line), lineTension=0)
     return chart

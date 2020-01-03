@@ -87,9 +87,17 @@ STRUCTURE = [
      ]
      },
     {'name': 'Repos',
-     'template': 'table.html',
-     'table': tables.github_repos_report,
-     'caption': 'Github repos listed in ros/rosdistro, ranked by number of forks/stars/subscriptions'
+     'subpages': [
+         {'name': 'Table',
+          'template': 'table.html',
+          'table': tables.github_repos_report,
+          'caption': 'Github repos listed in ros/rosdistro, ranked by number of forks/stars/subscriptions'
+          },
+         {'name': 'Total Backlog',
+          'chart': charts.get_repo_issues},
+         {'name': 'Issues and PRs',
+          'chart': charts.get_ticket_totals},
+     ]
      },
     {'name': 'Answers',
      'subpages': [
