@@ -4,7 +4,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
     <link rel="stylesheet" href="ros_metrics.css">
     <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
-    <title>Repos - ROS Metrics</title>
+    <title>Table - ROS Metrics</title>
     <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"/>
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -16,13 +16,19 @@
         <a href="index.html" >Users</a>
         <a href="packages_top.html" >Packages</a>
         <a href="rosdistro_rosdistro.html" >ROS Distro</a>
-        <a href="repos.html" class="nav_selected">Repos</a>
+        <a href="repos_table.html" class="nav_selected">Repos</a>
         <a href="answers_questions.html" >Answers</a>
         <a href="analytics_pageviews.html" >Analytics</a>
         <a href="misc_wiki.html" >Misc</a>
         <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="ghw.png" alt="github" /></a>
     </div>
-    <div class="main" style="margin-top: 60px">
+    <div class="navbar navbar1">
+        <a href="repos_table.html" class="nav_selected">Table</a>
+        <a href="repos_totalbacklog.html" >Total Backlog</a>
+        <a href="repos_issuesandprs.html" >Issues and PRs</a>
+    </div>
+    <div class="main" style="margin-top: 110px">
+
         <table id="myTable" class="display" style="width:100%">
         <thead>
             <tr>
