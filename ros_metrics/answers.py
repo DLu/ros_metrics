@@ -287,7 +287,7 @@ def get_top_users(db=None, all_time_count=15, yearly_count=15, by_votes=False):
         if uid not in users:
             users[uid] = db.lookup('username', 'users', f'WHERE id={uid}')
 
-        author = users[uid]
+        author = users[uid], f'https://answers.ros.org/users/{uid}/{users[uid]}/'
         points = 1 + answer['votes'] if by_votes else 1
 
         totals[author] += points
