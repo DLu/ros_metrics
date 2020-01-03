@@ -1,6 +1,7 @@
 from .rosdistro import get_rosdistro_repo, REPO_PATH
 from .constants import distros
 from .metric_db import MetricDB
+from .reports import ONE_WEEK
 from .util import get_github_api, now_epoch, epoch_to_datetime, datetime_to_epoch
 import pathlib
 import git
@@ -343,6 +344,7 @@ def update_repos(local_repos=False, github_repos=True):
     finally:
         db.close()
 
+
 def github_stat_report(db):
     report = {}
     ranks = collections.defaultdict(collections.Counter)
@@ -417,12 +419,17 @@ def github_repos_report(db=None):
     return lines
 
 
-def get_open_data(db, repo_id, is_pr):
+def get_open_data(db, repo_id, is_pr, simplified=False):
     opens = []
     closes = []
 
+    if repo_id is not None:
+        clause = f' and repo_id={repo_id}'
+    else:
+        clause = ''
+
     for entry in db.query('SELECT created_at, status, closed_at FROM github_issues '
-                          f'WHERE repo_id={repo_id} and is_pr={is_pr}'):
+                          f'WHERE is_pr={is_pr}' + clause):
         opens.append(entry['created_at'])
         closed = entry['closed_at']
         if closed:
@@ -443,7 +450,8 @@ def get_open_data(db, repo_id, is_pr):
             ep = closes[0]
 
         dt = epoch_to_datetime(ep)
-        series.append((dt, running))
+        if not simplified:
+            series.append((dt, running))
 
         while opens and opens[0] == ep:
             running += 1
@@ -453,13 +461,54 @@ def get_open_data(db, repo_id, is_pr):
             running -= 1
             closes.pop(0)
 
-        series.append((dt, running))
+        if not simplified or not series or dt - series[-1][0] > ONE_WEEK:
+            series.append((dt, running))
 
-    last_updated_at = db.lookup('last_updated_at', 'github_issues_updates', f'WHERE id={repo_id}')
-    series.append((epoch_to_datetime(last_updated_at), running))
+    if repo_id is not None:
+        last_updated_at = db.lookup('last_updated_at', 'github_issues_updates', f'WHERE id={repo_id}')
+        if last_updated_at:
+            series.append((epoch_to_datetime(last_updated_at), running))
 
     return series
 
 
-def get_issues_and_prs(db, repo_id):
-    return get_open_data(db, repo_id, 0), get_open_data(db, repo_id, 1)
+def get_issues_and_prs(db, repo_id, simplified=False):
+    return get_open_data(db, repo_id, 0, simplified), get_open_data(db, repo_id, 1, simplified)
+
+
+def get_total_repo_data(db, repo_id, is_pr, simplified=False):
+    data = collections.defaultdict(list)
+    counts = collections.Counter()
+    name = 'prs' if is_pr else 'issues'
+
+    if repo_id is not None:
+        clause = f' and repo_id={repo_id}'
+    else:
+        clause = ''
+
+    for entry in db.query('SELECT created_at FROM github_issues '
+                          f'WHERE is_pr={is_pr}' + clause + ' ORDER BY created_at'):
+        dt = epoch_to_datetime(entry['created_at'])
+        key = f'{name} opened'
+        counts[key] += 1
+
+        if not simplified or not data[key] or dt - data[key][-1][0] > ONE_WEEK:
+            data[key].append((dt, counts[key]))
+
+    for entry in db.query('SELECT status, closed_at FROM github_issues '
+                          f'WHERE status != "open" and is_pr={is_pr}' + clause + ' ORDER BY closed_at'):
+        dt = epoch_to_datetime(entry['closed_at'])
+        status = entry['status']
+        key = f'{name} {status}'
+        counts[key] += 1
+
+        if not simplified or not data[key] or dt - data[key][-1][0] > ONE_WEEK:
+            data[key].append((dt, counts[key]))
+
+    return data
+
+
+def get_total_issues_and_prs(db, repo_id=None, simplified=False):
+    data = get_total_repo_data(db, repo_id, 0, simplified)
+    data.update(get_total_repo_data(db, repo_id, 1, simplified))
+    return data

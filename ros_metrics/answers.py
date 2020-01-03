@@ -224,8 +224,10 @@ def update_answers():
 
 def answered_report(db, resolution=ONE_WEEK):
     answered_questions_series = []
+    closed_questions_series = []
     ratios_series = []
     answered = 0
+    closed = 0
 
     last_time = None
     total_q = 0.0
@@ -235,14 +237,20 @@ def answered_report(db, resolution=ONE_WEEK):
         total_q += 1.0
         dt = get_datetime_from_dict(user_dict, 'created_at')
 
-        if user_dict['accepted_answer_id']:
+        accepted = user_dict['accepted_answer_id']
+        if accepted is None:
+            pass
+        elif accepted < 0:
+            closed += 1
+        else:
             answered += 1
 
         if last_time is None or dt - last_time > resolution:
             last_time = dt
             answered_questions_series.append((dt, answered))
-            ratios_series.append((dt, answered / total_q))
-    return answered_questions_series, ratios_series
+            closed_questions_series.append((dt, closed))
+            ratios_series.append((dt, round(answered / total_q, 3)))
+    return answered_questions_series, closed_questions_series, ratios_series
 
 
 def karma_report(db):
@@ -287,7 +295,7 @@ def get_top_users(db=None, all_time_count=15, yearly_count=15, by_votes=False):
         if uid not in users:
             users[uid] = db.lookup('username', 'users', f'WHERE id={uid}')
 
-        author = users[uid]
+        author = users[uid], f'https://answers.ros.org/users/{uid}/{users[uid]}/'
         points = 1 + answer['votes'] if by_votes else 1
 
         totals[author] += points
@@ -298,3 +306,41 @@ def get_top_users(db=None, all_time_count=15, yearly_count=15, by_votes=False):
         yearly[year] = list(per_year[year].most_common(yearly_count))
     all_time = list(totals.most_common(all_time_count))
     return all_time, yearly
+
+
+def get_top_questions(db=None, q_count=10):
+    if db is None:
+        db = MetricDB('answers')
+
+    series = {}
+
+    question_queries = [
+        ('Top Scoring Questions', 'score'),
+        ('Top Viewed Questions', 'view_count'),
+    ]
+    for title, metric in question_queries:
+        values = []
+        for q in db.query(f'SELECT * from questions WHERE {metric} is not NULL ORDER BY -{metric} LIMIT {q_count}'):
+            values.append(((q['title'], q['url']), q[metric]))
+        series[title] = values
+
+    answers = db.unique_counts('answers', 'q_id')
+    most_answers = []
+    for q_id, num_answers in sorted(answers.items(), key=lambda d: d[1], reverse=True)[:q_count]:
+        q = db.query(f'SELECT title, url from questions WHERE id={q_id}')[0]
+        most_answers.append(((q['title'], q['url']), num_answers))
+    series['Most Answered Questions'] = most_answers
+
+    good_answers = []
+    for answer in db.query(f'SELECT * FROM answers WHERE votes is not NULL ORDER BY -votes LIMIT {q_count}'):
+        q_id = answer['q_id']
+        a_id = answer['id']
+        u_id = answer['user_id']
+        url = f'{SERVER}/question/{q_id}/?answer={a_id}#post-id-{a_id}'
+        title = db.lookup('title', 'questions', f'WHERE id={q_id}')
+        user = db.lookup('username', 'users', f'WHERE id={u_id}')
+        text = user + ' @ ' + title
+        good_answers.append(((text, url), answer['votes']))
+    series['Top Scoring Answers'] = good_answers
+
+    return [], series

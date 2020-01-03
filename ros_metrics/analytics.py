@@ -260,7 +260,7 @@ def get_total_series(db, metric='pageviews'):
         dt = year_month_to_datetime(row['year'], row['month'])
         name = profiles.get(row['profile_id'])
         if row[metric] or series[name]:
-            series[name].append({'x': dt.isoformat(), 'y': row[metric]})
+            series[name].append((dt, row[metric]))
     return series
 
 
@@ -285,7 +285,10 @@ def get_country_traffic(db, key='wiki'):
 
 
 def wiki_url_filter(url):
-    return url.replace('action/show/', '')
+    clean = url.replace('action/show/', '')
+    if len(clean) > 1:
+        clean = clean[1:]
+    return clean, 'https://wiki.ros.org/' + clean
 
 
 def top_wiki_report(db=None):

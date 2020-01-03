@@ -536,13 +536,13 @@ def get_people_ratio(db):
     return counts
 
 
-def get_repo_report(db, resolution=ONE_WEEK):
+def get_repo_report(db):
     series = collections.defaultdict(list)
 
     for commit in db.query('SELECT date, commit_id, distro, count FROM commits INNER JOIN repo_count'
                            ' ON commits.id = repo_count.commit_id ORDER BY date'):
         dt = get_datetime_from_dict(commit, 'date')
         key = commit['distro']
-        if not series[key] or (series[key][-1][-1] != commit['count'] and dt - series[key][-1][0] > resolution):
+        if not series[key] or (series[key][-1][-1] != commit['count']):
             series[key].append((dt, commit['count']))
     return series

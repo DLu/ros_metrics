@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+        {% if tops[0] %}
         <div class="all_time">
             <h2>All Time Top</h2>
             <ol>
             {%- for pkg, hits in tops[0]: %}
-            <li><span class="top_item">{{pkg}}</span>
+            <li><span class="top_item">
+                {%- if pkg is string -%}
+                {{pkg}}
+                {% else -%}
+                <a href="{{pkg[1]}}">{{pkg[0]}}</a>
+                {%- endif -%}
+                </span>
                 <span class="top_detail">({{'{0:,}'.format(hits)}})</span>
             {%- endfor %}
             </ol>
         </div>
+        {% endif %}
         <table>
         {%- for year_row in tops[1]|sort | batch(3) %}
             <tr>
@@ -18,7 +26,13 @@
                     <h3>{{year}}</h3>
                     <ol>
                 {%- for pkg, hits in tops[1][year]: %}
-                    <li><span class="top_item">{{pkg}}</span>
+                    <li><span class="top_item">
+                        {%- if pkg is string -%}
+                        {{pkg}}
+                        {% else -%}
+                        <a href="{{pkg[1]}}">{{pkg[0]}}</a>
+                        {%- endif -%}
+                        </span>
                         <span class="top_detail">({{'{0:,}'.format(hits)}})</span>
                 {%- endfor %}
                     </ol>

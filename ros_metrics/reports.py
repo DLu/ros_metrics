@@ -12,6 +12,39 @@ def get_datetime_from_dict(row, time_field):
         return epoch_to_datetime(row[time_field])
 
 
+def round_time(dt, mode=None):
+    if mode is None:
+        mode = ('weeks', 2)
+
+    regular = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    if mode == 'week':
+        return regular - datetime.timedelta(days=regular.weekday())
+    elif isinstance(mode, tuple) and mode[0] == 'weeks':
+        num_weeks = mode[1]  # Number of weeks to round to
+        week = regular - datetime.timedelta(days=regular.weekday())  # Rounded to beginning of week
+        _, weeknumber, _ = week.isocalendar()  # Get week number
+        off = weeknumber % num_weeks  # Get number of weeks off from rounded value
+        return week - datetime.timedelta(days=7 * off)
+    elif mode == 'month':
+        return regular - datetime.timedelta(days=regular.day)
+    else:
+        raise NotImplementedError(f'Unsupported mode {mode}')
+
+
+def round_series(all_values, mode=None):
+    series = []
+    last_time = None
+    last_val = 0
+    for dt, count in all_values:
+        regular = round_time(dt, mode)
+        if last_time != regular:
+            series.append((regular, last_val))
+            last_time = regular
+        last_val = count
+
+    return series
+
+
 def get_series(db, table, time_field, value_field, clause=''):
     series = []
     query = f'SELECT {value_field}, {time_field} FROM {table} {clause} ORDER BY {time_field}'
@@ -28,10 +61,14 @@ def get_aggregate_series(db, table, time_field, resolution=ONE_WEEK):
     for row in db.query(query):
         count += 1
         dt = get_datetime_from_dict(row, time_field)
-        if last_time is None or dt - last_time > resolution:
+        if resolution is None or last_time is None or dt - last_time > resolution:
             last_time = dt
             series.append((dt, count))
     return series
+
+
+def get_regular_aggregate_series(db, table, time_field, mode=None):
+    return round_series(get_aggregate_series(db, table, time_field, resolution=None), mode)
 
 
 def get_unique_series(db, table, time_field, ident_field, resolution=ONE_WEEK):
@@ -45,10 +82,14 @@ def get_unique_series(db, table, time_field, ident_field, resolution=ONE_WEEK):
             continue
         seen.add(ident)
         dt = get_datetime_from_dict(row, time_field)
-        if last_time is None or dt - last_time > resolution:
+        if resolution is None or last_time is None or dt - last_time > resolution:
             last_time = dt
             series.append((dt, len(seen)))
     return series
+
+
+def get_regular_unique_series(db, table, time_field, ident_field, mode=None):
+    return round_series(get_unique_series(db, table, time_field, ident_field, resolution=None), mode)
 
 
 def order_by_magnitude(count_dict, remove_fields=[]):
