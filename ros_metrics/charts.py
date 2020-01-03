@@ -15,6 +15,10 @@ BASIC_TIME_OPTIONS = {
     'responsive': True,
     'scales': {
         'xAxes': [{'type': 'time', 'display': True}]
+    },
+    'tooltips': {
+        'mode': 'x',
+        'intersect': False
     }
 }
 
