@@ -109,6 +109,11 @@ STRUCTURE = [
           'template': 'top.html',
           'tops': answers.get_top_users,
           'caption': 'Top answerers of questions on answers.ros.org, overall and by year.'
+          },
+         {'name': 'Interesting Qs',
+          'template': 'top.html',
+          'tops': answers.get_top_questions,
+          'caption': 'Various "interesting" statistics'
           }
      ]
      },
