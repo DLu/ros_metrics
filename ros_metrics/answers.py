@@ -224,8 +224,10 @@ def update_answers():
 
 def answered_report(db, resolution=ONE_WEEK):
     answered_questions_series = []
+    closed_questions_series = []
     ratios_series = []
     answered = 0
+    closed = 0
 
     last_time = None
     total_q = 0.0
@@ -235,14 +237,20 @@ def answered_report(db, resolution=ONE_WEEK):
         total_q += 1.0
         dt = get_datetime_from_dict(user_dict, 'created_at')
 
-        if user_dict['accepted_answer_id']:
+        accepted = user_dict['accepted_answer_id']
+        if accepted is None:
+            pass
+        elif accepted < 0:
+            closed += 1
+        else:
             answered += 1
 
         if last_time is None or dt - last_time > resolution:
             last_time = dt
             answered_questions_series.append((dt, answered))
-            ratios_series.append((dt, answered / total_q))
-    return answered_questions_series, ratios_series
+            closed_questions_series.append((dt, closed))
+            ratios_series.append((dt, round(answered / total_q, 3)))
+    return answered_questions_series, closed_questions_series, ratios_series
 
 
 def karma_report(db):

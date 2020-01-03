@@ -194,10 +194,11 @@ def get_scholar_plot():
 def get_questions_plot():
     answers_db = MetricDB('answers')
     chart = Chart('line', title='answers.ros.org Overall Statistics')
-    answered_questions_series, ratios_series = answers.answered_report(answers_db)
     chart.add('Total Questions', get_regular_aggregate_series(answers_db, 'questions', 'created_at'))
     chart.add('Total Answers', get_regular_aggregate_series(answers_db, 'answers', 'created_at'))
+    answered_questions_series, closed_questions_series, ratios_series = answers.answered_report(answers_db)
     chart.add('Answered Questions', round_series(answered_questions_series))
+    chart.add('Closed Questions', round_series(closed_questions_series))
     chart.add('Percent Answered', round_series(ratios_series), yAxisID='percent')
     chart['options']['scales']['yAxes'] = [{'title': 'count'},
                                            {'id': 'percent', 'position': 'right', 'ticks': {'suggestedMin': 0}}]
