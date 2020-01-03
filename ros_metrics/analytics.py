@@ -260,7 +260,7 @@ def get_total_series(db, metric='pageviews'):
         dt = year_month_to_datetime(row['year'], row['month'])
         name = profiles.get(row['profile_id'])
         if row[metric] or series[name]:
-            series[name].append({'x': dt.isoformat(), 'y': row[metric]})
+            series[name].append((dt, row[metric]))
     return series
 
 

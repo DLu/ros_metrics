@@ -4,8 +4,8 @@ import datetime
 import yaml
 
 from .metric_db import MetricDB
-from .reports import get_aggregate_series, get_unique_series, time_buckets, normalize_timepoints, get_series
-from .reports import get_email_plots, buckets_to_plot
+from .reports import round_series, get_regular_aggregate_series, get_regular_unique_series
+from .reports import time_buckets, normalize_timepoints, get_series, get_email_plots, buckets_to_plot
 from . import analytics, answers, scholar, packages, rosdistro, repos
 from .constants import countries, distros
 
@@ -62,6 +62,11 @@ class Chart(dict):
                 if isinstance(x, datetime.datetime):
                     x = x.isoformat()
                 new_series.append({'x': x, 'y': y})
+
+            # If all points in series are at midnight, cleave the time spec
+            if isinstance(series[0][0], datetime.datetime) and all(['T00:00:00' in d['x'] for d in new_series]):
+                for d in new_series:
+                    d['x'] = d['x'].replace('T00:00:00', '')
             series = new_series
         data_dict = {'label': name, 'data': series}
         if color is None:
@@ -103,20 +108,21 @@ def get_users_plot():
 
     manual = get_manual_stats('users subscribers')
     chart.add('ros-users subscribers', sorted(manual.items()))
-    chart.add('ros-users posters', get_unique_series(users_db, 'posts', 'created_at', 'user_id'))
+    chart.add('ros-users posters', get_regular_unique_series(users_db, 'posts', 'created_at', 'user_id'))
 
     manual_wiki = get_manual_stats('wiki.ros.org users')
     chart.add('wiki.ros.org users', sorted(manual_wiki.items()))
 
-    chart.add('answers.ros.org users', get_aggregate_series(answers_db, 'users', 'created_at'))
-    chart.add('answers.ros.org questioners', get_unique_series(answers_db, 'questions', 'created_at', 'user_id'))
-    chart.add('answers.ros.org answerers', get_unique_series(answers_db, 'answers', 'created_at', 'user_id'))
+    chart.add('answers.ros.org users', get_regular_aggregate_series(answers_db, 'users', 'created_at'))
+    chart.add('answers.ros.org questioners',
+              get_regular_unique_series(answers_db, 'questions', 'created_at', 'user_id'))
+    chart.add('answers.ros.org answerers', get_regular_unique_series(answers_db, 'answers', 'created_at', 'user_id'))
 
     total, active = rosdistro.get_people_data(rosdistro_db, None)
-    chart.add('rosdistro committers', total)
+    chart.add('rosdistro committers', round_series(total))
 
-    chart.add('Discourse users', get_aggregate_series(discourse_db, 'users', 'created_at'))
-    chart.add('Discourse posters', get_unique_series(discourse_db, 'posts', 'created_at', 'user_id'))
+    chart.add('Discourse users', get_regular_aggregate_series(discourse_db, 'users', 'created_at'))
+    chart.add('Discourse posters', get_regular_unique_series(discourse_db, 'posts', 'created_at', 'user_id'))
 
     return chart
 
@@ -184,11 +190,11 @@ def get_scholar_plot():
 def get_questions_plot():
     answers_db = MetricDB('answers')
     chart = Chart('line', title='answers.ros.org Overall Statistics')
-    chart.add('Total Questions', get_aggregate_series(answers_db, 'questions', 'created_at'))
-    chart.add('Total Answers', get_aggregate_series(answers_db, 'answers', 'created_at'))
     answered_questions_series, ratios_series = answers.answered_report(answers_db)
-    chart.add('Answered Questions', answered_questions_series)
-    chart.add('Percent Answered', ratios_series, yAxisID='percent')
+    chart.add('Total Questions', get_regular_aggregate_series(answers_db, 'questions', 'created_at'))
+    chart.add('Total Answers', get_regular_aggregate_series(answers_db, 'answers', 'created_at'))
+    chart.add('Answered Questions', round_series(answered_questions_series))
+    chart.add('Percent Answered', round_series(ratios_series), yAxisID='percent')
     chart['options']['scales']['yAxes'] = [{'title': 'count'},
                                            {'id': 'percent', 'position': 'right', 'ticks': {'suggestedMin': 0}}]
     return chart
@@ -280,11 +286,11 @@ def get_rosdistro_repos():
     rosdistro_db = MetricDB('rosdistro')
     series = rosdistro.get_repo_report(rosdistro_db)
     chart = Chart('line', title='Number of Repositories in rosdistro')
-    chart.add('All', series['all'])
+    chart.add('All', round_series(series['all']))
     for distro in distros:
         if not series.get(distro):
             continue
-        chart.add(distro, series[distro])
+        chart.add(distro, round_series(series[distro]))
     return chart
 
 
