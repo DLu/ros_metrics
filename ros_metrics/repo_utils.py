@@ -72,6 +72,31 @@ def clone_or_update(url, path=None, update=True):
             repo.remotes.origin.pull()
     return repo, path
 
+
+def resolve(url):
+    if url.startswith('git@'):
+        return url
+    original = url
+    try:
+        while True:
+            r = requests.get(url, allow_redirects=False, timeout=3.0)
+            if r.status_code != 301:
+                break
+            url = r.headers['Location']
+    except requests.exceptions.ConnectTimeout:
+        raise
+    except Exception as e:
+        print(url, e)
+        return None
+
+    if original.endswith('.git') and not url.endswith('.git'):
+        url += '.git'
+    if not original.endswith('/') and url.endswith('/'):
+        url = url[:-1]
+
+    return url
+
+
 def blob_contents(blob):
     if blob is None:
         return ''

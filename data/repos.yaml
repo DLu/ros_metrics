@@ -1,12 +1,4 @@
 tables:
-    repos:
-        - id
-        - key
-        - server
-        - org
-        - repo
-        - url
-        - status
     github_stats:
         - id
         - forks

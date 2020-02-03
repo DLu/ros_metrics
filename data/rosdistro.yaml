@@ -15,8 +15,21 @@ tables:
         - commit_id
         - distro
         - count
+    repos:
+        - id
+        - server
+        - org
+        - repo
+        - url
+        - status
+    remap_repos:
+        - id
+        - new_id
+    tags_checked:
+        - commit_id
 special_types:
     id: int
+    new_id: int
     commit_id: int
     date: int
     change_index: int
