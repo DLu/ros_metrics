@@ -1,3 +1,4 @@
+from .repo_utils import clone_or_update, get_cache_folder, CloneException, match_git_host
 from .rosdistro import get_rosdistro_repo, REPO_PATH
 from .constants import distros
 from .metric_db import MetricDB
@@ -8,25 +9,9 @@ import git
 import github
 import yaml
 import collections
-import re
 from tqdm import tqdm
 
-CACHE_PATH = pathlib.Path('cache/repos')
 FORBIDDEN_KEYS = ['-release', 'ros.org', 'svn', 'code.google.com']
-
-GITHUB_HTTP_PATTERN = re.compile('https?://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+)\.git')
-GITHUB_SSH_PATTERN = re.compile('git@(?P<server>github\.com):(?P<org>[^/]+)/(?P<repo>.+)\.git')
-BB_PATTERN = re.compile('https://(?P<server>bitbucket\.org)/(?P<org>.*)/(?P<repo>.+)')
-GITLAB_HTTP_PATTERN = re.compile('https?://(?P<server>gitlab\.[^/]+)/(?P<org>[^/]+)/(?P<repo>.+).git')
-GITLAB_SSH_PATTERN = re.compile('git@(?P<server>gitlab\.[^/]+):(?P<org>[^/]+)/(?P<repo>.+)\.git')
-PATTERNS = [GITHUB_HTTP_PATTERN, GITHUB_SSH_PATTERN, BB_PATTERN, GITLAB_HTTP_PATTERN, GITLAB_SSH_PATTERN]
-
-
-def match_git_host(url):
-    for pattern in PATTERNS:
-        m = pattern.match(url)
-        if m:
-            return m.groupdict()
 
 
 def get_raw_distro_dict(update=False):
@@ -35,7 +20,6 @@ def get_raw_distro_dict(update=False):
     rosdistro_path = pathlib.Path(REPO_PATH)
 
     all_repos = collections.defaultdict(dict)
-    CACHE_PATH.mkdir(exist_ok=True)
 
     for distro in tqdm(distros, 'updating distros'):
         distro_path = rosdistro_path / distro / 'distribution.yaml'
@@ -54,7 +38,7 @@ def get_raw_distro_dict(update=False):
                 if not repo_dict:
                     continue
 
-                folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
+                folder = get_cache_folder(repo_dict)
                 if not folder.exists():
                     try:
                         git.Repo.clone_from(release_url, str(folder))
@@ -124,48 +108,39 @@ def get_repo_list(db):
                 db.insert('repos', d)
 
 
-CLONE_MESSAGES = [
-    ('mercurial', 'Mercurial (hg) is required'),
-    ('no_access', 'HTTP Basic: Access denied'),
-    ('no_access', 'Permission denied'),
-    ('no_access', 'Connection refused'),
-    ('missing', 'not found'),
-]
-
-
 def clone(db, debug=False):
-    repos = []
+    repos = {}
     to_clone = []
 
-    CACHE_PATH.mkdir(exist_ok=True)
     for repo_dict in db.query('SELECT id, org, repo, url, status FROM repos ORDER BY id'):
         if repo_dict['status'] is not None:
             continue
-        folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
+        folder = get_cache_folder(repo_dict)
         if folder.exists():
-            repos.append(git.Repo(str(folder)))
+            repos[repo_dict['id']] = git.Repo(str(folder))
         else:
             to_clone.append((folder, repo_dict))
+
     if not to_clone:
         return repos
-    for folder, repo_dict in tqdm(sorted(to_clone), 'cloning repos'):
-        try:
-            repos.append(git.Repo.clone_from(repo_dict['url'], str(folder)))
-        except git.GitCommandError as e:
-            for status, msg in CLONE_MESSAGES:
-                if msg in e.stderr:
-                    repo_dict['status'] = status
-                    db.update('repos', repo_dict)
-                    break
 
-            if debug:
-                print(e)
+    for folder, repo_dict in tqdm(sorted(to_clone), 'cloning repos'):
+        id = repo_dict['id']
+        try:
+            repo, path = clone_or_update(repo_dict['url'], folder)
+            repos[id] = repo
+        except CloneException as e:
+            repo_dict['status'] = e.message
+            db.update('repos', repo_dict)
     return repos
 
 
 def update(repos):
-    for repo in tqdm(repos, 'updating repos'):
-        repo.remotes.origin.pull()
+    for repo_id, repo in tqdm(repos.items(), 'updating repos'):
+        try:
+            repo.remotes.origin.pull()
+        except git.GitCommandError as e:
+            print(repo, e)
 
 
 def check_statuses(db):
@@ -181,7 +156,7 @@ def check_statuses(db):
                 db.update('repos', repo_dict)
 
         # Count packages
-        folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
+        folder = get_cache_folder(repo_dict)
         xml = list(folder.rglob('package.xml')) + list(folder.rglob('manifest.xml'))
         if len(xml) > 0:
             continue

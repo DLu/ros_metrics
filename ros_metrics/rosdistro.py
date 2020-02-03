@@ -1,6 +1,4 @@
 import collections
-import io
-import git
 import pathlib
 import re
 from tqdm import tqdm
@@ -9,6 +7,7 @@ import yaml
 from .constants import distros, ros1_distros
 from .metric_db import MetricDB
 from .people import get_canonical_email
+from .repo_utils import clone_or_update, blob_contents
 from .reports import get_datetime_from_dict, ONE_WEEK
 from .util import version_compare
 
@@ -24,22 +23,7 @@ LEGACY_X2 = re.compile(r'releases/([^\-]*)\-(.*).yaml')
 
 
 def get_rosdistro_repo(update=True):
-    if not REPO_PATH.exists():
-        repo = git.Repo.clone_from(GIT_URL, REPO_PATH)
-    else:
-        repo = git.Repo(REPO_PATH)
-        if update:
-            repo.remotes.origin.pull()
-    return repo
-
-
-def blob_contents(blob):
-    if blob is None:
-        return ''
-    s = ''
-    with io.BytesIO(blob.data_stream.read()) as f:
-        s += f.read().decode('utf-8')
-    return s
+    return clone_or_update(GIT_URL, REPO_PATH, update)[0]
 
 
 def yaml_diff_iterator(a, b, keys=None):
