@@ -124,21 +124,35 @@ def clone(db, debug=False):
     if not to_clone:
         return repos
 
-    for folder, repo_dict in tqdm(sorted(to_clone), 'cloning repos'):
+    ts = now_epoch()
+    for folder, repo_dict in tqdm(sorted(to_clone, key=lambda pair: pair[0]), 'cloning repos'):
         id = repo_dict['id']
         try:
             repo, path = clone_or_update(repo_dict['url'], folder)
             repos[id] = repo
+            db.update('repo_updates', {'id': id, 'last_updated_at': ts})
         except CloneException as e:
             repo_dict['status'] = e.message
             db.update('repos', repo_dict)
     return repos
 
 
-def update(repos):
-    for repo_id, repo in tqdm(repos.items(), 'updating repos'):
+def update(db, repos, update_period=300000):
+    ts = now_epoch()
+    to_update = []
+    for repo_id, repo in repos.items():
+        last_updated_at = db.lookup('last_updated_at', 'repo_updates', f'WHERE id={repo_id}')
+        if last_updated_at and ts - last_updated_at < update_period:
+            continue
+        to_update.append((repo_id, repo))
+
+    if not to_update:
+        return
+
+    for repo_id, repo in tqdm(to_update, 'updating repos'):
         try:
             repo.remotes.origin.pull()
+            db.update('repo_updates', {'id': repo_id, 'last_updated_at': ts})
         except git.GitCommandError as e:
             print(repo, e)
 
