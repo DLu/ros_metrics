@@ -1,12 +1,4 @@
 tables:
-    repos:
-        - id
-        - key
-        - server
-        - org
-        - repo
-        - url
-        - status
     github_stats:
         - id
         - forks
@@ -24,6 +16,9 @@ tables:
         - closed_at
         - closer
     github_issues_updates:
+        - id
+        - last_updated_at
+    repo_updates:
         - id
         - last_updated_at
 

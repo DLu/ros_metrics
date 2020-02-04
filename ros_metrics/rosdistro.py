@@ -1,6 +1,4 @@
 import collections
-import io
-import git
 import pathlib
 import re
 from tqdm import tqdm
@@ -9,9 +7,9 @@ import yaml
 from .constants import distros, ros1_distros
 from .metric_db import MetricDB
 from .people import get_canonical_email
+from .repo_utils import clone_or_update, match_git_host, blob_contents
 from .reports import get_datetime_from_dict, ONE_WEEK
 from .util import version_compare
-
 
 GIT_URL = 'https://github.com/ros/rosdistro.git'
 REPO_PATH = pathlib.Path('cache/rosdistro')
@@ -24,22 +22,7 @@ LEGACY_X2 = re.compile(r'releases/([^\-]*)\-(.*).yaml')
 
 
 def get_rosdistro_repo(update=True):
-    if not REPO_PATH.exists():
-        repo = git.Repo.clone_from(GIT_URL, REPO_PATH)
-    else:
-        repo = git.Repo(REPO_PATH)
-        if update:
-            repo.remotes.origin.pull()
-    return repo
-
-
-def blob_contents(blob):
-    if blob is None:
-        return ''
-    s = ''
-    with io.BytesIO(blob.data_stream.read()) as f:
-        s += f.read().decode('utf-8')
-    return s
+    return clone_or_update(GIT_URL, REPO_PATH, update)[0]
 
 
 def yaml_diff_iterator(a, b, keys=None):
@@ -397,7 +380,79 @@ def count_repos(db, commit_id, commit):
         print(e)
 
 
-def update_rosdistro():
+def get_repo_id(db, repo_dict):
+    pieces = [f'{key}="{value}"' for (key, value) in repo_dict.items()]
+    if not pieces:
+        return
+    clause = 'WHERE ' + ' and '.join(pieces)
+    return db.lookup('id', 'repos', clause)
+
+
+def get_repo_id_from_url(db, url):
+    repo_dict = match_git_host(url)
+    if repo_dict:
+        return get_repo_id(db, repo_dict)
+
+
+def resolve_source_url(db, entry, distro, debug=False):
+    # Start by checking source and doc entries
+    url = entry.get('source', entry.get('doc', {})).get('url')
+    if url:
+        return url
+
+    # TODO: Check out release repo
+
+
+def load_repository_info(db, distro, distro_dict):
+    repos = {}
+    if not distro_dict.get('repositories'):
+        return repos
+
+    for entry in distro_dict['repositories'].values():
+        url = resolve_source_url(db, entry, distro)
+        if url is None:
+            # Can't determine source repo
+            continue
+        repo_dict = match_git_host(url)
+        if not repo_dict:
+            # Can't parse url
+            continue
+        id = get_repo_id(db, repo_dict)
+        if id is None:
+            id = db.get_next_id('repos')
+            repo_dict['id'] = id
+            repo_dict['url'] = url
+            db.insert('repos', repo_dict)
+
+        info = {'url': url}
+        version = entry.get('release', {}).get('version')
+        if not version:
+            continue
+        if '-' in version:
+            version, _, _ = version.partition('-')
+        info['version'] = version
+        repos[id] = info
+    return repos
+
+
+def check_tags(db, commit_id, commit):
+    for folder in sorted(commit.tree.trees, key=lambda d: d.name):
+        if folder.name not in distros:
+            continue
+        distro = folder.name
+
+        filename = 'distribution.yaml'
+        try:
+            path = folder[filename]
+        except KeyError:
+            continue
+        distro_dict = yaml.load(blob_contents(path))
+        load_repository_info(db, distro, distro_dict)
+
+    db.insert('tags_checked', {'commit_id': commit_id})
+
+
+def update_rosdistro(should_classify_commits=True, should_count_repos=True, should_check_tags=True):
     # Clone or update the repo in the cache
     repo = get_rosdistro_repo(update=True)
 
@@ -411,14 +466,15 @@ def update_rosdistro():
         main_path = set()
         already_classified = set(db.lookup_all('commit_id', 'changes'))
         already_counted = set(db.lookup_all('commit_id', 'repo_count'))
+        already_tagged = set(db.lookup_all('commit_id', 'tags_checked'))
 
-        for commit_id, commit in enumerate(tqdm(commits)):
+        for commit_id, commit in enumerate(tqdm(commits, desc='rosdistro commits')):
             main_path.add(commit.hexsha)
 
             n += 1
 
             # Check if already classified
-            if commit_id not in already_classified:
+            if commit_id not in already_classified and should_classify_commits:
                 commit_dict, classifications = classify_commit(repo, main_path, commit, commit_id)
                 db.update('commits', commit_dict)
                 if classifications:
@@ -428,16 +484,26 @@ def update_rosdistro():
             else:
                 matched += 1
 
-            if commit_id not in already_counted and commit_id % 100 == 0:
+            if should_count_repos and commit_id not in already_counted and commit_id % 100 == 0:
                 count_repos(db, commit_id, commit)
+
+            if should_check_tags and commit_id not in already_tagged and commit_id % 100 == 0:
+                check_tags(db, commit_id, commit)
 
     except KeyboardInterrupt:
         pass
     finally:
-        n = float(n)
-        print(matched, matched / n)
-        print(new_matches, new_matches / n)
+        if should_classify_commits:
+            n = float(n)
+            print(matched, matched / n)
+            print(new_matches, new_matches / n)
         db.close()
+
+
+def get_rosdistro_repos(db):
+    ids = set(db.lookup_all('id', 'repos'))
+    remaps = db.dict_lookup('id', 'new_id', 'remap_repos')
+    return [remaps.get(id, id) for id in ids]
 
 
 def commit_query(db, fields, clause=''):

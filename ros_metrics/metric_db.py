@@ -162,6 +162,14 @@ class MetricDB:
         query = f'UPDATE {table} SET {value_str} ' + clause
         self.execute(query, values)
 
+    def get_next_id(self, table, start_id=0):
+        """ Return an id that is not yet in the table """
+        all_ids = self.lookup_all('id', table)
+        id = start_id
+        while id in all_ids:
+            id += 1
+        return id
+
     # DB Structure Operations
     def get_field_type(self, field):
         """ Returns the type of a given field, based on the db_structure """

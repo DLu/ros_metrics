@@ -1,210 +1,120 @@
-from .rosdistro import get_rosdistro_repo, REPO_PATH
-from .constants import distros
+from .repo_utils import clone_or_update, get_cache_folder, CloneException, match_git_host, resolve
+from .rosdistro import get_repo_id, get_rosdistro_repos
 from .metric_db import MetricDB
 from .reports import ONE_WEEK
 from .util import get_github_api, now_epoch, epoch_to_datetime, datetime_to_epoch
-import pathlib
 import git
 import github
-import yaml
 import collections
-import re
+import requests
 from tqdm import tqdm
 
-CACHE_PATH = pathlib.Path('cache/repos')
-FORBIDDEN_KEYS = ['-release', 'ros.org', 'svn', 'code.google.com']
 
-GITHUB_HTTP_PATTERN = re.compile('https?://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+)\.git')
-GITHUB_SSH_PATTERN = re.compile('git@(?P<server>github\.com):(?P<org>[^/]+)/(?P<repo>.+)\.git')
-BB_PATTERN = re.compile('https://(?P<server>bitbucket\.org)/(?P<org>.*)/(?P<repo>.+)')
-GITLAB_HTTP_PATTERN = re.compile('https?://(?P<server>gitlab\.[^/]+)/(?P<org>[^/]+)/(?P<repo>.+).git')
-GITLAB_SSH_PATTERN = re.compile('git@(?P<server>gitlab\.[^/]+):(?P<org>[^/]+)/(?P<repo>.+)\.git')
-PATTERNS = [GITHUB_HTTP_PATTERN, GITHUB_SSH_PATTERN, BB_PATTERN, GITLAB_HTTP_PATTERN, GITLAB_SSH_PATTERN]
-
-
-def match_git_host(url):
-    for pattern in PATTERNS:
-        m = pattern.match(url)
-        if m:
-            return m.groupdict()
-
-
-def get_raw_distro_dict(update=False):
-    if update:
-        get_rosdistro_repo()
-    rosdistro_path = pathlib.Path(REPO_PATH)
-
-    all_repos = collections.defaultdict(dict)
-    CACHE_PATH.mkdir(exist_ok=True)
-
-    for distro in tqdm(distros, 'updating distros'):
-        distro_path = rosdistro_path / distro / 'distribution.yaml'
-        if not distro_path.exists():
-            continue
-        distro_dict = yaml.load(open(str(distro_path)))
-        repos = distro_dict['repositories']
-
-        for name, repo in sorted(repos.items()):
-            url = repo.get('source', repo.get('doc', {})).get('url')
-            if not url:
-                release_url = repo.get('release', {}).get('url')
-                if not release_url:
+def check_urls(rosdistro_db):
+    results = rosdistro_db.query('SELECT id, org, repo, url FROM repos WHERE status is null ORDER BY id')
+    if not results:
+        return
+    for repo_dict in tqdm(results, 'checking repo urls'):
+        try:
+            new_url = resolve(repo_dict['url'])
+            if new_url != repo_dict['url']:
+                repo_dict2 = match_git_host(new_url)
+                if repo_dict2 is None:
                     continue
-                repo_dict = match_git_host(release_url)
-                if not repo_dict:
-                    continue
-
-                folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
-                if not folder.exists():
-                    try:
-                        git.Repo.clone_from(release_url, str(folder))
-                    except Exception as e:
-                        continue
-
-                tracks_file = folder / 'tracks.yaml'
-                if not tracks_file.exists():
-                    continue
-                tracks = yaml.load(open(tracks_file))
-                if distro in tracks['tracks']:
-                    url = tracks['tracks'][distro]['vcs_uri']
-                else:
-                    continue
-            url = url.lower()
-            all_repos[name][distro] = url
-    return all_repos
-
-
-def two_substring_match(urls, subs, return_match=False):
-    if len(urls) != 2:
-        return False
-
-    a, b = urls
-    if subs in a and subs not in b:
-        return a if return_match else b
-    if subs in b and subs not in a:
-        return b if return_match else a
-    return None
-
-
-def get_repo_list(db):
-    all_repos = get_raw_distro_dict()
-    running_count = db.count('repos')
-    for name, repo_dict in all_repos.items():
-        urls = list(set(repo_dict.values()))
-        clean_urls = []
-        if len(urls) == 1:
-            for key in FORBIDDEN_KEYS:
-                if key in urls[0]:
-                    break
+                new_id = get_repo_id(rosdistro_db, repo_dict2)
+                if new_id is None:
+                    new_id = rosdistro_db.get_next_id('repos')
+                    repo_dict2['url'] = new_url
+                    repo_dict2['id'] = new_id
+                    rosdistro_db.insert('repos', repo_dict2)
+                repo_dict['status'] = 'remap'
+                rosdistro_db.insert('remap_repos', {'id': repo_dict['id'], 'new_id': new_id})
             else:
-                clean_urls.append(urls[0])
-        elif two_substring_match(urls, 'ros2'):
-            clean_urls += urls
-        else:
-            for key in FORBIDDEN_KEYS:
-                x = two_substring_match(urls, key)
-                if x:
-                    clean_urls.append(x)
-                    break
-            else:
-                # TODO: 404, 301 resolution
-                pass
-
-        for url in clean_urls:
-            d = match_git_host(url)
-            if not d:
-                # print(url)
-                continue
-            id = db.lookup('id', 'repos', 'WHERE key="{}" and url="{}"'.format(name, url))
-            if id is None:
-                d['key'] = name
-                d['url'] = url
-                d['id'] = running_count
-                running_count += 1
-                db.insert('repos', d)
+                repo_dict['status'] = 'ok'
+        except requests.exceptions.ConnectTimeout:
+            repo_dict['status'] = 'missing'
+        rosdistro_db.update('repos', repo_dict)
 
 
-CLONE_MESSAGES = [
-    ('mercurial', 'Mercurial (hg) is required'),
-    ('no_access', 'HTTP Basic: Access denied'),
-    ('no_access', 'Permission denied'),
-    ('no_access', 'Connection refused'),
-    ('missing', 'not found'),
-]
-
-
-def clone(db, debug=False):
-    repos = []
+def clone(rosdistro_db, repos_db, rosdistro_ids, debug=False):
+    repos = {}
     to_clone = []
 
-    CACHE_PATH.mkdir(exist_ok=True)
-    for repo_dict in db.query('SELECT id, org, repo, url, status FROM repos ORDER BY id'):
-        if repo_dict['status'] is not None:
+    for repo_dict in rosdistro_db.query('SELECT * FROM repos WHERE status = "ok" ORDER BY id'):
+        if repo_dict['id'] not in rosdistro_ids:
             continue
-        folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
+        folder = get_cache_folder(repo_dict)
         if folder.exists():
-            repos.append(git.Repo(str(folder)))
+            repos[repo_dict['id']] = git.Repo(str(folder))
         else:
             to_clone.append((folder, repo_dict))
+
     if not to_clone:
         return repos
-    for folder, repo_dict in tqdm(sorted(to_clone), 'cloning repos'):
-        try:
-            repos.append(git.Repo.clone_from(repo_dict['url'], str(folder)))
-        except git.GitCommandError as e:
-            for status, msg in CLONE_MESSAGES:
-                if msg in e.stderr:
-                    repo_dict['status'] = status
-                    db.update('repos', repo_dict)
-                    break
 
-            if debug:
-                print(e)
+    ts = now_epoch()
+    for folder, repo_dict in tqdm(sorted(to_clone, key=lambda pair: pair[0]), 'cloning repos'):
+        id = repo_dict['id']
+        try:
+            repo, path = clone_or_update(repo_dict['url'], folder)
+            repos[id] = repo
+            repos_db.update('repo_updates', {'id': id, 'last_updated_at': ts})
+        except CloneException as e:
+            repo_dict['status'] = e.message
+            rosdistro_db.update('repos', repo_dict)
     return repos
 
 
-def update(repos):
-    for repo in tqdm(repos, 'updating repos'):
-        repo.remotes.origin.pull()
+def update(repos_db, repos, update_period=300000):
+    ts = now_epoch()
+    to_update = []
+    for repo_id, repo in repos.items():
+        last_updated_at = repos_db.lookup('last_updated_at', 'repo_updates', f'WHERE id={repo_id}')
+        if last_updated_at and ts - last_updated_at < update_period:
+            continue
+        to_update.append((repo_id, repo))
+
+    if not to_update:
+        return
+
+    for repo_id, repo in tqdm(to_update, 'updating repos'):
+        try:
+            repo.remotes.origin.pull()
+            repos_db.update('repo_updates', {'id': repo_id, 'last_updated_at': ts})
+        except git.GitCommandError as e:
+            print(repo, e)
 
 
-def check_statuses(db):
-    for repo_dict in tqdm(db.query('SELECT id, org, repo, url FROM repos WHERE status is null ORDER BY id'),
+def check_statuses(rosdistro_db, rosdistro_ids):
+    for repo_dict in tqdm(rosdistro_db.query('SELECT * FROM repos WHERE status = "ok" ORDER BY id'),
                           desc='checking repo status'):
-        # Check for duplicates
-        url = repo_dict['url']
-        matches = db.lookup_all('id', 'repos', f'WHERE url="{url}" and status is null')
-        if len(matches) > 1 and matches[0] == repo_dict['id']:
-            for match in matches[1:]:
-                repo_dict = db.query(f'SELECT * from REPOS WHERE id={match}')[0]
-                repo_dict['status'] = 'dupe'
-                db.update('repos', repo_dict)
-
+        if repo_dict['id'] not in rosdistro_ids:
+            continue
         # Count packages
-        folder = CACHE_PATH / repo_dict['org'] / repo_dict['repo']
+        folder = get_cache_folder(repo_dict)
         xml = list(folder.rglob('package.xml')) + list(folder.rglob('manifest.xml'))
         if len(xml) > 0:
             continue
         repo_dict['status'] = 'not_ros'
-        db.update('repos', repo_dict)
+        rosdistro_db.update('repos', repo_dict)
 
 
-def get_github_repos(db):
+def get_github_repos(rosdistro_db, rosdistro_ids=None):
+    if rosdistro_ids is None:
+        rosdistro_ids = get_rosdistro_repos(rosdistro_db)
     repos = {}
-    for repo_dict in db.query('SELECT id, org, repo, status FROM repos WHERE server="github.com"'):
-        if repo_dict['status'] is not None:
+    for repo_dict in rosdistro_db.query('SELECT id, org, repo FROM repos WHERE status="ok" and server="github.com"'):
+        if repo_dict['id'] not in rosdistro_ids:
             continue
-        del repo_dict['status']
         repos[repo_dict['id']] = repo_dict
     return repos
 
 
-def get_github_stats(db, limit=3000000):  # ~1 month
-    existing_stats = db.dict_lookup('id', 'last_updated_at', 'github_stats')
-    repos = get_github_repos(db)
+def get_github_stats(repos_db, github_repos, limit=3000000):  # ~1 month
+    existing_stats = repos_db.dict_lookup('id', 'last_updated_at', 'github_stats')
     now = now_epoch()
     to_crawl = []
-    for repo_id, repo_dict in repos.items():
+    for repo_id, repo_dict in github_repos.items():
         if repo_id not in existing_stats:
             to_crawl.append(repo_dict)
         elif now - existing_stats[repo_id] > limit:
@@ -218,28 +128,18 @@ def get_github_stats(db, limit=3000000):  # ~1 month
         try:
             repo = gh.get_repo('{org}/{repo}'.format(**repo_dict))
         except github.GithubException as e:
-            if e.status == 404:
-                repo_dict['status'] = 'missing'
-                db.update('repos', repo_dict)
-                continue
-            else:
-                raise e
-
-        if repo.stargazers_count != repo.watchers_count:
-            print(repo)
-            print(repo.watchers_count)
-            print(repo.stargazers_count)
-            break
+            # This case should be handled by check_urls
+            continue
 
         row = {'id': repo_dict['id'],
                'forks': repo.network_count,
                'stars': repo.stargazers_count,
                'subs': repo.subscribers_count}
         row['last_updated_at'] = now
-        db.update('github_stats', row)
+        repos_db.update('github_stats', row)
 
 
-def get_github_repo_issues(db, gh, repo_dict, last_updated_at):
+def get_github_repo_issues(repos_db, gh, repo_dict, last_updated_at):
     try:
         repo_str = '{org}/{repo}'.format(**repo_dict)
         repo = gh.get_repo(repo_str)
@@ -290,20 +190,19 @@ def get_github_repo_issues(db, gh, repo_dict, last_updated_at):
                 entry['closed_at'] = datetime_to_epoch(issue.closed_at)
                 if issue.closed_by:
                     entry['closer'] = issue.closed_by.login
-        db.update('github_issues', entry, ['repo_id', 'number'])
+        repos_db.update('github_issues', entry, ['repo_id', 'number'])
 
-    db.update('github_issues_updates', {'id': repo_id, 'last_updated_at': now})
+    repos_db.update('github_issues_updates', {'id': repo_id, 'last_updated_at': now})
     if progress:
         progress.close()
 
 
-def get_github_issues(db):
-    repos = get_github_repos(db)
+def get_github_issues(repos_db, github_repos):
     to_crawl = []
     now = now_epoch()
 
-    for repo_id, repo_dict in sorted(repos.items(), key=lambda d: (d[1]['org'], d[1]['repo'])):
-        last_updated_at = db.lookup('last_updated_at', 'github_issues_updates', f'WHERE id={repo_id}')
+    for repo_id, repo_dict in sorted(github_repos.items(), key=lambda d: (d[1]['org'], d[1]['repo'])):
+        last_updated_at = repos_db.lookup('last_updated_at', 'github_issues_updates', f'WHERE id={repo_id}')
 
         if last_updated_at:
             if now - last_updated_at < 300000:
@@ -318,7 +217,7 @@ def get_github_issues(db):
     print(gh.get_rate_limit())
     for repo_dict, last_updated_at in tqdm(to_crawl, desc='Repos: GithubIssues'):
         try:
-            get_github_repo_issues(db, gh, repo_dict, last_updated_at)
+            get_github_repo_issues(repos_db, gh, repo_dict, last_updated_at)
         except github.RateLimitExceededException:
             print('Github limit')
             print(gh.get_rate_limit())
@@ -326,26 +225,30 @@ def get_github_issues(db):
 
 
 def update_repos(local_repos=False, github_repos=True):
-    db = MetricDB('repos')
+    rosdistro_db = MetricDB('rosdistro')
+    repos_db = MetricDB('repos')
     try:
-        get_repo_list(db)
+        check_urls(rosdistro_db)
+        rosdistro_ids = get_rosdistro_repos(rosdistro_db)
         if local_repos:
-            repos = clone(db)
-            update(repos)
-            check_statuses(db)
+            repos = clone(rosdistro_db, repos_db, rosdistro_ids)
+            update(repos_db, repos)
+            check_statuses(rosdistro_db, rosdistro_ids)
         if github_repos:
             try:
-                get_github_stats(db)
-                get_github_issues(db)
+                github_repos = get_github_repos(rosdistro_db, rosdistro_ids)
+                get_github_stats(repos_db, github_repos)
+                get_github_issues(repos_db, github_repos)
             except RuntimeError as e:
                 print(e)
     except KeyboardInterrupt:
         pass
     finally:
-        db.close()
+        repos_db.close()
+        rosdistro_db.close()
 
 
-def github_stat_report(db):
+def github_stat_report(db, github_repos):
     report = {}
     ranks = collections.defaultdict(collections.Counter)
 
@@ -401,17 +304,14 @@ def get_issue_report(db):
 def github_repos_report(db=None):
     if db is None:
         db = MetricDB('repos')
-    report = github_stat_report(db)
+    rosdistro_db = MetricDB('rosdistro')
+    github_repos = get_github_repos(rosdistro_db)
+
+    report = github_stat_report(db, github_repos)
     issue_report = get_issue_report(db)
     lines = []
-    for repo_dict in sorted(db.query('SELECT * FROM repos WHERE server="github.com" and status is null'),
-                            key=lambda d: report.get(d['id'], {}).get('rank_product', 0)):
-        id = repo_dict['id']
-        if id not in report:
-            continue
-        for key in ['forks', 'stars', 'subs']:
-            repo_dict[key] = '{:04d} ({})'.format(report[id][key], report[id][key[:-1] + '_rank'])
-        repo_dict['rank_product'] = report[id]['rank_product']
+    for id, repo_dict in github_repos.items():
+        repo_dict.update(report[id])
         for key in issue_report:
             repo_dict[key] = issue_report[key].get(id, '')
 
