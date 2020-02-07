@@ -2,7 +2,7 @@ from .repo_utils import clone_or_update, get_cache_folder, CloneException, match
 from .rosdistro import get_repo_id, get_rosdistro_repos
 from .metric_db import MetricDB
 from .reports import ONE_WEEK
-from .util import get_github_api, now_epoch, epoch_to_datetime, datetime_to_epoch
+from .util import get_github_api, get_github_rate_info, now_epoch, epoch_to_datetime, datetime_to_epoch
 import git
 import github
 import collections
@@ -214,17 +214,15 @@ def get_github_issues(repos_db, github_repos):
         return
 
     gh = get_github_api()
-    print(gh.get_rate_limit())
     for repo_dict, last_updated_at in tqdm(to_crawl, desc='Repos: GithubIssues'):
         try:
             get_github_repo_issues(repos_db, gh, repo_dict, last_updated_at)
         except github.RateLimitExceededException:
-            print('Github limit')
-            print(gh.get_rate_limit())
+            print(get_github_rate_info(gh))
             return
 
 
-def update_repos(local_repos=False, github_repos=True):
+def update_repos(local_repos=False, check_github_repos=True):
     rosdistro_db = MetricDB('rosdistro')
     repos_db = MetricDB('repos')
     try:
@@ -234,13 +232,19 @@ def update_repos(local_repos=False, github_repos=True):
             repos = clone(rosdistro_db, repos_db, rosdistro_ids)
             update(repos_db, repos)
             check_statuses(rosdistro_db, rosdistro_ids)
-        if github_repos:
-            try:
-                github_repos = get_github_repos(rosdistro_db, rosdistro_ids)
-                get_github_stats(repos_db, github_repos)
-                get_github_issues(repos_db, github_repos)
-            except RuntimeError as e:
-                print(e)
+        if check_github_repos:
+            gh = get_github_api()
+            limit = gh.get_rate_limit().core
+            if limit.remaining > 0:
+                try:
+                    github_repos = get_github_repos(rosdistro_db, rosdistro_ids)
+                    get_github_stats(repos_db, github_repos)
+                    get_github_issues(repos_db, github_repos)
+                except RuntimeError as e:
+                    print(get_github_rate_info(gh))
+                    print(e)
+            else:
+                print(get_github_rate_info(gh))
     except KeyboardInterrupt:
         pass
     finally:

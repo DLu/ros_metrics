@@ -184,3 +184,16 @@ def get_github_api():
     if not github_token:
         raise RuntimeError('Cannot find github token')
     return github.Github(github_token)
+
+def get_github_rate_info(gh=None):
+    if gh is None:
+        gh = get_github_api()
+
+    limit = gh.get_rate_limit().core
+    reset_time = limit.reset.replace(tzinfo=datetime.timezone.utc)
+    limit_local = reset_time.astimezone().strftime('%-I:%M %p')
+
+    delta = reset_time - datetime.datetime.now(datetime.timezone.utc)
+    minutes = delta.seconds // 60
+    seconds = delta.seconds - minutes * 60
+    return f'{limit.remaining}/{limit.limit} | Resets in {minutes}m{seconds:02d}s at {limit_local}'
