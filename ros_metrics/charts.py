@@ -17,7 +17,7 @@ BASIC_TIME_OPTIONS = {
         'xAxes': [{'type': 'time', 'display': True}]
     },
     'tooltips': {
-        'mode': 'x',
+        'mode': 'xfirst',
         'intersect': False
     }
 }
