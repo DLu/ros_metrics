@@ -110,7 +110,7 @@ def get_github_repos(rosdistro_db, rosdistro_ids=None):
     return repos
 
 
-def get_github_stats(repos_db, github_repos, limit=3000000):  # ~1 month
+def get_github_stats(rosdistro_db, repos_db, github_repos, limit=3000000):  # ~1 month
     existing_stats = repos_db.dict_lookup('id', 'last_updated_at', 'github_stats')
     now = now_epoch()
     to_crawl = []
@@ -128,7 +128,9 @@ def get_github_stats(repos_db, github_repos, limit=3000000):  # ~1 month
         try:
             repo = gh.get_repo('{org}/{repo}'.format(**repo_dict))
         except github.GithubException as e:
-            # This case should be handled by check_urls
+            if e.status == 404:
+                repo_dict['status'] = 'missing'
+                rosdistro_db.update('repos', repo_dict)
             continue
 
         row = {'id': repo_dict['id'],
@@ -238,7 +240,7 @@ def update_repos(local_repos=False, check_github_repos=True):
             if limit.remaining > 0:
                 try:
                     github_repos = get_github_repos(rosdistro_db, rosdistro_ids)
-                    get_github_stats(repos_db, github_repos)
+                    get_github_stats(rosdistro_db, repos_db, github_repos)
                     get_github_issues(repos_db, github_repos)
                 except RuntimeError as e:
                     print(get_github_rate_info(gh))
