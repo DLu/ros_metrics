@@ -291,7 +291,6 @@ def classify_commit(repo, main_path, commit, commit_id):
             return commit_dict, None
 
     parent = commit.parents[0]
-    diff = commit.diff(parent)
 
     all_valid = True
     seen = set()

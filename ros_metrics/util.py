@@ -4,7 +4,6 @@ import csv
 import datetime
 import dateutil.parser
 import github
-import os
 import pathlib
 import re
 import yaml
@@ -184,6 +183,7 @@ def get_github_api():
     if not github_token:
         raise RuntimeError('Cannot find github token')
     return github.Github(github_token)
+
 
 def get_github_rate_info(gh=None):
     if gh is None:
