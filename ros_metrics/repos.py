@@ -254,13 +254,13 @@ def update_repos(local_repos=False, check_github_repos=True):
         rosdistro_db.close()
 
 
-def github_stat_report(db, github_repos):
+def github_stat_report(rosdistro_db, repos_db, github_repos):
     report = {}
     ranks = collections.defaultdict(collections.Counter)
 
-    exclude = db.lookup_all('id', 'repos', 'WHERE status is not null')
+    exclude = rosdistro_db.lookup_all('id', 'repos', 'WHERE status != "ok"')
 
-    for repo_dict in db.query('SELECT id, forks, stars, subs from github_stats'):
+    for repo_dict in repos_db.query('SELECT id, forks, stars, subs from github_stats'):
         id = repo_dict['id']
         if id in exclude:
             continue
@@ -307,14 +307,14 @@ def get_issue_report(db):
     return issue_report
 
 
-def github_repos_report(db=None):
-    if db is None:
-        db = MetricDB('repos')
+def github_repos_report(repos_db=None):
+    if repos_db is None:
+        repos_db = MetricDB('repos')
     rosdistro_db = MetricDB('rosdistro')
     github_repos = get_github_repos(rosdistro_db)
 
-    report = github_stat_report(db, github_repos)
-    issue_report = get_issue_report(db)
+    report = github_stat_report(rosdistro_db, repos_db, github_repos)
+    issue_report = get_issue_report(repos_db)
     lines = []
     for id, repo_dict in github_repos.items():
         repo_dict.update(report[id])
