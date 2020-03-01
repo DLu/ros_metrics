@@ -20,6 +20,7 @@
  * Examines Github repo
  * Determines type of change for each commit
  * Counts the number of repositories contained in the distributions per commit
+ * Tracks which repos are present in each distro through time
 
 ### Multi-Repo Stats
  * Statistics based on the repositories listed in the rosdistro

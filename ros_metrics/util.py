@@ -1,5 +1,6 @@
 import bs4
 import calendar
+import collections
 import csv
 import datetime
 import dateutil.parser
@@ -97,6 +98,15 @@ def key_subset(d, keys, convert_ats=True):
                 new_d[key] = string_to_epoch(d[key])
             else:
                 new_d[key] = d[key]
+    return new_d
+
+
+def standardize_dict(d):
+    if not isinstance(d, collections.defaultdict):
+        return d
+    new_d = {}
+    for k, v in d.items():
+        new_d[k] = standardize_dict(v)
     return new_d
 
 

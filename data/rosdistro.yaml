@@ -25,6 +25,17 @@ tables:
     remap_repos:
         - id
         - new_id
+    release_url_map:
+        - release_url
+        - distro
+        - src_url
+    tags:
+        - id
+        - repo_id
+        - distro
+        - tag
+        - date
+        - is_release
     tags_checked:
         - commit_id
 special_types:
@@ -34,3 +45,5 @@ special_types:
     date: int
     change_index: int
     count: int
+    repo_id: int
+    is_release: bool
