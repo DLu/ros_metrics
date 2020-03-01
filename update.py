@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from ros_metrics.analytics import update_analytics
 from ros_metrics.answers import update_answers
+from ros_metrics.binaries import update_binaries
 from ros_metrics.discourse import update_discourse
 from ros_metrics.packages import update_packages
 from ros_metrics.repos import update_repos
@@ -13,6 +14,7 @@ if __name__ == '__main__':
     modules = {
         'analytics': update_analytics,
         'answers': update_answers,
+        'binaries': update_binaries,
         'discourse': update_discourse,
         'packages': update_packages,
         'repos': update_repos,

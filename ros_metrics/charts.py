@@ -6,7 +6,7 @@ import yaml
 from .metric_db import MetricDB
 from .reports import round_series, get_regular_aggregate_series, get_regular_unique_series
 from .reports import time_buckets, normalize_timepoints, get_series, get_email_plots, buckets_to_plot
-from . import analytics, answers, scholar, packages, rosdistro, repos
+from . import analytics, answers, binaries, scholar, packages, rosdistro, repos
 from .constants import countries, distros
 
 from .util import get_manual_stats, VERSIONS
@@ -324,4 +324,39 @@ def get_ticket_totals(repos_db=None):
     chart = Chart('line', title='')
     for key, line in repos.get_total_issues_and_prs(repos_db, simplified=True).items():
         chart.add(key, round_series(line), lineTension=0)
+    return chart
+
+def get_binaries_chart(binaries_db=None):
+    if binaries_db is None:
+        binaries_db = MetricDB('binaries')
+    chart = Chart('bar', {
+        'responsive': True,
+        'scales': {
+            'xAxes': [{'display': True, 'stacked': True, 'barPercentage': 1.0, 'categoryPercentage': 1.0}],
+            'yAxes': [{'stacked': True}]
+        },
+        'legend': {
+            'display': True
+        },
+        'tooltips': {
+            'intersect': False,
+            'mode': 'x'
+        }
+    }, title='Binaries')
+
+    rows = binaries.get_tagged_data(binaries_db)
+    tag_dict = binaries.get_downloads_by_field(rows, 'rosdistro', 'os')
+
+    chart['data']['labels'] = list(map(str, tag_dict.keys()))
+
+    all_os = collections.Counter()
+    for key in tag_dict:
+        all_os.update(tag_dict[key])
+
+    for os, _ in all_os.most_common():
+        values = []
+        for key in tag_dict:
+            values.append(tag_dict[key].get(os))
+        chart.add(os, values)
+
     return chart
