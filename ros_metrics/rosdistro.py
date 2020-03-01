@@ -1,15 +1,16 @@
 import collections
 import pathlib
 import re
+import requests
 from tqdm import tqdm
 import yaml
 
-from .constants import distros, ros1_distros
+from .constants import distros, ros1_distros, ros2_distros
 from .metric_db import MetricDB
 from .people import get_canonical_email
-from .repo_utils import clone_or_update, match_git_host, blob_contents
+from .repo_utils import clone_or_update, CloneException, match_git_host, blob_contents, resolve
 from .reports import get_datetime_from_dict, ONE_WEEK
-from .util import version_compare
+from .util import version_compare, standardize_dict
 
 GIT_URL = 'https://github.com/ros/rosdistro.git'
 REPO_PATH = pathlib.Path('cache/rosdistro')
@@ -23,6 +24,104 @@ LEGACY_X2 = re.compile(r'releases/([^\-]*)\-(.*).yaml')
 
 def get_rosdistro_repo(update=True):
     return clone_or_update(GIT_URL, REPO_PATH, update)[0]
+
+
+def commit_to_rosdistro(commit):
+    # Multilevel dictionary:
+    # First key: ROS Distro
+    # Second key: Package "name"
+    # Third key: Release type (release/doc/source)
+    repositories = collections.defaultdict(lambda: collections.defaultdict(dict))
+
+    for folder in commit.tree.trees:
+        if folder.name in distros:
+            distro = folder.name
+            for filename in ['distribution.yaml', 'release.yaml', 'doc.yaml', 'source.yaml']:
+                try:
+                    blob = folder[filename]
+                    distro_dict = yaml.load(blob_contents(blob))
+                except KeyError:
+                    continue
+                except yaml.error.YAMLError:
+                    continue
+
+                if not distro_dict.get('repositories'):
+                    continue
+                if filename == 'distribution.yaml':
+                    for name, d in distro_dict['repositories'].items():
+                        for release_type, entry in d.items():
+                            repositories[distro][name][release_type] = entry
+                else:
+                    path = pathlib.Path(blob.path)
+                    release_type = path.stem
+                    for name, entry in distro_dict['repositories'].items():
+                        repositories[distro][name][release_type] = entry
+        elif folder.name == 'releases':
+            for sub_blob in folder.blobs:
+                distro = pathlib.Path(sub_blob.name).stem.replace('-devel', '')
+                if distro not in distros:
+                    continue
+
+                try:
+                    distro_dict = yaml.load(blob_contents(sub_blob))
+                except yaml.error.YAMLError:
+                    continue
+
+                release_type = 'release' if distro_dict.get('type') == 'gbp' else 'source'
+                if 'repositories' in distro_dict:
+                    for name, entry in distro_dict['repositories'].items():
+                        repositories[distro][name][release_type] = entry
+                if 'gbp-repos' in distro_dict and isinstance(distro_dict['gbp-repos'], list):
+                    for entry in distro_dict['gbp-repos']:
+                        url = entry['url']
+                        name = pathlib.Path(url).stem.replace('-release', '')
+                        repositories[distro][name]['release'] = {'url': url}
+        elif folder.name == 'doc':
+            for distro_folder in folder.trees:
+                if distro_folder.name not in distros:
+                    continue
+                distro = distro_folder.name
+                for filename in distro_folder.blobs:
+                    if pathlib.Path(filename.name).suffix != '.rosinstall':
+                        continue
+                    try:
+                        entry = yaml.load(blob_contents(filename))
+                    except yaml.error.YAMLError:
+                        continue
+
+                    # Skip badly formatted rosinstalls
+                    if not isinstance(entry, list):
+                        continue
+
+                    for d in entry:
+                        if len(d) == 1:
+                            # Standard case
+                            src_type = list(d.keys())[0]
+                            info = d[src_type]
+                        else:
+                            # This is fixing a couple of badly formatted yaml entries for the sake of history
+                            src_type = None
+                            for st in ['git', 'hg', 'svn', 'bzr']:
+                                if isinstance(d, dict) and st in d and d[st] is None:
+                                    src_type = st
+                                    info = d
+                                    break
+                            else:
+                                raise RuntimeError('very badly formatted rosinstall')
+
+                        repo_d = {}
+                        repo_d['type'] = src_type
+
+                        url = info.get('url', info.get('uri'))
+                        if url:
+                            repo_d['url'] = url
+                        version = info.get('version')
+                        if version:
+                            repo_d['version'] = version
+
+                        repositories[distro][info['local-name']]['doc'] = repo_d
+
+    return standardize_dict(repositories)
 
 
 def yaml_diff_iterator(a, b, keys=None):
@@ -318,65 +417,17 @@ def classify_commit(repo, main_path, commit, commit_id):
         return commit_dict, None
 
 
-def count_repos(db, commit_id, commit):
-    try:
-        db.execute(f'DELETE FROM repo_count WHERE commit_id={commit_id}')
+def count_repos(db, commit_id, repositories):
+    db.execute(f'DELETE FROM repo_count WHERE commit_id={commit_id}')
+    all_names = set()
+    for distro in repositories:
+        distro_names = set(repositories[distro].keys())
+        all_names.update(distro_names)
+        db.insert('repo_count', {'commit_id': commit_id, 'distro': distro, 'count': len(distro_names)})
 
-        name_map = collections.defaultdict(set)
-        for folder in commit.tree.trees:
-            if folder.name in distros:
-                distro = folder.name
-                for filename in ['distribution.yaml', 'release.yaml', 'doc.yaml', 'source.yaml']:
-                    try:
-                        path = folder[filename]
-                    except KeyError:
-                        continue
-                    distro_dict = yaml.load(blob_contents(path))
-                    if not distro_dict.get('repositories'):
-                        continue
-                    these_names = set(distro_dict['repositories'].keys())
-                    name_map[distro].update(these_names)
-            elif folder.name == 'releases':
-                for sub_blob in folder.blobs:
-                    p = pathlib.Path(sub_blob.name)
-                    stem = p.stem.replace('-devel', '')
-                    if stem in distros:
-                        distro = stem
-                        distro_dict = yaml.load(blob_contents(sub_blob))
-                        if 'repositories' in distro_dict:
-                            names = set(distro_dict['repositories'].keys())
-                            name_map[distro].update(names)
-                        elif 'gbp-repos' in distro_dict:
-                            gbp = distro_dict['gbp-repos']
-                            if type(gbp) == list:
-                                names = set([x['name'] for x in gbp])
-                            else:
-                                print(gbp)
-                                exit(0)
-                            name_map[distro].update(names)
-                        else:
-                            print(distro_dict)
-                            exit(0)
-            elif folder.name == 'doc':
-                for distro_folder in folder.trees:
-                    if distro_folder.name not in distros:
-                        continue
-                    distro = distro_folder.name
-                    for filename in distro_folder.blobs:
-                        p = pathlib.Path(filename.name)
-                        if p.suffix == '.rosinstall':
-                            name_map[distro].add(p.stem)
-
-        all_names = set()
-        for name, name_set in name_map.items():
-            all_names.update(name_set)
-            db.insert('repo_count', {'commit_id': commit_id, 'distro': name, 'count': len(name_set)})
-        if all_names and set(name_map.keys()).intersection(set(ros1_distros)):
-            db.insert('repo_count', {'commit_id': commit_id, 'distro': 'all', 'count': len(all_names)})
-    except yaml.YAMLError:
-        return
-    except Exception as e:
-        print(e)
+    # Skip the counts where its JUST the ROS2 repos
+    if all_names and set(repositories.keys()).intersection(set(ros1_distros)):
+        db.insert('repo_count', {'commit_id': commit_id, 'distro': 'all', 'count': len(all_names)})
 
 
 def get_repo_id(db, repo_dict):
@@ -393,21 +444,52 @@ def get_repo_id_from_url(db, url):
         return get_repo_id(db, repo_dict)
 
 
-def resolve_source_url(db, entry, distro, debug=False):
-    # Start by checking source and doc entries
-    url = entry.get('source', entry.get('doc', {})).get('url')
-    if url:
-        return url
+def get_source_url_from_release_repo(release_url, distro):
+    # Resolve/Ping it
+    try:
+        release_url = resolve(release_url)
+    except requests.exceptions.ConnectTimeout:
+        return None
 
-    # TODO: Check out release repo
+    # Clone it
+    try:
+        _, folder = clone_or_update(release_url, update=False)
+    except CloneException as e:
+        return None
+
+    tracks_file = folder / 'tracks.yaml'
+    if not tracks_file.exists():
+        return None
+
+    tracks = yaml.load(open(tracks_file))
+    if distro not in tracks['tracks']:
+        return None
+
+    return tracks['tracks'][distro]['vcs_uri']
+
+
+def resolve_source_url(db, entry, distro):
+    # Start by checking source and doc entries
+    for release_type in ['source', 'doc']:
+        url = entry.get(release_type, {}).get('url')
+        if url:
+            return url
+
+    # Get Release URL
+    release_url = entry['release']['url']
+    query = f'SELECT src_url FROM release_url_map WHERE release_url="{release_url}" AND distro="{distro}"'
+    stored_url_results = db.query(query)
+    if stored_url_results:
+        return stored_url_results[0]['src_url']
+
+    src_url = get_source_url_from_release_repo(release_url, distro)
+    db.insert('release_url_map', {'release_url': release_url, 'src_url': src_url, 'distro': distro})
 
 
 def load_repository_info(db, distro, distro_dict):
     repos = {}
-    if not distro_dict.get('repositories'):
-        return repos
 
-    for entry in distro_dict['repositories'].values():
+    for entry in distro_dict.values():
         url = resolve_source_url(db, entry, distro)
         if url is None:
             # Can't determine source repo
@@ -416,6 +498,9 @@ def load_repository_info(db, distro, distro_dict):
         if not repo_dict:
             # Can't parse url
             continue
+
+        parsed_branch = repo_dict.pop('branch', None)
+
         id = get_repo_id(db, repo_dict)
         if id is None:
             id = db.get_next_id('repos')
@@ -425,29 +510,64 @@ def load_repository_info(db, distro, distro_dict):
 
         info = {'url': url}
         version = entry.get('release', {}).get('version')
-        if not version:
-            continue
-        if '-' in version:
-            version, _, _ = version.partition('-')
-        info['version'] = version
+        if version:
+            info['is_release'] = True
+            if '-' in version:
+                version, _, _ = version.partition('-')
+            info['version'] = version
+        else:
+            info['is_release'] = False
+            info['version'] = entry.get('source', entry.get('doc', {})).get('version', parsed_branch)
+
         repos[id] = info
     return repos
 
 
-def check_tags(db, commit_id, commit):
-    for folder in sorted(commit.tree.trees, key=lambda d: d.name):
-        if folder.name not in distros:
-            continue
-        distro = folder.name
+def check_tags(db, commit_id, repositories, timestamp):
+    all_tag_ids = set(db.lookup_all('id', 'tags'))
 
-        filename = 'distribution.yaml'
-        try:
-            path = folder[filename]
-        except KeyError:
-            continue
-        distro_dict = yaml.load(blob_contents(path))
-        load_repository_info(db, distro, distro_dict)
+    for distro, distro_dict in repositories.items():
+        entry = load_repository_info(db, distro, distro_dict)
 
+        query = f'SELECT repo_id, tag, max(date), is_release FROM tags ' \
+                f'WHERE distro="{distro}" and date <= {timestamp} GROUP BY repo_id'
+        previous_list = db.query(query)
+        previous_dict = {}
+        for row in previous_list:
+            previous_dict[row['repo_id']] = row['tag'], row['is_release']
+
+        all_ids = set(previous_dict.keys()).union(set(entry.keys()))
+        for repo_id in all_ids:
+            if repo_id in entry:
+                version = entry[repo_id]['version']
+                is_release = entry[repo_id]['is_release']
+                if not is_release and version is None:
+                    version = 'default'
+            else:
+                version = None
+                is_release = None
+
+            if (version, is_release) == previous_dict.get(repo_id):
+                # Nothing has changed
+                continue
+
+            d = {'repo_id': repo_id, 'distro': distro, 'tag': version, 'is_release': is_release, 'date': timestamp}
+
+            after = db.query(f'SELECT id, tag, min(date), is_release FROM tags '
+                             f'WHERE repo_id="{repo_id}" and distro="{distro}" and date > {timestamp}')
+            if after:
+                a_d = after[-1]
+                if a_d['id'] is not None and version == a_d['tag'] and is_release == a_d['is_release']:
+                    db.update('tags', {'id': a_d['id'], 'date': timestamp})
+                    continue
+
+            id = len(all_tag_ids)
+            while id in all_tag_ids:
+                id += 1
+            all_tag_ids.add(id)
+
+            d['id'] = id
+            db.insert('tags', d)
     db.insert('tags_checked', {'commit_id': commit_id})
 
 
@@ -483,11 +603,28 @@ def update_rosdistro(should_classify_commits=True, should_count_repos=True, shou
             else:
                 matched += 1
 
-            if should_count_repos and commit_id not in already_counted and commit_id % 100 == 0:
-                count_repos(db, commit_id, commit)
+            count_this_commit = should_count_repos and commit_id not in already_counted and commit_id % 100 == 0
+            tag_this_commit = should_check_tags and commit_id not in already_tagged and commit_id % 1000 == 0
 
-            if should_check_tags and commit_id not in already_tagged and commit_id % 100 == 0:
-                check_tags(db, commit_id, commit)
+            # Special Case: At a brief period, ROS2 had a separate branch for its rosdistro commits.
+            # This special case makes sure that the number of repos for that period are each indexed
+            if should_count_repos and commit.authored_date >= 1512524340 and commit.authored_date < 1547075230:
+                present_distros = set()
+                for folder in commit.tree.trees:
+                    if folder.name in distros:
+                        present_distros.add(folder.name)
+
+                if present_distros and len(present_distros - set(ros2_distros)) == 0:
+                    count_this_commit = commit_id not in already_counted
+
+            if count_this_commit or tag_this_commit:
+                repositories = commit_to_rosdistro(commit)
+
+                if count_this_commit:
+                    count_repos(db, commit_id, repositories)
+
+                if tag_this_commit:
+                    check_tags(db, commit_id, repositories, commit.authored_date)
 
     except KeyboardInterrupt:
         pass
