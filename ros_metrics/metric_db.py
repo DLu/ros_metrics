@@ -170,6 +170,19 @@ class MetricDB:
             id += 1
         return id
 
+    def get_entry_id(self, table, values):
+        """ If the given values are in a table, return the id. Otherwise assign a new id and insert values """
+        clause_parts = []
+        for k, v in values.items():
+            clause_parts.append('{}={}'.format(k, self.format_value(k, v)))
+        clause = ' and '.join(clause_parts)
+        id = self.lookup('id', table, f'WHERE {clause}')
+        if id is None:
+            id = self.get_next_id(table)
+            values['id'] = id
+            self.insert(table, values)
+        return id
+
     # DB Structure Operations
     def get_field_type(self, field):
         """ Returns the type of a given field, based on the db_structure """
