@@ -163,10 +163,15 @@ def get_email_plots(db):
     unique = collections.Counter()
     seen = set()
 
+    today = datetime.datetime.today()
+    today_key = today.year, today.month
+
     results = db.query('SELECT created_at, topic_id FROM posts WHERE created_at IS NOT NULL ORDER BY created_at')
     for result in results:
         dt = get_datetime_from_dict(result, 'created_at')
         key = dt.year, dt.month
+        if key == today_key:
+            continue
         total[key] += 1
         ident = result['topic_id']
         if ident in seen:
