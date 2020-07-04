@@ -71,6 +71,7 @@ def query(service, profile_id, metrics, dimensions=None, start_date='7daysAgo', 
                                           start_date=start_date, end_date=end_date,
                                           dimensions=dimensions_s,
                                           metrics=metrics_s,
+                                          max_results=500,
                                           start_index=start_index).execute()
         if bar is None:
             bar = tqdm(total=results['totalResults'], desc=f'{profile_id} {start_date} {dimensions_s}')

@@ -173,7 +173,7 @@ def fetch_answer(db, aid, initial_dict=None):
     db.update('answers', answer_dict)
 
 
-def update_users(db, limit=50):
+def update_users(db, limit=None):
     users = set()
     users.update(set(db.lookup_all('user_id', 'questions')))
     users.update(set(db.lookup_all('user_id', 'answers')))
@@ -191,7 +191,8 @@ def update_users(db, limit=50):
                 no_crawl.append(user)
 
     to_crawl = sorted(missing) + sorted(no_crawl)
-    to_crawl = to_crawl[:limit]
+    if limit:
+        to_crawl = to_crawl[:limit]
 
     if not to_crawl:
         return

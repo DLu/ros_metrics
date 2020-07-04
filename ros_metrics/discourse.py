@@ -12,16 +12,18 @@ USER_DATA_FREQUENCY = 60 * 60 * 24 * 30
 
 def fetch_page(path, params=None, debug=False):
     global config
-    if params is None:
-        params = {}
 
     if config is None:
         config = get_keys()['discourse']
 
-    params['api_key'] = config['key']
-    params['api_username'] = config['user']
+    headers = {
+        'Accept': 'application/json; charset=utf-8',
+        'Api-Key': config['key'],
+        'Api-Username': config['user'],
+    }
+
     url = config['host'] + path
-    response = requests.get(url, allow_redirects=False, params=params)
+    response = requests.get(url, allow_redirects=False, params=params, headers=headers)
 
     response_dict = response.json()
 
@@ -53,7 +55,9 @@ def fetch_user_list(db):
 
         response = fetch_page(url)
 
-        total = response.get('total_rows_directory_items')
+        total = response.get('total_rows_directory_items') or \
+            response.get('meta', {}).get('total_rows_directory_items')
+
         if bar is None and total:
             bar = tqdm(total=total, desc='Discourse users')
 
@@ -67,7 +71,8 @@ def fetch_user_list(db):
             db.update('users', item)
 
         if response['directory_items']:
-            url = response['load_more_directory_items']
+            url = response.get('load_more_directory_items') or \
+                response.get('meta', {}).get('load_more_directory_items')
         else:
             url = None
     if bar:
@@ -82,7 +87,8 @@ def fetch_user_data(db, limit=500):
     old = db.query(f'SELECT username, id FROM users WHERE last_updated < {cutoff_date} ORDER BY last_updated')
 
     to_crawl = unseen + old
-    to_crawl = to_crawl[:limit]
+    if limit:
+        to_crawl = to_crawl[:limit]
 
     if not to_crawl:
         return
