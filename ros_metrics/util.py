@@ -167,6 +167,8 @@ def get_manual_stats(field):
             del row['']
             values = {}
             for k, v in row.items():
+                if v == '':
+                    continue
                 values[dateutil.parser.parse(k)] = int(v)
             return values
 
