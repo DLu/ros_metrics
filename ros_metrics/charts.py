@@ -30,7 +30,7 @@ STACKED_BAR_OPTIONS = {
     }
 }
 
-DEFINED_COLORS = yaml.load(open('viz/colors.yaml'))
+DEFINED_COLORS = yaml.safe_load(open('viz/colors.yaml'))
 SOME_COLORS = ['#4dc9f6',
                '#f67019',
                '#f53794',

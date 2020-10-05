@@ -179,7 +179,7 @@ KEYS = None
 def get_keys():
     global KEYS
     if KEYS is None:
-        KEYS = yaml.load(open('keys.yaml'))
+        KEYS = yaml.safe_load(open('keys.yaml'))
     return KEYS
 
 
@@ -188,7 +188,7 @@ def get_github_api():
     for path in [pathlib.Path.home() / '.git-tokens', pathlib.Path('keys.yaml')]:
         if not path.exists():
             continue
-        values = yaml.load(open(path))
+        values = yaml.safe_load(open(path))
         if 'github' in values:
             github_token = values['github']
             break

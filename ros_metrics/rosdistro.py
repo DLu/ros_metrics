@@ -39,7 +39,7 @@ def commit_to_rosdistro(commit):
             for filename in ['distribution.yaml', 'release.yaml', 'doc.yaml', 'source.yaml']:
                 try:
                     blob = folder[filename]
-                    distro_dict = yaml.load(blob_contents(blob))
+                    distro_dict = yaml.safe_load(blob_contents(blob))
                 except KeyError:
                     continue
                 except yaml.error.YAMLError:
@@ -63,7 +63,7 @@ def commit_to_rosdistro(commit):
                     continue
 
                 try:
-                    distro_dict = yaml.load(blob_contents(sub_blob))
+                    distro_dict = yaml.safe_load(blob_contents(sub_blob))
                 except yaml.error.YAMLError:
                     continue
 
@@ -85,7 +85,7 @@ def commit_to_rosdistro(commit):
                     if pathlib.Path(filename.name).suffix != '.rosinstall':
                         continue
                     try:
-                        entry = yaml.load(blob_contents(filename))
+                        entry = yaml.safe_load(blob_contents(filename))
                     except yaml.error.YAMLError:
                         continue
 
@@ -144,8 +144,8 @@ def yaml_diff_iterator(a, b, keys=None):
 
 
 def yaml_diff(diff):
-    a_dict = yaml.load(blob_contents(diff.a_blob))
-    b_dict = yaml.load(blob_contents(diff.b_blob))
+    a_dict = yaml.safe_load(blob_contents(diff.a_blob))
+    b_dict = yaml.safe_load(blob_contents(diff.b_blob))
     return yaml_diff_iterator(a_dict, b_dict)
 
 
@@ -461,7 +461,7 @@ def get_source_url_from_release_repo(release_url, distro):
     if not tracks_file.exists():
         return None
 
-    tracks = yaml.load(open(tracks_file))
+    tracks = yaml.safe_load(open(tracks_file))
     if distro not in tracks['tracks']:
         return None
 

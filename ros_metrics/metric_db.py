@@ -24,7 +24,7 @@ class MetricDB:
         self.raw_db.row_factory = dict_factory
 
         structure_filepath = data_folder / f'{key}.yaml'
-        self.db_structure = yaml.load(open(str(structure_filepath)))
+        self.db_structure = yaml.safe_load(open(str(structure_filepath)))
         self._update_database_structure()
 
     def query(self, query):

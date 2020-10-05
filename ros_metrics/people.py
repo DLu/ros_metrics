@@ -11,7 +11,7 @@ GITHUB_PATTERN = re.compile(r'(.*)' + GITHUB_SUFFIX)
 
 # People data is stored as a yaml for convenient PR changes
 PEOPLE_DATA_PATH = 'data/people.yaml'
-PEOPLE_DATA = yaml.load(open(PEOPLE_DATA_PATH))
+PEOPLE_DATA = yaml.safe_load(open(PEOPLE_DATA_PATH))
 TO_CANONICAL = {}
 
 for email, person_dict in PEOPLE_DATA.items():
