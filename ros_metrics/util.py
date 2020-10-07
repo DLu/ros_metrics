@@ -139,7 +139,7 @@ NUM = r'(\d+)'
 DOT = r'\.'
 SHORT_VERSION = NUM + DOT + NUM + DOT + NUM
 SHORT_VERSION_PATTERN = re.compile(SHORT_VERSION)
-FULL_VERSION_PATTERN = re.compile(SHORT_VERSION + '\-' + NUM)
+FULL_VERSION_PATTERN = re.compile(SHORT_VERSION + r'\-' + NUM)
 VERSIONS = ['major', 'minor', 'patch', 'build']
 
 

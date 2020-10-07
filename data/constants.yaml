@@ -41,6 +41,7 @@ ubuntu:
   - cosmic
   - disco
   - eoan
+  - focal
 debian:
   - stretch
   - jessie
