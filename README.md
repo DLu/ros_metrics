@@ -38,7 +38,17 @@
  * Uses resources from [`scholarly` Python library](https://github.com/OrganicIrradiation/scholarly)
  * Counts citations per year
 
-
+### [ROS Wiki](https://wiki.ros.org)
+ * Uses a combination of the [publicly available mirror data](http://wiki.ros.org/Mirrors#Setup_rsync) and the [DocBook](http://moinmo.in/DocBook) format downloads.
+ * Tracks the number of editors, pages and revisions.
+ * Raw number of users is not publicly available and drawn from the official Metrics report.
+ * TODO:
+     * [ ] [Special case for ROS2](https://github.com/ros2/ros2_documentation)
+     * [ ] How are wiki edits spread across users?
+     * [ ] How big are wiki edits?
+     * [ ] Number of wiki tutorial pages under in any package
+     * [ ] Content per language/namespace
+     * [ ] Integrate users
 
 ## Privately Available
 The following data sources can only be crawled via use of an API key (or other special authentication)
@@ -60,14 +70,3 @@ The following data sources can only be crawled via use of an API key (or other s
  * Uses [Google Analytics API](https://developers.google.com/analytics/devguides/reporting/core/v4/quickstart/installed-py)
  * Overall number of unique pageviews, users and sessions gathered by month/year.
  * Pageviews breakdown by [url, country and operating system](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/) done by year.
-
-## TODO
-
-### [ROS Wiki](https://wiki.ros.org)
- * [*] number of users
- * [ ] num pages
- * [ ] num edits
- * [*] num wiki page views
- * [ ] How are wiki edits spread across users?
- * [ ] How big are wiki edits?
- * [ ] Number of wiki tutorial pages under in any package

@@ -108,6 +108,7 @@ def get_users_plot():
     answers_db = MetricDB('answers')
     users_db = MetricDB('ros_users')
     rosdistro_db = MetricDB('rosdistro')
+    wiki_db = MetricDB('wiki')
     chart = Chart('line', title='Number of ROS Users')
 
     manual = get_manual_stats('users subscribers')
@@ -116,6 +117,7 @@ def get_users_plot():
 
     manual_wiki = get_manual_stats('wiki.ros.org users')
     chart.add('wiki.ros.org users', sorted(manual_wiki.items()))
+    chart.add('wiki.ros.org editors', get_regular_unique_series(wiki_db, 'revisions', 'date', 'user'))
 
     chart.add('answers.ros.org users', get_regular_aggregate_series(answers_db, 'users', 'created_at'))
     chart.add('answers.ros.org questioners',
@@ -359,4 +361,11 @@ def get_binaries_chart(binaries_db=None):
             values.append(tag_dict[key].get(os))
         chart.add(os, values)
 
+    return chart
+
+def get_wiki_chart():
+    wiki_db = MetricDB('wiki')
+    chart = Chart('line', title='Total wiki.ros.org Pages and Edits')
+    chart.add('pages', get_regular_unique_series(wiki_db, 'revisions', 'date', 'page_id'))
+    chart.add('edits', get_regular_aggregate_series(wiki_db, 'revisions', 'date'))
     return chart
