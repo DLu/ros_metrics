@@ -8,6 +8,7 @@ from ros_metrics.repos import update_repos
 from ros_metrics.rosdistro import update_rosdistro
 from ros_metrics.ros_users import update_ros_users
 from ros_metrics.scholar import update_scholar
+from ros_metrics.wiki import update_wiki
 import argparse
 
 if __name__ == '__main__':
@@ -21,6 +22,7 @@ if __name__ == '__main__':
         'rosdistro': update_rosdistro,
         'ros_users': update_ros_users,
         'scholar': update_scholar,
+        'wiki': update_wiki
     }
 
     parser = argparse.ArgumentParser()

@@ -1,0 +1,18 @@
+tables:
+  pages:
+    - id
+    - title
+    - first_commit
+    - last_commit
+  revisions:
+    - page_id
+    - number
+    - date
+    - user
+    - comment
+special_types:
+    title: text
+    user: text
+    comment: text
+
+default_type: int

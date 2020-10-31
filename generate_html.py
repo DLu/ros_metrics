@@ -5,7 +5,7 @@ import collections
 from jinja2 import Environment, FileSystemLoader
 import pathlib
 from ros_metrics import charts, tables
-from ros_metrics import analytics, answers, packages, repos
+from ros_metrics import analytics, answers, packages, repos, wiki
 from ros_metrics.metric_db import MetricDB
 from ros_metrics.constants import distros, os_list
 from tqdm import tqdm
@@ -151,13 +151,25 @@ STRUCTURE = [
          # }
      ]
      },
-    {'name': 'Misc',
+    {'name': 'Wiki',
      'subpages': [
-         {'name': 'Wiki',
+         {'name': 'Activity',
+          'chart': charts.get_wiki_chart,
+          'caption': 'Total number of pages and edits for wiki.ros.org'
+          },
+         {'name': 'TopPages',
           'template': 'top.html',
           'tops': analytics.top_wiki_report,
           'caption': 'Top wiki pages, as measured by Google Analytics, both overall and by year created.'
           },
+         {'name': 'Interesting',
+          'template': 'top.html',
+          'tops': wiki.interesting_wiki_report,
+          'caption': 'Interesting factoids for the wiki.'
+          },
+     ]},
+    {'name': 'Misc',
+     'subpages': [
          {'name': 'Emails',
           'chart': charts.get_emails_plot,
           'caption': 'Number of posts/threads on the two email platforms. '
