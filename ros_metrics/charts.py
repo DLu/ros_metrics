@@ -42,14 +42,20 @@ SOME_COLORS = ['#4dc9f6',
                '#8549ba']
 
 
-class Chart(dict):
-    def __init__(self, chart_type, options=None, title=None):
+class BaseChart(dict):
+    def __init__(self, chart_type, options=None):
         self['type'] = chart_type
-        self['data'] = {'datasets': []}
+
         if options is not None:
             self['options'] = copy.deepcopy(options)
         else:
-            self['options'] = copy.deepcopy(BASIC_TIME_OPTIONS)
+            self['options'] = {}
+
+
+class Chart(BaseChart):
+    def __init__(self, chart_type, options=None, title=None):
+        BaseChart.__init__(self, chart_type, options if options is not None else BASIC_TIME_OPTIONS)
+        self['data'] = {'datasets': []}
 
         if title:
             self['options']['title'] = {
@@ -72,18 +78,38 @@ class Chart(dict):
                 for d in new_series:
                     d['x'] = d['x'].replace('T00:00:00', '')
             series = new_series
-        data_dict = {'label': name, 'data': series}
+
         if color is None:
             if name in DEFINED_COLORS:
                 color = DEFINED_COLORS[name]
             else:
                 color = SOME_COLORS[self.color_i % len(SOME_COLORS)]
                 self.color_i += 1
-        data_dict['backgroundColor'] = color
+
+        self.add_dataset(name, series, color, **kwargs)
+
+    def add_dataset(self, name, series, color=None, **kwargs):
+        data_dict = {'label': name, 'data': series}
+        if color:
+            data_dict['backgroundColor'] = color
         if self['type'] == 'line' and 'fill' not in kwargs:
             data_dict['fill'] = False
         data_dict.update(kwargs)
         self['data']['datasets'].append(data_dict)
+
+
+class ZingChart(dict):
+    def __init__(self, chart_type, options=None, title=None):
+        BaseChart.__init__(self, chart_type, options)
+        self['series'] = []
+        self['globals'] = {'fontFamily': 'Overpass, sans-serif'}
+
+    def add_dataset(self, name, series, color=None, **kwargs):
+        data_dict = {'text': name, 'values': series}
+        if color:
+            data_dict['backgroundColor'] = color
+        data_dict.update(kwargs)
+        self['series'].append(data_dict)
 
 
 def bucket_plot(buckets, values=None, other_limit=None, title=None):
@@ -154,13 +180,39 @@ def get_package_ratio_chart(field, title=None, values=None, other_limit=None):
                        title=title)
 
 
-def get_package_country_chart():
+def get_package_country_chart(N=15):
     packages_db = MetricDB('packages')
-    cc_list, buckets = packages.get_package_buckets(packages_db, 'countries', 'cc')
-    chart = Chart('bar', STACKED_BAR_OPTIONS, 'Countries with most traffic to packages.ros.org')
-    for cc, d_series in buckets.items():
-        title = '{name} {emoji}'.format(**countries[cc.lower()])
-        chart.add(title, d_series)
+    cc_list, by_country = packages.get_package_buckets(packages_db, 'countries', 'cc')
+    buckets = time_buckets(packages_db, 'countries', cc_list, 'year, month', 'cc', 'hits', months=False)
+
+    options = {'style': {'labelOverall': {'text': 'Overall'}}}
+
+    chart = ZingChart('rankflow', options, title='Countries with most traffic to packages.ros.org')
+    ranks = collections.defaultdict(dict)
+
+    for year, c_dict in buckets.items():
+        for i, (cc, _) in enumerate(c_dict.most_common(N)):
+            ranks[year][cc] = i + 1
+
+    for cc in cc_list:
+        series = []
+        valid = False
+        for year in buckets:
+            if cc in ranks[year]:
+                series.append(ranks[year][cc])
+                valid = True
+            else:
+                series.append(None)
+
+        if valid:
+            title = '{name} {emoji}'.format(**countries[cc.lower()])
+            chart['series'].append({'text': title, 'ranks': series, 'rank': len(chart['series']) + 1})
+
+    year_str = list(map(str, buckets.keys()))
+    chart['scaleX'] = {
+        'values': year_str,
+        'labels': year_str
+    }
     return chart
 
 
@@ -171,19 +223,6 @@ def get_package_os_chart():
     for name, d_series in buckets.items():
         chart.add(name, d_series)
     return chart
-
-
-def get_package_country_list():
-    packages_db = MetricDB('packages')
-    cc_list, _ = packages.get_package_buckets(packages_db, 'countries', 'cc')
-    buckets = time_buckets(packages_db, 'countries', cc_list, 'year, month', 'cc', 'hits', months=False)
-    rankings = {}
-    for year in buckets:
-        ranks = []
-        for cc, _ in buckets[year].most_common(15):
-            ranks.append('{name} {emoji}'.format(**countries[cc.lower()]))
-        rankings[year] = ranks
-    return rankings
 
 
 def get_scholar_plot():

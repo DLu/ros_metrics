@@ -54,9 +54,8 @@ STRUCTURE = [
          #  'chart': get_package_ratio_chart(dbs['packages'], 'library')
          #  },
          {'name': 'Country',
-          'template': 'countries.html',
+          'template': 'zing_chart.html',
           'chart': charts.get_package_country_chart,
-          'rankings': charts.get_package_country_list,
           'caption': 'Top ROS-using countries based on packages.ros.org downloads.'
           },
          {'name': 'ROS2',
