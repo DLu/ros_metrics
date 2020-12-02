@@ -1,14 +1,21 @@
-import apiclient.discovery
-import oauth2client.service_account
-import sys
-from tqdm import tqdm
 import collections
 import datetime
+import sys
+import time
 from urllib.parse import urlparse
+
+import apiclient.discovery
+
+import oauth2client.service_account
+
+import googleapiclient.errors
+
+from tqdm import tqdm
+
 
 from .metric_db import MetricDB
 from .reports import get_top_by_year
-from .util import get_year_month_date_range, year_month_to_datetime, clean_dict, epoch_to_datetime, now_epoch, get_keys
+from .util import clean_dict, epoch_to_datetime, get_keys, get_year_month_date_range, now_epoch, year_month_to_datetime
 
 MONTHLY_REPORTS = {'totals': {}}
 YEARLY_REPORTS = {
@@ -27,12 +34,14 @@ DOMAINS = [
     'index.ros.org'
 ]
 
+NAME_LOOKUP = {}
+
 
 def get_api_service():
     api_key = get_keys()['analytics']
     scopes = ['https://www.googleapis.com/auth/analytics.readonly']
     credentials = oauth2client.service_account.ServiceAccountCredentials.from_json_keyfile_dict(api_key, scopes=scopes)
-    return apiclient.discovery.build('analytics', 'v3', credentials=credentials)
+    return apiclient.discovery.build('analyticsreporting', 'v4', credentials=credentials)
 
 
 def get_profiles(service):
@@ -54,41 +63,69 @@ def get_profiles(service):
     return ids
 
 
-def query(service, profile_id, metrics, dimensions=None, start_date='7daysAgo', end_date='today'):
+def query(service, profile_id, metrics, dimensions=None, start_date='7daysAgo', end_date='today', max_attempts=5):
     if isinstance(metrics, str):
         metrics = [metrics]
     if dimensions is None:
         dimensions = []
 
     rows = []
-    start_index = 1
     bar = None
-    dimensions_s = ','.join(add_prefix(dimensions))
-    metrics_s = ','.join(add_prefix(metrics))
+
+    report_request = {
+        'viewId': add_prefix(str(profile_id)),
+        'dateRanges': [{'startDate': start_date, 'endDate': end_date}],
+        'dimensions': [{'name': dimension} for dimension in add_prefix(dimensions)],
+        'metrics': [{'expression': metric} for metric in add_prefix(metrics)],
+    }
+    body = {'reportRequests': [report_request]}
 
     while True:
-        results = service.data().ga().get(ids=add_prefix(str(profile_id)),
-                                          start_date=start_date, end_date=end_date,
-                                          dimensions=dimensions_s,
-                                          metrics=metrics_s,
-                                          max_results=500,
-                                          start_index=start_index).execute()
-        if bar is None:
-            bar = tqdm(total=results['totalResults'], desc=f'{profile_id} {start_date} {dimensions_s}')
-        # print(yaml.dump(results))
+        attempts = 0
+        results = None
+        e = None
+        while results is None and attempts < max_attempts:
+            try:
+                results = service.reports().batchGet(body=body).execute()
+            except googleapiclient.errors.HttpError:
+                time.sleep(10)
+                results = None
+                attempts += 1
+        if attempts >= max_attempts:
+            raise e
 
-        for row in results.get('rows', []):
+        report = results['reports'][0]
+        data = report['data']
+
+        metric_types = {}
+        for metric_d in report['columnHeader']['metricHeader']['metricHeaderEntries']:
+            name = metric_d['name'].replace('ga:', '')
+            if metric_d['type'] == 'INTEGER':
+                metric_types[name] = int
+            else:
+                print(f'Unknown metric type {metric_d}')
+
+        if bar is None:
+            profile_name = NAME_LOOKUP.get(profile_id, profile_id)
+            dimensions_s = ','.join(dimensions)
+            bar = tqdm(total=data['rowCount'], desc=f'{profile_name} {start_date} {dimensions_s}')
+
+        for row in data.get('rows', []):
             row_dict = {}
-            for header, row_value in zip(results['columnHeaders'], row):
-                key = header.get('name', '').replace('ga:', '')
-                if header.get('dataType') == 'INTEGER' or key in ['month', 'year']:
-                    row_value = int(row_value)
-                row_dict[key] = row_value
+            for dimension, value in zip(dimensions, row.get('dimensions', [])):
+                row_dict[dimension] = value
+            for metric, value in zip(metrics, row['metrics'][0]['values']):
+                if metric in metric_types:
+                    value = metric_types[metric](value)
+                row_dict[metric] = value
+
             rows.append(row_dict)
-            start_index += 1
+
             bar.update()
 
-        if 'nextLink' not in results:
+        if 'nextPageToken' in report:
+            report_request['pageToken'] = report['nextPageToken']
+        else:
             break
     bar.close()
     return rows
@@ -177,19 +214,20 @@ def get_missing_data(db, profile_id, start_year, start_month):
 
 
 def get_stats(service, db, profile_id, table, start_date, end_date):
-    dimensions = ['year'] + list(REPORT_DATA[table].keys())
+    dimensions = list(REPORT_DATA[table].keys())
     metrics = ['uniquePageviews']
     if table in MONTHLY_REPORTS:
-        dimensions.append('month')
         metrics.append('users')
         metrics.append('sessions')
     results = query(service, profile_id, metrics, dimensions, start_date, end_date)
+
     year = int(start_date[0:4])
+    month = int(start_date[5:7])
 
     # Flush existing data (if any)
     base_flush = f'DELETE FROM {table} WHERE profile_id={profile_id} and year={year}'
     if table in MONTHLY_REPORTS:
-        base_flush += ' and month={}'.format(int(start_date[5:7]))
+        base_flush += f' and month={month}'
     db.execute(base_flush)
 
     # n = len(results)
@@ -222,6 +260,9 @@ def get_stats(service, db, profile_id, table, start_date, end_date):
         for row in results:
             clean_dict(row, remapping)
             row['profile_id'] = profile_id
+            row['year'] = year
+            if table in MONTHLY_REPORTS:
+                row['month'] = month
             db.insert(table, row)
 
     db.execute(f'DELETE FROM updates WHERE profile_id={profile_id} and table_name="{table}"')
@@ -238,6 +279,7 @@ def update_analytics():
         profile_id = lookup_profile(service, db, profile_name)
         if profile_id is None:
             continue
+        NAME_LOOKUP[profile_id] = profile_name
 
         start_year, start_month = get_start_point(service, db, profile_id)
         if start_year is None:
