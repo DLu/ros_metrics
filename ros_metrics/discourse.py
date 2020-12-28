@@ -128,9 +128,9 @@ def process_post(db, post, process_topic=True):
     db.update('topics', topic_info)
 
 
-def fetch_post(db, id):
+def fetch_post(db, post_id):
     try:
-        data = fetch_page(f'/posts/{id}.json')
+        data = fetch_page(f'/posts/{post_id}.json')
     except Exception:
         return
 

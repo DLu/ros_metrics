@@ -504,10 +504,10 @@ def load_repository_info(db, distro, distro_dict):
 
         parsed_branch = repo_dict.pop('branch', None)
 
-        id = get_repo_id(db, repo_dict)
-        if id is None:
-            id = db.get_next_id('repos')
-            repo_dict['id'] = id
+        repo_id = get_repo_id(db, repo_dict)
+        if repo_id is None:
+            repo_id = db.get_next_id('repos')
+            repo_dict['id'] = repo_id
             repo_dict['url'] = url
             db.insert('repos', repo_dict)
 
@@ -522,7 +522,7 @@ def load_repository_info(db, distro, distro_dict):
             info['is_release'] = False
             info['version'] = entry.get('source', entry.get('doc', {})).get('version', parsed_branch)
 
-        repos[id] = info
+        repos[repo_id] = info
     return repos
 
 
@@ -564,12 +564,12 @@ def check_tags(db, commit_id, repositories, timestamp):
                     db.update('tags', {'id': a_d['id'], 'date': timestamp})
                     continue
 
-            id = len(all_tag_ids)
-            while id in all_tag_ids:
-                id += 1
-            all_tag_ids.add(id)
+            tag_id = len(all_tag_ids)
+            while tag_id in all_tag_ids:
+                tag_id += 1
+            all_tag_ids.add(tag_id)
 
-            d['id'] = id
+            d['id'] = tag_id
             db.insert('tags', d)
     db.insert('tags_checked', {'commit_id': commit_id})
 
@@ -642,7 +642,7 @@ def update_rosdistro(should_classify_commits=True, should_count_repos=True, shou
 def get_rosdistro_repos(db):
     ids = set(db.lookup_all('id', 'repos'))
     remaps = db.dict_lookup('id', 'new_id', 'remap_repos')
-    return [remaps.get(id, id) for id in ids]
+    return [remaps.get(repo_id, repo_id) for repo_id in ids]
 
 
 def commit_query(db, fields, clause=''):

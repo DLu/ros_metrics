@@ -50,8 +50,8 @@ def get_profiles(service):
         account = account_d.get('id')
         properties = service.management().webproperties().list(accountId=account).execute()
         for property_d in properties.get('items', []):
-            property = property_d.get('id')
-            profiles = service.management().profiles().list(accountId=account, webPropertyId=property).execute()
+            webPropertyId = property_d.get('id')
+            profiles = service.management().profiles().list(accountId=account, webPropertyId=webPropertyId).execute()
             for profile_d in profiles.get('items', []):
                 name = profile_d.get('name')
                 # Hack for clarity

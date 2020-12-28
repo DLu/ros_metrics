@@ -59,11 +59,11 @@ def clone(rosdistro_db, repos_db, rosdistro_ids, debug=False):
 
     ts = now_epoch()
     for folder, repo_dict in tqdm(sorted(to_clone, key=lambda pair: pair[0]), 'cloning repos'):
-        id = repo_dict['id']
+        repo_id = repo_dict['id']
         try:
             repo, path = clone_or_update(repo_dict['url'], folder)
-            repos[id] = repo
-            repos_db.update('repo_updates', {'id': id, 'last_updated_at': ts})
+            repos[repo_id] = repo
+            repos_db.update('repo_updates', {'id': repo_id, 'last_updated_at': ts})
         except CloneException as e:
             repo_dict['status'] = e.message
             rosdistro_db.update('repos', repo_dict)
@@ -266,13 +266,13 @@ def github_stat_report(rosdistro_db, repos_db, github_repos):
     exclude = rosdistro_db.lookup_all('id', 'repos', 'WHERE status != "ok"')
 
     for repo_dict in repos_db.query('SELECT id, forks, stars, subs from github_stats'):
-        id = repo_dict['id']
-        if id in exclude:
+        repo_id = repo_dict['id']
+        if repo_id in exclude:
             continue
         del repo_dict['id']
         for key in repo_dict:
             ranks[key][repo_dict[key]] += 1
-        report[id] = repo_dict
+        report[repo_id] = repo_dict
 
     for repo_dict in report.values():
         my_ranks = {}
@@ -321,10 +321,10 @@ def github_repos_report(repos_db=None):
     report = github_stat_report(rosdistro_db, repos_db, github_repos)
     issue_report = get_issue_report(repos_db)
     lines = []
-    for id, repo_dict in github_repos.items():
-        repo_dict.update(report[id])
+    for repo_id, repo_dict in github_repos.items():
+        repo_dict.update(report[repo_id])
         for key in issue_report:
-            repo_dict[key] = issue_report[key].get(id, '')
+            repo_dict[key] = issue_report[key].get(repo_id, '')
 
         lines.append(repo_dict)
     return lines

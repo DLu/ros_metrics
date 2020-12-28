@@ -163,10 +163,10 @@ class MetricDB:
     def get_next_id(self, table, start_id=0):
         """Return an id that is not yet in the table."""
         all_ids = self.lookup_all('id', table)
-        id = start_id
-        while id in all_ids:
-            id += 1
-        return id
+        next_id = start_id
+        while next_id in all_ids:
+            next_id += 1
+        return next_id
 
     def get_entry_id(self, table, values):
         """If the given values are in a table, return the id. Otherwise assign a new id and insert values."""
@@ -174,12 +174,12 @@ class MetricDB:
         for k, v in values.items():
             clause_parts.append('{}={}'.format(k, self.format_value(k, v)))
         clause = ' and '.join(clause_parts)
-        id = self.lookup('id', table, f'WHERE {clause}')
-        if id is None:
-            id = self.get_next_id(table)
-            values['id'] = id
+        entry_id = self.lookup('id', table, f'WHERE {clause}')
+        if entry_id is None:
+            entry_id = self.get_next_id(table)
+            values['id'] = entry_id
             self.insert(table, values)
-        return id
+        return entry_id
 
     # DB Structure Operations
     def get_field_type(self, field):
