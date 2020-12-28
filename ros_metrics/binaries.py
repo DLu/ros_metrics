@@ -15,12 +15,12 @@ BINARY_REPOS = [('ros2', 'ros2')]
 
 # Categories, and the list of expected values for those categories
 CATEGORIES = {
-    'os': set(['windows', 'macos', 'linux']),
+    'os': {'windows', 'macos', 'linux'},
     'rosdistro': set(ros2_distros),
     'architecture': set(architectures),
     'flavor': set(os_list + ['centos']),
-    'type': set(['debug', 'release']),
-    'dds': set(['fastrtps', 'opensplice']),
+    'type': {'debug', 'release'},
+    'dds': {'fastrtps', 'opensplice'},
 }
 
 # Dictionary from piece of a binary name to the more common name for it
@@ -74,7 +74,7 @@ def categorize_binary_name(name, merge_alphabeta=True, debug=False):
         return
 
     # Running list of parts of the binary name that we have not yet classified
-    parts = set([REMAPPED_CATEGORY_VALUES.get(part, part) for part in parts])
+    parts = {REMAPPED_CATEGORY_VALUES.get(part, part) for part in parts}
 
     categories = {}
 

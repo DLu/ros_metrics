@@ -22,7 +22,7 @@ YEARLY_REPORTS = {
     'cc_views': {'countryIsoCode': 'cc'},
     'os_views': {'operatingSystem': 'os', 'operatingSystemVersion': 'osv'}
 }
-REPORT_DATA = dict()
+REPORT_DATA = {}
 REPORT_DATA.update(MONTHLY_REPORTS)
 REPORT_DATA.update(YEARLY_REPORTS)
 
@@ -296,7 +296,7 @@ def update_analytics():
 
 
 def get_total_series(db, metric='pageviews'):
-    profiles = dict([(row['id'], row['name']) for row in db.query('SELECT * FROM profiles')])
+    profiles = {row['id']: row['name'] for row in db.query('SELECT * FROM profiles')}
     series = collections.defaultdict(list)
     for row in db.query('SELECT * FROM totals ORDER BY year, month'):
         dt = year_month_to_datetime(row['year'], row['month'])

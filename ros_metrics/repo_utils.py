@@ -30,7 +30,7 @@ def match_git_host(url):
     for pattern in PATTERNS:
         m = pattern.match(url)
         if m:
-            return dict([(k, v.lower()) for (k, v) in m.groupdict().items()])
+            return {k: v.lower() for (k, v) in m.groupdict().items()}
 
 
 def get_cache_folder(repo_dict):

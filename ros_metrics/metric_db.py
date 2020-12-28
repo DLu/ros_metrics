@@ -21,7 +21,7 @@ class MetricDB:
         filepath = data_folder / f'{key}.db'
         self.raw_db = sqlite3.connect(str(filepath), detect_types=sqlite3.PARSE_DECLTYPES)
         sqlite3.register_adapter(bool, int)
-        sqlite3.register_converter("bool", lambda v: bool(int(v)))
+        sqlite3.register_converter('bool', lambda v: bool(int(v)))
         self.raw_db.row_factory = dict_factory
 
         structure_filepath = data_folder / f'{key}.yaml'
@@ -113,7 +113,7 @@ class MetricDB:
     def dict_lookup(self, key_field, value_field, table, clause=''):
         """ Return a dictionary mapping the key_field to the value_field for some query """
         results = self.query(f'SELECT {key_field}, {value_field} FROM {table} {clause}')
-        return dict([(d[key_field], d[value_field]) for d in results])
+        return {d[key_field]: d[value_field] for d in results}
 
     def unique_counts(self, table, ident_field):
         """ Return a dictionary mapping the different values of the ident_field column to how many times each appears"""

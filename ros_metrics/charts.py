@@ -74,7 +74,7 @@ class Chart(BaseChart):
                 new_series.append({'x': x, 'y': y})
 
             # If all points in series are at midnight, cleave the time spec
-            if isinstance(series[0][0], datetime.datetime) and all(['T00:00:00' in d['x'] for d in new_series]):
+            if isinstance(series[0][0], datetime.datetime) and all('T00:00:00' in d['x'] for d in new_series):
                 for d in new_series:
                     d['x'] = d['x'].replace('T00:00:00', '')
             series = new_series
@@ -117,7 +117,7 @@ def bucket_plot(buckets, values=None, other_limit=None, title=None):
     other = collections.Counter()
     for name, d_series in normalize_timepoints(buckets, values).items():
         if other_limit is not None:
-            total_area = sum([x[1] for x in d_series])
+            total_area = sum(x[1] for x in d_series)
             if total_area < other_limit:
                 for x, y in d_series:
                     other[x] += y
@@ -125,7 +125,7 @@ def bucket_plot(buckets, values=None, other_limit=None, title=None):
         chart.add(name, d_series)
 
     if other:
-        chart.add('other', list(sorted(other.items())))
+        chart.add('other', sorted(other.items()))
     return chart
 
 

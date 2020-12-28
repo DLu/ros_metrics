@@ -196,7 +196,7 @@ def update_packages(force=False):
     pairs = get_filename_url_pairs(dates)
 
     # If all files exist, don't do any work
-    if not force and all([filename.exists() for (filename, url) in pairs]):
+    if not force and all(filename.exists() for (filename, url) in pairs):
         return
 
     scrape(pairs)

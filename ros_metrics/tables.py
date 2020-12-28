@@ -53,7 +53,7 @@ class Table(object):
             new_key = column[:-1] + '_rank'
             self.headers.append(new_key)
 
-        cdef = {'render': 'rankRenderer', 'targets': display_columns, "orderSequence": ["desc", "asc"]}
+        cdef = {'render': 'rankRenderer', 'targets': display_columns, 'orderSequence': ['desc', 'asc']}
         self.column_defs.append(cdef)
         cdef = {'visible': False, 'targets': hidden_columns}
         self.column_defs.append(cdef)
