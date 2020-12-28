@@ -2,8 +2,10 @@
 
 import csv
 import sys
-from matplotlib.pyplot import plot, show, legend, title, savefig, clf
+
 from dateutil import parser  # pip install python-dateutil
+
+from matplotlib.pyplot import clf, legend, plot, savefig, show, title
 
 PLOTS = [
     ('Website Metrics', ['Homepage Views', 'Installation Views', 'Tutorials Views']),
@@ -22,7 +24,7 @@ for row in D:
     for key in D.fieldnames[1:]:
         try:
             a.append(float(row[key]))
-        except:
+        except ValueError:
             a.append(None)
     ROWS[row['']] = a
 

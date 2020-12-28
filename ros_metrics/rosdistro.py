@@ -1,16 +1,19 @@
 import collections
 import pathlib
 import re
+
 import requests
+
 from tqdm import tqdm
+
 import yaml
 
 from .constants import distros, ros1_distros, ros2_distros
 from .metric_db import MetricDB
 from .people import get_canonical_email
-from .repo_utils import clone_or_update, CloneException, match_git_host, blob_contents, resolve
-from .reports import get_datetime_from_dict, ONE_WEEK
-from .util import version_compare, standardize_dict
+from .repo_utils import CloneException, blob_contents, clone_or_update, match_git_host, resolve
+from .reports import ONE_WEEK, get_datetime_from_dict
+from .util import standardize_dict, version_compare
 
 GIT_URL = 'https://github.com/ros/rosdistro.git'
 REPO_PATH = pathlib.Path('cache/rosdistro')
@@ -461,7 +464,10 @@ def get_source_url_from_release_repo(release_url, distro):
     if not tracks_file.exists():
         return None
 
-    tracks = yaml.safe_load(open(tracks_file))
+    try:
+        tracks = yaml.safe_load(open(tracks_file))
+    except yaml.constructor.ConstructorError:
+        tracks = yaml.load(open(tracks_file))
     if distro not in tracks['tracks']:
         return None
 
@@ -501,10 +507,10 @@ def load_repository_info(db, distro, distro_dict):
 
         parsed_branch = repo_dict.pop('branch', None)
 
-        id = get_repo_id(db, repo_dict)
-        if id is None:
-            id = db.get_next_id('repos')
-            repo_dict['id'] = id
+        repo_id = get_repo_id(db, repo_dict)
+        if repo_id is None:
+            repo_id = db.get_next_id('repos')
+            repo_dict['id'] = repo_id
             repo_dict['url'] = url
             db.insert('repos', repo_dict)
 
@@ -519,7 +525,7 @@ def load_repository_info(db, distro, distro_dict):
             info['is_release'] = False
             info['version'] = entry.get('source', entry.get('doc', {})).get('version', parsed_branch)
 
-        repos[id] = info
+        repos[repo_id] = info
     return repos
 
 
@@ -561,12 +567,12 @@ def check_tags(db, commit_id, repositories, timestamp):
                     db.update('tags', {'id': a_d['id'], 'date': timestamp})
                     continue
 
-            id = len(all_tag_ids)
-            while id in all_tag_ids:
-                id += 1
-            all_tag_ids.add(id)
+            tag_id = len(all_tag_ids)
+            while tag_id in all_tag_ids:
+                tag_id += 1
+            all_tag_ids.add(tag_id)
 
-            d['id'] = id
+            d['id'] = tag_id
             db.insert('tags', d)
     db.insert('tags_checked', {'commit_id': commit_id})
 
@@ -639,7 +645,7 @@ def update_rosdistro(should_classify_commits=True, should_count_repos=True, shou
 def get_rosdistro_repos(db):
     ids = set(db.lookup_all('id', 'repos'))
     remaps = db.dict_lookup('id', 'new_id', 'remap_repos')
-    return [remaps.get(id, id) for id in ids]
+    return [remaps.get(repo_id, repo_id) for repo_id in ids]
 
 
 def commit_query(db, fields, clause=''):

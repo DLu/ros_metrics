@@ -1,9 +1,11 @@
-import requests
 import time
+
+import requests
+
 from tqdm import tqdm
 
 from .metric_db import MetricDB
-from .util import now_epoch, key_subset, get_keys
+from .util import get_keys, key_subset, now_epoch
 
 config = None
 USER_CRAWL_FREQUENCY = 60 * 60 * 24 * 7
@@ -126,9 +128,9 @@ def process_post(db, post, process_topic=True):
     db.update('topics', topic_info)
 
 
-def fetch_post(db, id):
+def fetch_post(db, post_id):
     try:
-        data = fetch_page(f'/posts/{id}.json')
+        data = fetch_page(f'/posts/{post_id}.json')
     except Exception:
         return
 

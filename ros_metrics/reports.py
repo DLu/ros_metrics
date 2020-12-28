@@ -1,6 +1,7 @@
 import collections
 import datetime
-from .util import year_month_to_datetime, epoch_to_datetime
+
+from .util import epoch_to_datetime, year_month_to_datetime
 
 ONE_WEEK = datetime.timedelta(days=7)
 
@@ -110,7 +111,7 @@ def time_buckets(db, table, values, time_field, ident_field, value_field=None, m
 
         one_time_field = time_field.split(',')[0]
         results = db.query(f'SELECT {select_field} FROM {table} ' +
-                           f'WHERE {ident_field} = \'{value}\' AND {one_time_field} IS NOT NULL ORDER BY {time_field}')
+                           f"WHERE {ident_field} = '{value}' AND {one_time_field} IS NOT NULL ORDER BY {time_field}")
         for result in results:
             dt = get_datetime_from_dict(result, time_field)
             if months:
@@ -208,7 +209,7 @@ def get_top_by_year(db, table, ident_field, value_field, clause='', yearly_count
         total[ident] += row[value_field]
 
     yearly = collections.defaultdict(list)
-    years = list(sorted(set(earliest.values())))
+    years = sorted(set(earliest.values()))
     for year in years[1:]:
         pkgs = [pkg for pkg in earliest if earliest[pkg] == year]
         for pkg, hits in total.most_common():

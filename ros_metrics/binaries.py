@@ -1,9 +1,10 @@
-from .metric_db import MetricDB
-from .util import get_github_api, now_epoch, datetime_to_epoch, epoch_to_datetime
-from .constants import ros2_distros, os_list, architectures
 import collections
 import pathlib
 import re
+
+from .constants import architectures, os_list, ros2_distros
+from .metric_db import MetricDB
+from .util import datetime_to_epoch, epoch_to_datetime, get_github_api, now_epoch
 
 ALPHA_BETA_PATTERN = re.compile(r'(alpha|beta)(\d+)')
 DATE_STRING_PATTERN = re.compile(r'\d{8}')
@@ -14,12 +15,12 @@ BINARY_REPOS = [('ros2', 'ros2')]
 
 # Categories, and the list of expected values for those categories
 CATEGORIES = {
-    'os': set(['windows', 'macos', 'linux']),
+    'os': {'windows', 'macos', 'linux'},
     'rosdistro': set(ros2_distros),
     'architecture': set(architectures),
     'flavor': set(os_list + ['centos']),
-    'type': set(['debug', 'release']),
-    'dds': set(['fastrtps', 'opensplice']),
+    'type': {'debug', 'release'},
+    'dds': {'fastrtps', 'opensplice'},
 }
 
 # Dictionary from piece of a binary name to the more common name for it
@@ -29,6 +30,7 @@ REMAPPED_CATEGORY_VALUES = {
     'aarch64': 'arm64',
     'osx': 'macos',
 }
+
 
 def update_binaries():
     # Download the raw numbers from github - no categorization
@@ -73,7 +75,7 @@ def categorize_binary_name(name, merge_alphabeta=True, debug=False):
         return
 
     # Running list of parts of the binary name that we have not yet classified
-    parts = set([REMAPPED_CATEGORY_VALUES.get(part, part) for part in parts])
+    parts = {REMAPPED_CATEGORY_VALUES.get(part, part) for part in parts}
 
     categories = {}
 
@@ -129,6 +131,7 @@ def get_latest_data(db):
         rows.append(row)
     return rows
 
+
 def get_tagged_data(db, merge_alphabeta=True):
     rows = get_latest_data(db)
     for row in rows:
@@ -137,6 +140,7 @@ def get_tagged_data(db, merge_alphabeta=True):
             continue
         row.update(d)
     return rows
+
 
 def get_downloads_by_field(tagged_data, field, field1=None):
     totals = collections.OrderedDict()

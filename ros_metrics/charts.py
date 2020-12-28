@@ -1,15 +1,15 @@
 import collections
 import copy
 import datetime
+
 import yaml
 
-from .metric_db import MetricDB
-from .reports import round_series, get_regular_aggregate_series, get_regular_unique_series
-from .reports import time_buckets, normalize_timepoints, get_series, get_email_plots, buckets_to_plot
-from . import analytics, answers, binaries, scholar, packages, rosdistro, repos
+from . import analytics, answers, binaries, packages, repos, rosdistro, scholar
 from .constants import countries, distros
-
-from .util import get_manual_stats, VERSIONS
+from .metric_db import MetricDB
+from .reports import buckets_to_plot, get_email_plots, get_regular_aggregate_series
+from .reports import get_regular_unique_series, get_series, normalize_timepoints, round_series, time_buckets
+from .util import VERSIONS, get_manual_stats
 
 BASIC_TIME_OPTIONS = {
     'responsive': True,
@@ -74,7 +74,7 @@ class Chart(BaseChart):
                 new_series.append({'x': x, 'y': y})
 
             # If all points in series are at midnight, cleave the time spec
-            if isinstance(series[0][0], datetime.datetime) and all(['T00:00:00' in d['x'] for d in new_series]):
+            if isinstance(series[0][0], datetime.datetime) and all('T00:00:00' in d['x'] for d in new_series):
                 for d in new_series:
                     d['x'] = d['x'].replace('T00:00:00', '')
             series = new_series
@@ -117,7 +117,7 @@ def bucket_plot(buckets, values=None, other_limit=None, title=None):
     other = collections.Counter()
     for name, d_series in normalize_timepoints(buckets, values).items():
         if other_limit is not None:
-            total_area = sum([x[1] for x in d_series])
+            total_area = sum(x[1] for x in d_series)
             if total_area < other_limit:
                 for x, y in d_series:
                     other[x] += y
@@ -125,7 +125,7 @@ def bucket_plot(buckets, values=None, other_limit=None, title=None):
         chart.add(name, d_series)
 
     if other:
-        chart.add('other', list(sorted(other.items())))
+        chart.add('other', sorted(other.items()))
     return chart
 
 
@@ -367,6 +367,7 @@ def get_ticket_totals(repos_db=None):
         chart.add(key, round_series(line), lineTension=0)
     return chart
 
+
 def get_binaries_chart(binaries_db=None):
     if binaries_db is None:
         binaries_db = MetricDB('binaries')
@@ -401,6 +402,7 @@ def get_binaries_chart(binaries_db=None):
         chart.add(os, values)
 
     return chart
+
 
 def get_wiki_chart():
     wiki_db = MetricDB('wiki')

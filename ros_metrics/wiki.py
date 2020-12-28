@@ -1,13 +1,16 @@
 import collections
 import pathlib
 import re
-import requests
 import subprocess
 import time
 from xml.dom.minidom import parseString
+
+import requests
+
 from tqdm import tqdm
+
 from .metric_db import MetricDB
-from .util import BeautifulParser, string_to_epoch, now_epoch
+from .util import BeautifulParser, now_epoch, string_to_epoch
 
 WIKI_URL = 'https://wiki.ros.org/'
 MIRROR_PATH = pathlib.Path('cache/wiki')
@@ -49,12 +52,14 @@ def sync_mirror():
     subprocess.call(['rsync', '-azv', 'rsync.osuosl.org::ros_wiki_mirror', str(MIRROR_PATH),
                      '--bwlimit=200', '--delete', '--exclude', 'attachments'])
 
+
 def translate_path_to_wiki(path):
     base = path.stem
     pieces = re.split(PAREN_PATTERN, base)
     for pi in range(1, len(pieces), 2):
         pieces[pi] = bytes.fromhex(pieces[pi]).decode('utf-8')
     return ''.join(pieces)
+
 
 def update_pages(db):
     existing = db.dict_lookup('title', 'id', 'pages')
@@ -64,6 +69,7 @@ def update_pages(db):
             continue
         db.insert('pages', {'id': len(existing), 'title': title})
         existing[title] = len(existing)
+
 
 def parse_doc_book(page_name):
     url = DOCBOOK_TEMPLATE.format(page_name)
@@ -84,6 +90,7 @@ def parse_doc_book(page_name):
             rev_dict[key] = child.firstChild.data
         yield rev_dict
 
+
 def get_recently_updated_pages():
     pages = set()
     r = requests.get('http://wiki.ros.org/RecentChanges?max_days=60&action=content')
@@ -91,6 +98,7 @@ def get_recently_updated_pages():
     for row in soup.find_all_by_class('td', 'rcpagelink'):
         pages.add(str(row.text))
     return pages
+
 
 def update_recent_edits(db):
     existing = db.dict_lookup('title', 'id', 'pages')
@@ -101,6 +109,7 @@ def update_recent_edits(db):
         else:
             db.insert('pages', {'id': len(existing), 'title': title})
             existing[title] = len(existing)
+
 
 def update_revisions(db):
     queue = list(db.query('SELECT * FROM pages WHERE last_commit IS NULL'))
@@ -126,6 +135,7 @@ def update_revisions(db):
         db.update('pages', page)
         time.sleep(5)
 
+
 def update_wiki():
     sync_mirror()
 
@@ -136,6 +146,7 @@ def update_wiki():
         update_revisions(db)
     finally:
         db.close()
+
 
 def interesting_wiki_report(db=None):
     if db is None:

@@ -6,12 +6,11 @@ from urllib.parse import urlparse
 
 import apiclient.discovery
 
-import oauth2client.service_account
-
 import googleapiclient.errors
 
-from tqdm import tqdm
+import oauth2client.service_account
 
+from tqdm import tqdm
 
 from .metric_db import MetricDB
 from .reports import get_top_by_year
@@ -23,7 +22,7 @@ YEARLY_REPORTS = {
     'cc_views': {'countryIsoCode': 'cc'},
     'os_views': {'operatingSystem': 'os', 'operatingSystemVersion': 'osv'}
 }
-REPORT_DATA = dict()
+REPORT_DATA = {}
 REPORT_DATA.update(MONTHLY_REPORTS)
 REPORT_DATA.update(YEARLY_REPORTS)
 
@@ -51,8 +50,8 @@ def get_profiles(service):
         account = account_d.get('id')
         properties = service.management().webproperties().list(accountId=account).execute()
         for property_d in properties.get('items', []):
-            property = property_d.get('id')
-            profiles = service.management().profiles().list(accountId=account, webPropertyId=property).execute()
+            webPropertyId = property_d.get('id')
+            profiles = service.management().profiles().list(accountId=account, webPropertyId=webPropertyId).execute()
             for profile_d in profiles.get('items', []):
                 name = profile_d.get('name')
                 # Hack for clarity
@@ -297,7 +296,7 @@ def update_analytics():
 
 
 def get_total_series(db, metric='pageviews'):
-    profiles = dict([(row['id'], row['name']) for row in db.query('SELECT * FROM profiles')])
+    profiles = {row['id']: row['name'] for row in db.query('SELECT * FROM profiles')}
     series = collections.defaultdict(list)
     for row in db.query('SELECT * FROM totals ORDER BY year, month'):
         dt = year_month_to_datetime(row['year'], row['month'])

@@ -1,12 +1,16 @@
-import bs4
 import calendar
 import collections
 import csv
 import datetime
-import dateutil.parser
-import github
 import pathlib
 import re
+
+import bs4
+
+import dateutil.parser
+
+import github
+
 import yaml
 
 
@@ -49,7 +53,7 @@ epoch_to_datetime = datetime.datetime.fromtimestamp
 
 
 def get_year_month_date_range(start_year, start_month):
-    """ Generate a list of tuples of (year, month) from (start_year, start_month) until last month """
+    """Generate a list of tuples of (year, month) from (start_year, start_month) until last month."""
     today = datetime.datetime.today()
     dates = []
     # inclusive of this year
