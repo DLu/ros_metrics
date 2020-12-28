@@ -1,4 +1,5 @@
 import re
+
 import yaml
 
 # This data associates multiple aliases with a single person entity.

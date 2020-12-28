@@ -1,13 +1,15 @@
 import collections
-import requests
 import pathlib
+
+import requests
+
 from tqdm import tqdm
 
 from .link_analysis import classify_link
 from .metric_db import MetricDB
-from .util import get_year_month_date_range, year_month_to_datetime, find_by_class, BeautifulParser, string_to_bytes
-from .util import clean_dict
-from .reports import order_by_magnitude, time_buckets, normalize_timepoints, get_top_by_year
+from .reports import get_top_by_year, normalize_timepoints, order_by_magnitude, time_buckets
+from .util import BeautifulParser, clean_dict, find_by_class, get_year_month_date_range, year_month_to_datetime
+from .util import string_to_bytes
 
 BASE_URL = 'https://awstats.osuosl.org/reports/packages.ros.org/{year}/{month:02d}/'
 PAGES = {

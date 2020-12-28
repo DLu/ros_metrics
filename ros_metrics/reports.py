@@ -1,6 +1,7 @@
 import collections
 import datetime
-from .util import year_month_to_datetime, epoch_to_datetime
+
+from .util import epoch_to_datetime, year_month_to_datetime
 
 ONE_WEEK = datetime.timedelta(days=7)
 

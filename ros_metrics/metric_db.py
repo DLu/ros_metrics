@@ -1,6 +1,7 @@
-import sqlite3
-import yaml
 import pathlib
+import sqlite3
+
+import yaml
 
 data_folder = (pathlib.Path(__file__).parent.parent / 'data').resolve()
 

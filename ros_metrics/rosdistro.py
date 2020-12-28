@@ -1,16 +1,19 @@
 import collections
 import pathlib
 import re
+
 import requests
+
 from tqdm import tqdm
+
 import yaml
 
 from .constants import distros, ros1_distros, ros2_distros
 from .metric_db import MetricDB
 from .people import get_canonical_email
-from .repo_utils import clone_or_update, CloneException, match_git_host, blob_contents, resolve
-from .reports import get_datetime_from_dict, ONE_WEEK
-from .util import version_compare, standardize_dict
+from .repo_utils import CloneException, blob_contents, clone_or_update, match_git_host, resolve
+from .reports import ONE_WEEK, get_datetime_from_dict
+from .util import standardize_dict, version_compare
 
 GIT_URL = 'https://github.com/ros/rosdistro.git'
 REPO_PATH = pathlib.Path('cache/rosdistro')

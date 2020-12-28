@@ -1,8 +1,11 @@
 import collections
+
 import requests
+
 from tqdm import tqdm
+
 from .metric_db import MetricDB
-from .reports import get_datetime_from_dict, ONE_WEEK
+from .reports import ONE_WEEK, get_datetime_from_dict
 from .util import clean_dict, now_epoch
 
 # Askbot API does not require a key

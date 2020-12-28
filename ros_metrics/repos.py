@@ -1,13 +1,18 @@
-from .repo_utils import clone_or_update, get_cache_folder, CloneException, match_git_host, resolve
-from .rosdistro import get_repo_id, get_rosdistro_repos
-from .metric_db import MetricDB
-from .reports import ONE_WEEK
-from .util import get_github_api, get_github_rate_info, now_epoch, epoch_to_datetime, datetime_to_epoch
-import git
-import github
 import collections
+
+import git
+
+import github
+
 import requests
+
 from tqdm import tqdm
+
+from .metric_db import MetricDB
+from .repo_utils import CloneException, clone_or_update, get_cache_folder, match_git_host, resolve
+from .reports import ONE_WEEK
+from .rosdistro import get_repo_id, get_rosdistro_repos
+from .util import datetime_to_epoch, epoch_to_datetime, get_github_api, get_github_rate_info, now_epoch
 
 
 def check_urls(rosdistro_db):

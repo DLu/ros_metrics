@@ -1,5 +1,6 @@
-from .constants import os_list, architectures
 import re
+
+from .constants import architectures, os_list
 
 
 APT_REPO_PREFIX = re.compile(r'^(ros[\-a-z23]*)/ubuntu/(.*)')

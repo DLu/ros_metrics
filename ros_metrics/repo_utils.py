@@ -1,7 +1,9 @@
-import git
 import io
 import pathlib
 import re
+
+import git
+
 import requests
 
 GITHUB_HTTP_PATTERN = re.compile('https?://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+?)(?:\.git)?$')

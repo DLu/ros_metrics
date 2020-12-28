@@ -1,8 +1,9 @@
 import scholarly
-from scholarly.scholarly import _CITATIONPUB, _get_soup, _HOST
-from .reports import round_time
+from scholarly.scholarly import _CITATIONPUB, _HOST, _get_soup
+
 from .metric_db import MetricDB
-from .util import now_epoch, year_month_to_datetime, epoch_to_datetime
+from .reports import round_time
+from .util import epoch_to_datetime, now_epoch, year_month_to_datetime
 
 
 paper_ids = {

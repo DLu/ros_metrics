@@ -2,12 +2,15 @@
 
 import argparse
 import collections
-from jinja2 import Environment, FileSystemLoader
 import pathlib
-from ros_metrics import charts, tables
+
+from jinja2 import Environment, FileSystemLoader
+
 from ros_metrics import analytics, answers, packages, repos, wiki
-from ros_metrics.metric_db import MetricDB
+from ros_metrics import charts, tables
 from ros_metrics.constants import distros, os_list
+from ros_metrics.metric_db import MetricDB
+
 from tqdm import tqdm
 
 parser = argparse.ArgumentParser()

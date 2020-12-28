@@ -1,9 +1,11 @@
-import requests
 import time
+
+import requests
+
 from tqdm import tqdm
 
 from .metric_db import MetricDB
-from .util import now_epoch, key_subset, get_keys
+from .util import get_keys, key_subset, now_epoch
 
 config = None
 USER_CRAWL_FREQUENCY = 60 * 60 * 24 * 7

@@ -1,12 +1,16 @@
-import bs4
 import calendar
 import collections
 import csv
 import datetime
-import dateutil.parser
-import github
 import pathlib
 import re
+
+import bs4
+
+import dateutil.parser
+
+import github
+
 import yaml
 
 

@@ -6,12 +6,11 @@ from urllib.parse import urlparse
 
 import apiclient.discovery
 
-import oauth2client.service_account
-
 import googleapiclient.errors
 
-from tqdm import tqdm
+import oauth2client.service_account
 
+from tqdm import tqdm
 
 from .metric_db import MetricDB
 from .reports import get_top_by_year

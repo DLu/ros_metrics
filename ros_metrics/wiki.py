@@ -1,13 +1,16 @@
 import collections
 import pathlib
 import re
-import requests
 import subprocess
 import time
 from xml.dom.minidom import parseString
+
+import requests
+
 from tqdm import tqdm
+
 from .metric_db import MetricDB
-from .util import BeautifulParser, string_to_epoch, now_epoch
+from .util import BeautifulParser, now_epoch, string_to_epoch
 
 WIKI_URL = 'https://wiki.ros.org/'
 MIRROR_PATH = pathlib.Path('cache/wiki')

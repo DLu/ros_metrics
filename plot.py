@@ -2,8 +2,10 @@
 
 import csv
 import sys
-from matplotlib.pyplot import plot, show, legend, title, savefig, clf
+
 from dateutil import parser  # pip install python-dateutil
+
+from matplotlib.pyplot import clf, legend, plot, savefig, show, title
 
 PLOTS = [
     ('Website Metrics', ['Homepage Views', 'Installation Views', 'Tutorials Views']),

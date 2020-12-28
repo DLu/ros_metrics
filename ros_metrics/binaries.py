@@ -1,9 +1,10 @@
-from .metric_db import MetricDB
-from .util import get_github_api, now_epoch, datetime_to_epoch, epoch_to_datetime
-from .constants import ros2_distros, os_list, architectures
 import collections
 import pathlib
 import re
+
+from .constants import architectures, os_list, ros2_distros
+from .metric_db import MetricDB
+from .util import datetime_to_epoch, epoch_to_datetime, get_github_api, now_epoch
 
 ALPHA_BETA_PATTERN = re.compile(r'(alpha|beta)(\d+)')
 DATE_STRING_PATTERN = re.compile(r'\d{8}')

@@ -2,12 +2,14 @@ import collections
 import gzip
 import mailbox
 import pathlib
-import requests
 import re
+
+import requests
+
 from tqdm import tqdm
 
 from .metric_db import MetricDB
-from .util import string_to_epoch, BeautifulParser
+from .util import BeautifulParser, string_to_epoch
 
 FROM_PATTERN = re.compile(r'^(.+) at ([^\(]+) \((.+)\)$')
 FILE_PATTERN = re.compile(r'(\d{4}\-.*).txt.gz')

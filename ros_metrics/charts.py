@@ -1,15 +1,15 @@
 import collections
 import copy
 import datetime
+
 import yaml
 
-from .metric_db import MetricDB
-from .reports import round_series, get_regular_aggregate_series, get_regular_unique_series
-from .reports import time_buckets, normalize_timepoints, get_series, get_email_plots, buckets_to_plot
-from . import analytics, answers, binaries, scholar, packages, rosdistro, repos
+from . import analytics, answers, binaries, packages, repos, rosdistro, scholar
 from .constants import countries, distros
-
-from .util import get_manual_stats, VERSIONS
+from .metric_db import MetricDB
+from .reports import buckets_to_plot, get_email_plots, get_regular_aggregate_series
+from .reports import get_regular_unique_series, get_series, normalize_timepoints, round_series, time_buckets
+from .util import VERSIONS, get_manual_stats
 
 BASIC_TIME_OPTIONS = {
     'responsive': True,
