@@ -31,6 +31,7 @@ REMAPPED_CATEGORY_VALUES = {
     'osx': 'macos',
 }
 
+
 def update_binaries():
     # Download the raw numbers from github - no categorization
     db = MetricDB('binaries')
@@ -130,6 +131,7 @@ def get_latest_data(db):
         rows.append(row)
     return rows
 
+
 def get_tagged_data(db, merge_alphabeta=True):
     rows = get_latest_data(db)
     for row in rows:
@@ -138,6 +140,7 @@ def get_tagged_data(db, merge_alphabeta=True):
             continue
         row.update(d)
     return rows
+
 
 def get_downloads_by_field(tagged_data, field, field1=None):
     totals = collections.OrderedDict()

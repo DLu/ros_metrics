@@ -367,6 +367,7 @@ def get_ticket_totals(repos_db=None):
         chart.add(key, round_series(line), lineTension=0)
     return chart
 
+
 def get_binaries_chart(binaries_db=None):
     if binaries_db is None:
         binaries_db = MetricDB('binaries')
@@ -401,6 +402,7 @@ def get_binaries_chart(binaries_db=None):
         chart.add(os, values)
 
     return chart
+
 
 def get_wiki_chart():
     wiki_db = MetricDB('wiki')
