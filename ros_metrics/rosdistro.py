@@ -464,7 +464,10 @@ def get_source_url_from_release_repo(release_url, distro):
     if not tracks_file.exists():
         return None
 
-    tracks = yaml.safe_load(open(tracks_file))
+    try:
+        tracks = yaml.safe_load(open(tracks_file))
+    except yaml.constructor.ConstructorError:
+        tracks = yaml.load(open(tracks_file))
     if distro not in tracks['tracks']:
         return None
 

@@ -24,7 +24,7 @@ for row in D:
     for key in D.fieldnames[1:]:
         try:
             a.append(float(row[key]))
-        except:
+        except ValueError:
             a.append(None)
     ROWS[row['']] = a
 

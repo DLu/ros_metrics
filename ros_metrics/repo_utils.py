@@ -6,17 +6,18 @@ import git
 
 import requests
 
-GITHUB_HTTP_PATTERN = re.compile('https?://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+?)(?:\.git)?$')
-GITHUB_SSH_PATTERN = re.compile('git@(?P<server>github\.com):(?P<org>[^/]+)/(?P<repo>.+)\.git')
-GITHUB_URI_PATTERN = re.compile('git://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+?)(?:\.git)?$')
-BB_PATTERN = re.compile('https://(?P<server>bitbucket\.org)/(?P<org>.*)/(?P<repo>.+)')
-GITLAB_HTTP_PATTERN = re.compile('https?://(?P<server>gitlab\.[^/]+)/(?P<org>[^/]+)/(?P<repo>.+).git')
-GITLAB_SSH_PATTERN = re.compile('git@(?P<server>gitlab\.[^/]+):(?P<org>[^/]+)/(?P<repo>.+)\.git')
-GOOGLECODE_PATTERN = re.compile('https?://(?P<org>[^\.]+)\.(?P<server>googlecode.com)/svn/.*/(?P<repo>.+)')
-KFORGE_PATTERN = re.compile('https?://(?P<server>kforge.ros.org)/(?P<org>[^/]+)/(?P<repo>.+)')
-CODEROS_PATTERN = re.compile('https?://(?P<server>code.ros.org)/svn/(?P<org>[^/]+)/stacks/(?P<repo>.+)/trunk')
-CODEROS_BRANCH_PATTERN = re.compile('https?://(?P<server>code.ros.org)/svn/(?P<org>[^/]+)/stacks/(?P<repo>.+)/branches/(?P<branch>.+)')
-SF_PATTERN = re.compile('https?://svn.(?P<server>code.sf.net)/p/(?P<org>[^/]+)/code/trunk/(?:stacks/)?(?P<repo>.+)')
+GITHUB_HTTP_PATTERN = re.compile(r'https?://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+?)(?:\.git)?$')
+GITHUB_SSH_PATTERN = re.compile(r'git@(?P<server>github\.com):(?P<org>[^/]+)/(?P<repo>.+)\.git')
+GITHUB_URI_PATTERN = re.compile(r'git://(?P<server>github\.com)/(?P<org>[^/]+)/(?P<repo>.+?)(?:\.git)?$')
+BB_PATTERN = re.compile(r'https://(?P<server>bitbucket\.org)/(?P<org>.*)/(?P<repo>.+)')
+GITLAB_HTTP_PATTERN = re.compile(r'https?://(?P<server>gitlab\.[^/]+)/(?P<org>[^/]+)/(?P<repo>.+).git')
+GITLAB_SSH_PATTERN = re.compile(r'git@(?P<server>gitlab\.[^/]+):(?P<org>[^/]+)/(?P<repo>.+)\.git')
+GOOGLECODE_PATTERN = re.compile(r'https?://(?P<org>[^\.]+)\.(?P<server>googlecode.com)/svn/.*/(?P<repo>.+)')
+KFORGE_PATTERN = re.compile(r'https?://(?P<server>kforge.ros.org)/(?P<org>[^/]+)/(?P<repo>.+)')
+CODEROS_PATTERN = re.compile(r'https?://(?P<server>code.ros.org)/svn/(?P<org>[^/]+)/stacks/(?P<repo>.+)/trunk')
+CODEROS_BRANCH_PATTERN = re.compile(r'https?://(?P<server>code.ros.org)/svn/(?P<org>[^/]+)/stacks/(?P<repo>.+)/'
+                                    'branches/(?P<branch>.+)')
+SF_PATTERN = re.compile(r'https?://svn.(?P<server>code.sf.net)/p/(?P<org>[^/]+)/code/trunk/(?:stacks/)?(?P<repo>.+)')
 
 PATTERNS = [GITHUB_HTTP_PATTERN, GITHUB_SSH_PATTERN, GITHUB_URI_PATTERN, BB_PATTERN, GITLAB_HTTP_PATTERN,
             GITLAB_SSH_PATTERN, GOOGLECODE_PATTERN, KFORGE_PATTERN, CODEROS_PATTERN, CODEROS_BRANCH_PATTERN, SF_PATTERN]
