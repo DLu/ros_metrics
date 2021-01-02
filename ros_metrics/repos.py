@@ -146,7 +146,7 @@ def get_github_stats(rosdistro_db, repos_db, github_repos, limit=3000000):  # ~1
         repos_db.update('github_stats', row)
 
 
-def get_github_repo_issues(repos_db, gh, repo_dict, last_updated_at):
+def get_github_repo_issues(repos_db, gh, repo_dict, last_updated_at, sleep_mode=False):
     try:
         repo_str = '{org}/{repo}'.format(**repo_dict)
         repo = gh.get_repo(repo_str)
@@ -166,7 +166,17 @@ def get_github_repo_issues(repos_db, gh, repo_dict, last_updated_at):
     # Actually covers prs and issues
     # Note: Some PRs might get returned repeatedly if they are timestamped in the future relative to our timezone
     for issue in repo.get_issues(state='all', since=last_updated_dt):
+
+        if sleep_mode and gh.get_rate_limit().core.remaining < 100:
+            # Sleep for an hour
+            import time
+            time.sleep(4000)
+
         if progress is None and last_updated_at is None:
+            if issue.number > gh.get_rate_limit().core.remaining:
+                print('Skipping {}/{} ({})'.format(repo_dict['org'], repo_dict['repo'], issue.number))
+                return
+
             progress = tqdm(total=issue.number, desc=repo_str)
 
         if progress:
