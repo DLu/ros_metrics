@@ -648,6 +648,13 @@ def get_rosdistro_repos(db):
     return [remaps.get(repo_id, repo_id) for repo_id in ids]
 
 
+def get_repo_name(db, repo_id):
+    results = db.query(f'SELECT org, repo FROM repos WHERE id={repo_id}')
+    if results:
+        result = results[0]
+        return '{org}/{repo}'.format(**result)
+
+
 def commit_query(db, fields, clause=''):
     for commit in db.query(f'SELECT date, {fields} FROM commits INNER JOIN changes' +
                            f' ON commits.id = changes.commit_id {clause} ORDER BY date'):

@@ -4,7 +4,7 @@ import datetime
 
 import yaml
 
-from . import analytics, answers, binaries, packages, repos, rosdistro, scholar
+from . import analytics, answers, binaries, commits, packages, repos, rosdistro, scholar
 from .constants import countries, distros
 from .metric_db import MetricDB
 from .reports import buckets_to_plot, get_email_plots, get_regular_aggregate_series
@@ -135,6 +135,7 @@ def get_users_plot():
     users_db = MetricDB('ros_users')
     rosdistro_db = MetricDB('rosdistro')
     wiki_db = MetricDB('wiki')
+    commits_db = MetricDB('commits')
     chart = Chart('line', title='Number of ROS Users')
 
     manual = get_manual_stats('users subscribers')
@@ -152,6 +153,8 @@ def get_users_plot():
 
     total, active = rosdistro.get_people_data(rosdistro_db, None)
     chart.add('rosdistro committers', round_series(total))
+
+    chart.add('repo committers', round_series(commits.get_people_data(commits_db)))
 
     chart.add('Discourse users', get_regular_aggregate_series(discourse_db, 'users', 'created_at'))
     chart.add('Discourse posters', get_regular_unique_series(discourse_db, 'posts', 'created_at', 'user_id'))
@@ -409,4 +412,12 @@ def get_wiki_chart():
     chart = Chart('line', title='Total wiki.ros.org Pages and Edits')
     chart.add('pages', get_regular_unique_series(wiki_db, 'revisions', 'date', 'page_id'))
     chart.add('edits', get_regular_aggregate_series(wiki_db, 'revisions', 'date'))
+    return chart
+
+
+def get_commits_chart(commits_db=None):
+    if commits_db is None:
+        commits_db = MetricDB('commits')
+    chart = Chart('line', title='Number of Commits')
+    chart.add('All Repos', get_regular_aggregate_series(commits_db, 'commits', 'date'))
     return chart
