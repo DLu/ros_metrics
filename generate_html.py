@@ -103,6 +103,9 @@ STRUCTURE = [
           'chart': charts.get_repo_issues},
          {'name': 'Issues and PRs',
           'chart': charts.get_ticket_totals},
+         {'name': 'NumCommits',
+          'chart': charts.get_commits_chart
+          },
      ]
      },
     {'name': 'Answers',

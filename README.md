@@ -26,10 +26,10 @@
  * Statistics based on the repositories listed in the rosdistro
  * Scores [Github repositories](https://developer.github.com/v3/) based on stars, forks and subscribers.
  * Gathers information on the issues/pull requests opened and closed.
+ * Counts the total number of commits
  * TODO:
      * [ ] Determine number of packages per repository/commit
      * [ ] General git stats
-        * Number of commits
         * lines of code
         * authors
         * languages

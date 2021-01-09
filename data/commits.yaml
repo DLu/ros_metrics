@@ -1,0 +1,13 @@
+tables:
+    commits:
+        - id
+        - repo_id
+        - hash
+        - author
+        - email
+        - date
+
+special_types:
+    id: int
+    repo_id: int
+    date: int
