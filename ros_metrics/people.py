@@ -15,13 +15,24 @@ PEOPLE_DATA_PATH = 'data/people.yaml'
 PEOPLE_DATA = yaml.safe_load(open(PEOPLE_DATA_PATH))
 TO_CANONICAL = {}
 
+
+def get_fields(entry, field):
+    if field not in entry:
+        return []
+    value = entry[field]
+    if isinstance(value, list):
+        return value
+    else:
+        return [value]
+
+
 for email, person_dict in PEOPLE_DATA.items():
     for alt_email in person_dict.get('alt_emails', []):
         TO_CANONICAL[alt_email.lower()] = email
 
-    if 'github' in person_dict:
-        # Map from github id to canonical email, as well as generated email from github id
-        gh_lower = person_dict['github'].lower()
+    # Map from github id to canonical email, as well as generated email from github id
+    for gh_id in get_fields(person_dict, 'github'):
+        gh_lower = gh_id.lower()
         TO_CANONICAL[gh_lower] = email
         TO_CANONICAL[gh_lower + GITHUB_SUFFIX] = email
 
