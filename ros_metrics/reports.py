@@ -54,9 +54,9 @@ def get_series(db, table, time_field, value_field, clause=''):
     return series
 
 
-def get_aggregate_series(db, table, time_field, resolution=ONE_WEEK):
+def get_aggregate_series(db, table, time_field, resolution=ONE_WEEK, clause=''):
     series = []
-    query = f'SELECT {time_field} FROM {table} WHERE {time_field} is not NULL ORDER BY {time_field}'
+    query = f'SELECT {time_field} FROM {table} WHERE {time_field} is not NULL {clause} ORDER BY {time_field}'
     last_time = None
     count = 0
     for row in db.query(query):
@@ -68,8 +68,8 @@ def get_aggregate_series(db, table, time_field, resolution=ONE_WEEK):
     return series
 
 
-def get_regular_aggregate_series(db, table, time_field, mode=None):
-    return round_series(get_aggregate_series(db, table, time_field, resolution=None), mode)
+def get_regular_aggregate_series(db, table, time_field, mode=None, clause=''):
+    return round_series(get_aggregate_series(db, table, time_field, resolution=None, clause=clause), mode)
 
 
 def get_unique_series(db, table, time_field, ident_field, resolution=ONE_WEEK):

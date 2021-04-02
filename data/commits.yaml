@@ -6,8 +6,10 @@ tables:
         - author
         - email
         - date
+        - valid
 
 special_types:
     id: int
     repo_id: int
     date: int
+    valid: bool

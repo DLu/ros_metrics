@@ -115,3 +115,17 @@ def blob_contents(blob):
     with io.BytesIO(blob.data_stream.read()) as f:
         s += f.read().decode('utf-8')
     return s
+
+
+def tree_iterator(tree, filename_filter=None, subfolder=pathlib.Path()):
+    for subtree in sorted(tree.trees, key=lambda d: d.name):
+        yield from tree_iterator(subtree, filename_filter, subfolder / subtree.name)
+    for blob in tree.blobs:
+        if filename_filter and filename_filter != blob.name:
+            continue
+        yield subfolder / blob.name, blob
+
+
+def find_manifests(tree):
+    yield from tree_iterator(tree, 'manifest.xml')
+    yield from tree_iterator(tree, 'package.xml')

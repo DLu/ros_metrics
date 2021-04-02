@@ -419,5 +419,5 @@ def get_commits_chart(commits_db=None):
     if commits_db is None:
         commits_db = MetricDB('commits')
     chart = Chart('line', title='Number of Commits')
-    chart.add('All Repos', get_regular_aggregate_series(commits_db, 'commits', 'date'))
+    chart.add('All Repos', get_regular_aggregate_series(commits_db, 'commits', 'date', clause='AND valid == 1'))
     return chart
