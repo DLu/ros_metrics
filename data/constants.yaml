@@ -20,6 +20,7 @@ ros2:
   - eloquent
   - foxy
   - galactic
+  - humble
   - rolling
 ubuntu:
   - lucid
