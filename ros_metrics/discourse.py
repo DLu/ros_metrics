@@ -66,7 +66,7 @@ def fetch_user_list(db):
         for item in response['directory_items']:
             bar.update()
             d = item['user']
-            for key in ['avatar_template', 'title']:
+            for key in ['avatar_template', 'title', 'flair_name']:
                 del d[key]
             del item['user']
             item.update(d)
