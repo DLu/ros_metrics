@@ -24,8 +24,8 @@ def get_citations_by_year(id_citations, fixed=False):
     else:
         url = _CITATIONPUB.format(id_citations)
         soup = _get_soup(_HOST + url)
-        years = [int(y.text) for y in soup.find_all(class_='gsc_vcd_g_t')]
-        cites = [int(c.text) for c in soup.find_all(class_='gsc_vcd_g_al')]
+        years = [int(y.text) for y in soup.find_all(class_='gsc_oci_g_t')]
+        cites = [int(c.text) for c in soup.find_all(class_='gsc_oci_g_al')]
         return dict(zip(years, cites))
 
 
