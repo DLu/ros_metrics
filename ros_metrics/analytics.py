@@ -1,5 +1,6 @@
 import collections
 import datetime
+import socket
 import sys
 import time
 from urllib.parse import urlparse
@@ -25,6 +26,8 @@ YEARLY_REPORTS = {
 REPORT_DATA = {}
 REPORT_DATA.update(MONTHLY_REPORTS)
 REPORT_DATA.update(YEARLY_REPORTS)
+
+socket.setdefaulttimeout(600.0)
 
 DOMAINS = [
     'answers.ros.org',

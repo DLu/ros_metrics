@@ -17,7 +17,7 @@ PLOTS = [
 ]
 SINGLE_PLOTS = ['Total Downloads', 'Unique IPs', 'Papers Citing']
 
-D = csv.DictReader(open('aggregated.csv'))
+D = csv.DictReader(open('data/aggregated.csv'))
 ROWS = {}
 for row in D:
     a = []

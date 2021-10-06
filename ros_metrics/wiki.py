@@ -49,7 +49,7 @@ def sync_mirror():
         now = now_epoch()
         if now - t < TWO_WEEKS_IN_SECONDS:
             return
-    subprocess.call(['rsync', '-azv', 'rsync.osuosl.org::ros_wiki_mirror', str(MIRROR_PATH),
+    subprocess.call(['rsync', '-azvq', 'rsync.osuosl.org::ros_wiki_mirror', str(MIRROR_PATH),
                      '--bwlimit=200', '--delete', '--exclude', 'attachments'])
 
 

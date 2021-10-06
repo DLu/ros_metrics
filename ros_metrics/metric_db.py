@@ -189,7 +189,15 @@ class MetricDB:
     def format_value(self, field, value):
         """If the field's type is text, surround with quotes."""
         if self.get_field_type(field) == 'text':
-            return f'"{value}"'
+            if not isinstance(value, str):
+                value = str(value)
+            if '"' in value:
+                if "'" in value:
+                    return '"{}"'.format(value.replace('"', '""'))
+                else:
+                    return f"'{value}'"
+            else:
+                return f'"{value}"'
         else:
             return value
 

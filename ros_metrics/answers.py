@@ -97,6 +97,7 @@ def process_question(db, item):
         del item['closed']
     item['user_id'] = item['author']['id']
     del item['author']
+    item['last_crawl_at'] = now_epoch()
     db.update('questions', item)
 
 
