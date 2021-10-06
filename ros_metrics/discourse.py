@@ -98,7 +98,7 @@ def fetch_user_data(db, limit=500):
         try:
             username = user_dict['username']
             data = fetch_page(f'/users/{username}.json')
-        except Exception as e:
+        except Exception:
             user_dict['username'] = None
             user_dict['last_updated'] = now
             db.update('users', user_dict)

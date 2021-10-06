@@ -457,7 +457,7 @@ def get_source_url_from_release_repo(release_url, distro):
     # Clone it
     try:
         _, folder = clone_or_update(release_url, update=False)
-    except CloneException as e:
+    except CloneException:
         return None
 
     tracks_file = folder / 'tracks.yaml'
@@ -656,7 +656,7 @@ def get_repo_name(db, repo_id):
 
 
 def commit_query(db, fields, clause=''):
-    for commit in db.query(f'SELECT date, {fields} FROM commits INNER JOIN changes' +
+    for commit in db.query(f'SELECT date, {fields} FROM commits INNER JOIN changes'
                            f' ON commits.id = changes.commit_id {clause} ORDER BY date'):
         dt = get_datetime_from_dict(commit, 'date')
         yield dt, commit

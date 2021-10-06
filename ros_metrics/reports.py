@@ -110,7 +110,7 @@ def time_buckets(db, table, values, time_field, ident_field, value_field=None, m
             select_field += ', ' + value_field
 
         one_time_field = time_field.split(',')[0]
-        results = db.query(f'SELECT {select_field} FROM {table} ' +
+        results = db.query(f'SELECT {select_field} FROM {table} '
                            f"WHERE {ident_field} = '{value}' AND {one_time_field} IS NOT NULL ORDER BY {time_field}")
         for result in results:
             dt = get_datetime_from_dict(result, time_field)

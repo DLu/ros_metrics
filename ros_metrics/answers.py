@@ -38,7 +38,7 @@ def fetch_user(db, user_id):
     try:
         contents = fetch_page(f'users/{user_id}')
         update_user(db, contents)
-    except Exception as e:
+    except Exception:
         # Likely the user was deleted
         db.update('users', {'id': user_id, 'last_crawl_at': -1})
 
@@ -211,7 +211,7 @@ def manual_closing_check(db):
             fetch_question(db, d['id'])
         except KeyboardInterrupt:
             break
-        except Exception as e:
+        except Exception:
             db.update('questions', {'id': d['id'], 'accepted_answer_id': -1})
             continue
 

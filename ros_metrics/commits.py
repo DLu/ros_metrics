@@ -9,6 +9,7 @@ from .reports import ONE_WEEK, get_datetime_from_dict
 from .repos import clone
 from .rosdistro import get_repo_name, get_rosdistro_repos
 
+
 def get_commits(repo, tags, ignore_list=set()):
     """Retrieve all commmits with lineage from one of the released tags."""
     commit_map = {}
@@ -27,6 +28,7 @@ def get_commits(repo, tags, ignore_list=set()):
     commits.sort(key=lambda d: d.authored_date)
 
     return commits
+
 
 def is_valid_commit(commit):
     results = list(find_manifests(commit.tree))
