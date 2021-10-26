@@ -9,7 +9,7 @@ from .constants import countries, distros
 from .metric_db import MetricDB
 from .reports import buckets_to_plot, get_email_plots, get_regular_aggregate_series
 from .reports import get_regular_unique_series, get_series, normalize_timepoints, round_series, time_buckets
-from .util import VERSIONS, get_manual_stats
+from .util import VERSIONS, epoch_to_datetime, get_manual_stats, year_month_to_datetime
 
 BASIC_TIME_OPTIONS = {
     'responsive': True,
@@ -411,7 +411,18 @@ def get_wiki_chart():
     wiki_db = MetricDB('wiki')
     chart = Chart('line', title='Total wiki.ros.org Pages and Edits')
     chart.add('pages', get_regular_unique_series(wiki_db, 'revisions', 'date', 'page_id'))
-    chart.add('edits', get_regular_aggregate_series(wiki_db, 'revisions', 'date'))
+
+    buckets = collections.Counter()
+    results = wiki_db.query('SELECT date FROM revisions ORDER BY date')
+    for result in results:
+        dt = epoch_to_datetime(result['date'])
+        m = dt.month - ((dt.month - 1) % 4)
+        key = dt.year, m
+        buckets[key] += 1
+    series = []
+    for k, v in sorted(buckets.items()):
+        series.append((year_month_to_datetime(*k), v))
+    chart.add('edits per quarter', series)
     return chart
 
 
