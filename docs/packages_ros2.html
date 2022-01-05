@@ -1,5 +1,6 @@
 <html>
 <head>
+    <meta http-equiv="refresh" content="2; URL=packages_tarballs.html" />
     <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
     <link rel="stylesheet" href="ros_metrics.css">
@@ -27,111 +28,10 @@
         <a href="packages_aptrepo.html" >AptRepo</a>
         <a href="packages_linux.html" >Linux</a>
         <a href="packages_country.html" >Country</a>
-        <a href="packages_ros2.html" class="nav_selected">ROS2</a>
+        <a href="packages_tarballs.html" >Tarballs</a>
     </div>
     <div class="main" style="margin-top: 110px">
-        <div style="width:75%;">
-            <canvas id="chart"></canvas>
-        </div>
-        <div class="caption">Number of binary downloads per ROS2 release, broken down by OS.</div>
-
-        <script>
-            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
-            var ctx = document.getElementById('chart').getContext('2d');
-            var myChart = new Chart(ctx, {
-"data": {
-"datasets": [
-{
-"backgroundColor": "#4dc9f6",
-"data": [
-853,
-1428,
-2661,
-3449,
-4170,
-30887,
-29370,
-25256,
-4234
-],
-"label": "windows"
-},
-{
-"backgroundColor": "#f67019",
-"data": [
-1760,
-2825,
-2555,
-1995,
-6973,
-13258,
-8107,
-19077,
-6065
-],
-"label": "linux"
-},
-{
-"backgroundColor": "#f53794",
-"data": [
-339,
-474,
-1165,
-558,
-1721,
-1901,
-2491,
-4469,
-null
-],
-"label": "macos"
-}
-],
-"labels": [
-"alpha",
-"beta",
-"ardent",
-"bouncy",
-"crystal",
-"dashing",
-"eloquent",
-"foxy",
-"galactic"
-]
-},
-"options": {
-"legend": {
-"display": true
-},
-"responsive": true,
-"scales": {
-"xAxes": [
-{
-"barPercentage": 1.0,
-"categoryPercentage": 1.0,
-"display": true,
-"stacked": true
-}
-],
-"yAxes": [
-{
-"stacked": true
-}
-]
-},
-"title": {
-"display": true,
-"fontSize": 24,
-"text": "Binaries"
-},
-"tooltips": {
-"intersect": false,
-"mode": "x"
-}
-},
-"type": "bar"
-});
-        </script>
+        Page renamed. Redirecting...
     </div>
 </body>
 </html>

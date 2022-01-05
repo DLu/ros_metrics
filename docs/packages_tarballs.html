@@ -1,0 +1,137 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>Tarballs - ROS Metrics</title>
+    <script src="chart.js"></script>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="metrics.png" alt="ros metrics" />
+        <a href="index.html" >Users</a>
+        <a href="packages_top.html" class="nav_selected">Packages</a>
+        <a href="rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="repos_table.html" >Repos</a>
+        <a href="answers_questions.html" >Answers</a>
+        <a href="analytics_pageviews.html" >Analytics</a>
+        <a href="wiki_activity.html" >Wiki</a>
+        <a href="misc_emails.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="ghw.png" alt="github" /></a>
+    </div>
+    <div class="navbar navbar1">
+        <a href="packages_top.html" >Top</a>
+        <a href="packages_rosdistro.html" >ROS Distro</a>
+        <a href="packages_architecture.html" >Architecture</a>
+        <a href="packages_aptrepo.html" >AptRepo</a>
+        <a href="packages_linux.html" >Linux</a>
+        <a href="packages_country.html" >Country</a>
+        <a href="packages_tarballs.html" class="nav_selected">Tarballs</a>
+    </div>
+    <div class="main" style="margin-top: 110px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption">Number of tarball/zip file downloads from GitHub Release pages per ROS2 release, broken down by OS.</div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+853,
+1428,
+2669,
+3462,
+4181,
+31003,
+29447,
+26192,
+4485
+],
+"label": "windows"
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+1760,
+2831,
+2563,
+1995,
+7004,
+13396,
+8141,
+20871,
+6423
+],
+"label": "linux"
+},
+{
+"backgroundColor": "#f53794",
+"data": [
+339,
+474,
+1165,
+558,
+1721,
+1901,
+2493,
+4687,
+null
+],
+"label": "macos"
+}
+],
+"labels": [
+"alpha",
+"beta",
+"ardent",
+"bouncy",
+"crystal",
+"dashing",
+"eloquent",
+"foxy",
+"galactic"
+]
+},
+"options": {
+"legend": {
+"display": true
+},
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"barPercentage": 1.0,
+"categoryPercentage": 1.0,
+"display": true,
+"stacked": true
+}
+],
+"yAxes": [
+{
+"stacked": true
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "Tarballs from GitHub"
+},
+"tooltips": {
+"intersect": false,
+"mode": "x"
+}
+},
+"type": "bar"
+});
+        </script>
+    </div>
+</body>
+</html>
