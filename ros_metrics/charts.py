@@ -371,7 +371,7 @@ def get_ticket_totals(repos_db=None):
     return chart
 
 
-def get_binaries_chart(binaries_db=None):
+def get_tarball_chart(binaries_db=None):
     if binaries_db is None:
         binaries_db = MetricDB('binaries')
     chart = Chart('bar', {
@@ -387,7 +387,7 @@ def get_binaries_chart(binaries_db=None):
             'intersect': False,
             'mode': 'x'
         }
-    }, title='Binaries')
+    }, title='Tarballs from GitHub')
 
     rows = binaries.get_tagged_data(binaries_db)
     tag_dict = binaries.get_downloads_by_field(rows, 'rosdistro', 'os')

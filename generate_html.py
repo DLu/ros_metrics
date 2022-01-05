@@ -61,9 +61,10 @@ STRUCTURE = [
           'chart': charts.get_package_country_chart,
           'caption': 'Top ROS-using countries based on packages.ros.org downloads.'
           },
-         {'name': 'ROS2',
-          'chart': charts.get_binaries_chart,
-          'caption': 'Number of binary downloads per ROS2 release, broken down by OS.'
+         {'name': 'Tarballs',
+          'chart': charts.get_tarball_chart,
+          'caption': 'Number of tarball/zip file downloads from GitHub Release pages per ROS2 release, '
+                     'broken down by OS.'
           }
          # {'name': 'OS',
          # 'chart': charts.get_package_os_chart(dbs['packages'])
