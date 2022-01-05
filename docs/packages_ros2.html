@@ -4,7 +4,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
     <link rel="stylesheet" href="ros_metrics.css">
     <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
-    <title>ROS2 - ROS Metrics</title>
+    <title>Tarballs - ROS Metrics</title>
     <script src="chart.js"></script>
 </head>
 <body>
@@ -27,13 +27,13 @@
         <a href="packages_aptrepo.html" >AptRepo</a>
         <a href="packages_linux.html" >Linux</a>
         <a href="packages_country.html" >Country</a>
-        <a href="packages_ros2.html" class="nav_selected">ROS2</a>
+        <a href="packages_ros2.html" class="nav_selected">Tarballs</a>
     </div>
     <div class="main" style="margin-top: 110px">
         <div style="width:75%;">
             <canvas id="chart"></canvas>
         </div>
-        <div class="caption">Number of binary downloads per ROS2 release, broken down by OS.</div>
+        <div class="caption">Number of tarball/zip file downloads from GitHub Release pages per ROS2 release, broken down by OS.</div>
 
         <script>
             Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
@@ -122,7 +122,7 @@ null
 "title": {
 "display": true,
 "fontSize": 24,
-"text": "Binaries"
+"text": "Tarballs from GitHub"
 },
 "tooltips": {
 "intersect": false,
