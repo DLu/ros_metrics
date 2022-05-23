@@ -44,6 +44,8 @@ ubuntu:
   - disco
   - eoan
   - focal
+  - impish
+  - jammy
 debian:
   - stretch
   - jessie
