@@ -21,6 +21,7 @@ ros2:
   - foxy
   - galactic
   - humble
+  - iron
   - rolling
 ubuntu:
   - lucid
