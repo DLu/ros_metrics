@@ -1,0 +1,86 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>ros4hri/hri_rviz - ROS Metrics</title>
+    <script src="../chart.js"></script>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos_table.html" >Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../analytics_pageviews.html" >Analytics</a>
+        <a href="../wiki_activity.html" >Wiki</a>
+        <a href="../misc_emails.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width:75%;">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2022-11-30",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2022-11-30",
+"y": 0
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "ros4hri/hri_rviz Backlog Size"
+},
+"tooltips": {
+"intersect": false,
+"mode": "xfirst"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>
