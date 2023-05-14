@@ -72,9 +72,12 @@ def clone_or_update(url, path=None, update=True):
             print(e)
             exit(0)
     else:
-        repo = git.Repo(path)
-        if update:
-            repo.remotes.origin.pull()
+        try:
+            repo = git.Repo(path)
+            if update:
+                repo.remotes.origin.pull()
+        except git.GitCommandError as e:
+            raise CloneException(str(e))
     return repo, path
 
 
