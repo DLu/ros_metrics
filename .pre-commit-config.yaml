@@ -3,7 +3,7 @@
 exclude: ^docs/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.3.0
+  rev: v4.4.0
   hooks:
   - id: check-yaml
   - id: end-of-file-fixer
@@ -14,11 +14,23 @@ repos:
   - id: check-merge-conflict
   - id: mixed-line-ending
   - id: requirements-txt-fixer
+  - id: check-shebang-scripts-are-executable
+  - id: detect-private-key
+  - id: destroyed-symlinks
+  - id: check-symlinks
+  - id: check-case-conflict
 - repo: https://github.com/pre-commit/mirrors-autopep8
-  rev: v1.5.7
+  rev: v2.0.2
   hooks:
   - id: autopep8
 - repo: https://github.com/PyCQA/flake8
-  rev: 3.9.2
+  rev: 6.0.0
   hooks:
   - id: flake8
+- repo: https://github.com/codespell-project/codespell
+  hooks:
+  - id: codespell
+    args:
+    - --write-changes
+  rev: v2.2.4
+autoupdate_schedule: quarterly
