@@ -157,7 +157,7 @@ def get_downloads_by_field(tagged_data, field, field1=None):
 
         if field1 is None:
             totals[val] += row['count']
-        else:
+        elif field1 in row:
             val1 = row[field1]
             if val1 not in totals[val]:
                 totals[val][val1] = 0
