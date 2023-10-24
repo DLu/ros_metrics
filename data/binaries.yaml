@@ -1,25 +1,25 @@
 tables:
-    binary_repos:
-    - id
-    - org
-    - repo
-    releases:
-    - id
-    - repo_id
-    - name
-    - created_at
-    assets:
-    - id
-    - release_id
-    - name
-    downloads:
-    - asset_id
-    - measured_at
-    - count
+  binary_repos:
+  - id
+  - org
+  - repo
+  releases:
+  - id
+  - repo_id
+  - name
+  - created_at
+  assets:
+  - id
+  - release_id
+  - name
+  downloads:
+  - asset_id
+  - measured_at
+  - count
 
 special_types:
-    org: text
-    repo: text
-    name: text
+  org: text
+  repo: text
+  name: text
 
 default_type: int

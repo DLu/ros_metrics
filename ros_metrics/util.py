@@ -124,7 +124,7 @@ SIZES = {
 
 
 def string_to_bytes(s):
-    if type(s) == int:
+    if isinstance(s, int):
         return s
     s = s.strip()
     m = SIZE_PATTERN.match(s)

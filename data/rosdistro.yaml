@@ -1,49 +1,49 @@
 tables:
-    commits:
-        - id
-        - hash
-        - author
-        - email
-        - date
-    changes:
-        - commit_id
-        - change_index
-        - noun
-        - verb
-        - detail
-    repo_count:
-        - commit_id
-        - distro
-        - count
-    repos:
-        - id
-        - server
-        - org
-        - repo
-        - url
-        - status
-    remap_repos:
-        - id
-        - new_id
-    release_url_map:
-        - release_url
-        - distro
-        - src_url
-    tags:
-        - id
-        - repo_id
-        - distro
-        - tag
-        - date
-        - is_release
-    tags_checked:
-        - commit_id
+  commits:
+  - id
+  - hash
+  - author
+  - email
+  - date
+  changes:
+  - commit_id
+  - change_index
+  - noun
+  - verb
+  - detail
+  repo_count:
+  - commit_id
+  - distro
+  - count
+  repos:
+  - id
+  - server
+  - org
+  - repo
+  - url
+  - status
+  remap_repos:
+  - id
+  - new_id
+  release_url_map:
+  - release_url
+  - distro
+  - src_url
+  tags:
+  - id
+  - repo_id
+  - distro
+  - tag
+  - date
+  - is_release
+  tags_checked:
+  - commit_id
 special_types:
-    id: int
-    new_id: int
-    commit_id: int
-    date: int
-    change_index: int
-    count: int
-    repo_id: int
-    is_release: bool
+  id: int
+  new_id: int
+  commit_id: int
+  date: int
+  change_index: int
+  count: int
+  repo_id: int
+  is_release: bool

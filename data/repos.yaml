@@ -1,38 +1,36 @@
 tables:
-    github_stats:
-        - id
-        - forks
-        - stars
-        - subs
-        - last_updated_at
-    github_issues:
-        - repo_id
-        - number
-        - is_pr
-        - created_at
-        - title
-        - username
-        - status
-        - closed_at
-        - closer
-    github_issues_updates:
-        - id
-        - last_updated_at
-    repo_updates:
-        - id
-        - last_updated_at
-
+  github_stats:
+  - id
+  - forks
+  - stars
+  - subs
+  - last_updated_at
+  github_issues:
+  - repo_id
+  - number
+  - is_pr
+  - created_at
+  - title
+  - username
+  - status
+  - closed_at
+  - closer
+  github_issues_updates:
+  - id
+  - last_updated_at
+  repo_updates:
+  - id
+  - last_updated_at
 
 special_types:
-    key: text
-    server: text
-    org: text
-    repo: text
-    url: text
-    is_pr: bool
-    username: text
-    closer: text
-    status: text
-
+  key: text
+  server: text
+  org: text
+  repo: text
+  url: text
+  is_pr: bool
+  username: text
+  closer: text
+  status: text
 
 default_type: int

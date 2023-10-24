@@ -1,11 +1,11 @@
 tables:
   citations:
-      - citation_id
-      - year
-      - citations
+  - citation_id
+  - year
+  - citations
   updates:
-      - last_updated_at
+  - last_updated_at
 special_types:
-    citation_id: text
+  citation_id: text
 
 default_type: int

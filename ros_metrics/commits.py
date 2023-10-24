@@ -11,7 +11,7 @@ from .rosdistro import get_repo_name, get_rosdistro_repos
 
 
 def get_commits(repo, tags, ignore_list=set()):
-    """Retrieve all commmits with lineage from one of the released tags."""
+    """Retrieve all commits with lineage from one of the released tags."""
     commit_map = {}
     for tag in tags:
         try:

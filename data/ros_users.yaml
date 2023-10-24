@@ -1,21 +1,21 @@
 tables:
   users:
-      - id
-      - name
-      - email
+  - id
+  - name
+  - email
   posts:
-      - id
-      - user_id
-      - topic_id
-      - raw
-      - created_at
+  - id
+  - user_id
+  - topic_id
+  - raw
+  - created_at
   topics:
-      - id
-      - name
+  - id
+  - name
 
 special_types:
-    email: text
-    name: text
-    raw: text
+  email: text
+  name: text
+  raw: text
 
 default_type: int

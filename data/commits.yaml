@@ -1,15 +1,15 @@
 tables:
-    commits:
-        - id
-        - repo_id
-        - hash
-        - author
-        - email
-        - date
-        - valid
+  commits:
+  - id
+  - repo_id
+  - hash
+  - author
+  - email
+  - date
+  - valid
 
 special_types:
-    id: int
-    repo_id: int
-    date: int
-    valid: bool
+  id: int
+  repo_id: int
+  date: int
+  valid: bool
