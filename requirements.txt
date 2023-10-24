@@ -7,6 +7,6 @@ mailbox
 oauth2client
 PyGithub
 requests
-scholarly
+scholarly==0.5.0
 tabulate
 tqdm

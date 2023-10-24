@@ -1,4 +1,7 @@
 tables:
+  papers:
+  - citation_id
+  - title
   citations:
   - citation_id
   - year
@@ -7,5 +10,6 @@ tables:
   - last_updated_at
 special_types:
   citation_id: text
+  title: text
 
 default_type: int
