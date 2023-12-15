@@ -5,7 +5,7 @@ import requests
 from tqdm import tqdm
 
 from .metric_db import MetricDB
-from .reports import ONE_WEEK, get_datetime_from_dict
+from .reports import get_datetime_from_dict
 from .util import clean_dict, now_epoch
 
 # Askbot API does not require a key
@@ -224,37 +224,6 @@ def update_answers():
         update_users(db)
     finally:
         db.close()
-
-
-def answered_report(db, resolution=ONE_WEEK):
-    answered_questions_series = []
-    closed_questions_series = []
-    ratios_series = []
-    answered = 0
-    closed = 0
-
-    last_time = None
-    total_q = 0.0
-    for user_dict in db.query('SELECT * FROM questions ORDER BY created_at, id'):
-        if user_dict['created_at'] is None:
-            continue
-        total_q += 1.0
-        dt = get_datetime_from_dict(user_dict, 'created_at')
-
-        accepted = user_dict['accepted_answer_id']
-        if accepted is None:
-            pass
-        elif accepted < 0:
-            closed += 1
-        else:
-            answered += 1
-
-        if last_time is None or dt - last_time > resolution:
-            last_time = dt
-            answered_questions_series.append((dt, answered))
-            closed_questions_series.append((dt, closed))
-            ratios_series.append((dt, round(answered / total_q, 3)))
-    return answered_questions_series, closed_questions_series, ratios_series
 
 
 def karma_report(db):

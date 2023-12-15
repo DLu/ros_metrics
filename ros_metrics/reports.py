@@ -102,7 +102,7 @@ def order_by_magnitude(count_dict, remove_fields=[]):
     return ordered_values
 
 
-def time_buckets(db, table, values, time_field, ident_field, value_field=None, months=True):
+def time_buckets(db, table, values, time_field, ident_field, value_field=None, months=True, extra_clause=''):
     buckets = collections.defaultdict(collections.Counter)
     for value in values:
         select_field = time_field
@@ -111,7 +111,8 @@ def time_buckets(db, table, values, time_field, ident_field, value_field=None, m
 
         one_time_field = time_field.split(',')[0]
         results = db.query(f'SELECT {select_field} FROM {table} '
-                           f"WHERE {ident_field} = '{value}' AND {one_time_field} IS NOT NULL ORDER BY {time_field}")
+                           f"WHERE {ident_field} = '{value}' AND {one_time_field} IS NOT NULL {extra_clause}"
+                           f' ORDER BY {time_field}')
         for result in results:
             dt = get_datetime_from_dict(result, time_field)
             if months:

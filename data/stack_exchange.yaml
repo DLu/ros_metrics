@@ -1,0 +1,39 @@
+tables:
+  users:
+  - id
+  - username
+  - reputation
+  - created_at
+  questions:
+  - id
+  - title
+  - user_id
+  - body
+  - link
+  - accepted_answer_id
+  - created_at
+  - last_activity_at
+  - view_count
+  - score
+  - ros_id
+  tags:
+  - q_id
+  - tag
+  answers:
+  - id
+  - q_id
+  - body
+  - score
+  - created_at
+  - last_activity_at
+  - user_id
+  - accepted
+  - ros_id
+special_types:
+  username: text
+  title: text
+  body: text
+  link: text
+  tag: text
+  accepted: bool
+default_type: int
