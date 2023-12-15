@@ -5,6 +5,7 @@ google-api-python-client
 jinja2
 mailbox
 oauth2client
+Py-StackExchange
 PyGithub
 requests
 scholarly==0.5.0

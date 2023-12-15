@@ -7,7 +7,7 @@ import yaml
 from . import analytics, answers, binaries, commits, packages, repos, rosdistro, scholar
 from .constants import countries, distros
 from .metric_db import MetricDB
-from .reports import buckets_to_plot, get_email_plots, get_regular_aggregate_series
+from .reports import buckets_to_plot, get_email_plots, get_regular_aggregate_series, get_datetime_from_dict
 from .reports import get_regular_unique_series, get_series, normalize_timepoints, round_series, time_buckets
 from .util import VERSIONS, epoch_to_datetime, get_manual_stats, year_month_to_datetime
 
@@ -134,6 +134,7 @@ def get_users_plot():
     answers_db = MetricDB('answers')
     users_db = MetricDB('ros_users')
     rosdistro_db = MetricDB('rosdistro')
+    stack_db = MetricDB('stack_exchange')
     wiki_db = MetricDB('wiki')
     commits_db = MetricDB('commits')
     chart = Chart('line', title='Number of ROS Users')
@@ -158,6 +159,8 @@ def get_users_plot():
 
     chart.add('Discourse users', get_regular_aggregate_series(discourse_db, 'users', 'created_at'))
     chart.add('Discourse posters', get_regular_unique_series(discourse_db, 'posts', 'created_at', 'user_id'))
+
+    chart.add('robotics.stackexchange.com ros users', get_regular_aggregate_series(stack_db, 'users', 'created_at'))
 
     return chart
 
@@ -235,15 +238,125 @@ def get_scholar_plot():
     return chart
 
 
-def get_questions_plot():
+def merge_series_q(data):
+    all_keys = set()
+    for name in data:
+        all_keys |= set(data[name].keys())
+
+    prev = {}
+    total_s = []
+    for key in sorted(all_keys):
+        total = 0
+        for name in data:
+            if key in data[name]:
+                value = data[name][key]
+                total += value
+                prev[name] = value
+            elif name in prev:
+                total += prev[name]
+        total_s.append((key, total))
+    return total_s
+
+
+def answered_report(db, extra_clause=''):
+    data = {}
+    answered = 0
+    closed = 0
+    total_q = 0
+
+    clause = ''
+    if extra_clause:
+        clause = f'WHERE TRUE {extra_clause}'
+    for q_dict in db.query(f'SELECT created_at, accepted_answer_id FROM questions {clause} ORDER BY created_at, id'):
+        if q_dict['created_at'] is None:
+            continue
+        total_q += 1
+        dt = get_datetime_from_dict(q_dict, 'created_at')
+
+        accepted = q_dict['accepted_answer_id']
+        if accepted is None:
+            pass
+        elif accepted < 0:
+            closed += 1
+        else:
+            answered += 1
+
+        data[dt] = {
+            'total': total_q,
+            'answered': answered,
+            'closed': closed,
+        }
+    return data
+
+
+def get_question_sites():
     answers_db = MetricDB('answers')
-    chart = Chart('line', title='answers.ros.org Overall Statistics')
-    chart.add('Total Questions', get_regular_aggregate_series(answers_db, 'questions', 'created_at'))
-    chart.add('Total Answers', get_regular_aggregate_series(answers_db, 'answers', 'created_at'))
-    answered_questions_series, closed_questions_series, ratios_series = answers.answered_report(answers_db)
-    chart.add('Answered Questions', round_series(answered_questions_series))
-    chart.add('Closed Questions', round_series(closed_questions_series))
-    chart.add('Percent Answered', round_series(ratios_series), yAxisID='percent')
+    stack_db = MetricDB('stack_exchange')
+    return [
+        ('answers.ros.org', answers_db, ''),
+        ('Robotics Stack Exchange', stack_db, 'AND ros_id IS NULL'),
+    ]
+
+
+def get_questions_plot():
+    chart = Chart('line', title='Q&A Overall Statistics')
+
+    qdata = {}
+    adata = {}
+    pdata = {}
+    queue = []
+    for name, db, extra_clause in get_question_sites():
+        question_series = get_regular_aggregate_series(db, 'questions', 'created_at', clause=extra_clause)
+        queue.append((f'Total {name} Questions', question_series))
+        qdata[name] = dict(question_series)
+
+        answer_series = get_regular_aggregate_series(db, 'answers', 'created_at', clause=extra_clause)
+        queue.append((f'Total {name} Answers', answer_series))
+        adata[name] = dict(answer_series)
+
+        answered_data = answered_report(db, extra_clause=extra_clause)
+        pdata[name] = answered_data
+        x = [(key, value['answered'] / value['total']) for (key, value) in sorted(answered_data.items())]
+        queue.append((f'{name} Percent Answered', round_series(x)))
+
+    chart.add('Total Questions', merge_series_q(qdata))
+    chart.add('Total Answers', merge_series_q(adata))
+
+    # Merge Answered Data
+    all_keys = set()
+    for name in pdata:
+        all_keys |= set(pdata[name].keys())
+
+    prev = {}
+    answered_s = []
+    closed_s = []
+    ratio_s = []
+    for key in sorted(all_keys):
+        total = collections.Counter()
+
+        for name in pdata:
+            if key in pdata[name]:
+                for field in pdata[name][key]:
+                    value = pdata[name][key][field]
+                    total[field] += value
+                prev[name] = pdata[name][key]
+            elif name in prev:
+                for field in prev[name]:
+                    total[field] += prev[name][field]
+
+        answered_s.append((key, total['answered']))
+        closed_s.append((key, total['closed']))
+        ratio_s.append((key, total['answered'] / total['total']))
+    chart.add('Percent Answered', round_series(ratio_s), yAxisID='percent')
+    chart.add('Answered Questions', round_series(answered_s))
+    chart.add('Closed Questions', round_series(closed_s))
+
+    for name, plot in queue:
+        if 'Percent' in name:
+            chart.add(name, plot, yAxisID='percent')
+        else:
+            chart.add(name, plot)
+
     chart['options']['scales']['yAxes'] = [{'title': 'count'},
                                            {'id': 'percent', 'position': 'right', 'ticks': {'suggestedMin': 0}}]
     return chart
@@ -260,12 +373,18 @@ def get_karma_chart():
 
 
 def get_answers_distro_chart():
-    answers_db = MetricDB('answers')
-    buckets = time_buckets(answers_db, 'questions INNER JOIN tags on tags.q_id = questions.id', distros,
-                           'created_at', 'tag')
+    all_buckets = collections.defaultdict(collections.Counter)
+    for name, db, extra_clause in get_question_sites():
+        for prefix in ['', 'ros-']:
+            values = [prefix + distro for distro in distros]
+            buckets = time_buckets(db, 'questions INNER JOIN tags on tags.q_id = questions.id', values,
+                                   'created_at', 'tag', extra_clause=extra_clause)
+            for month, counts in buckets.items():
+                for key, count in counts.items():
+                    all_buckets[month][key.replace(prefix, '')] += count
 
-    chart = Chart('bar', STACKED_BAR_OPTIONS, 'ROS Distro Usage by answers.ros.org tags')
-    for name, d_series in normalize_timepoints(buckets, distros).items():
+    chart = Chart('bar', STACKED_BAR_OPTIONS, 'ROS Distro Usage by Q+A site tags')
+    for name, d_series in normalize_timepoints(all_buckets, distros).items():
         chart.add(name, d_series)
     return chart
 

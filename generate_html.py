@@ -113,7 +113,7 @@ STRUCTURE = [
      'subpages': [
          {'name': 'Questions',
           'chart': charts.get_questions_plot,
-          'caption': 'Total number of questions, answers, questions with an accepted answer on answers.ros.org, '
+          'caption': 'Total number of questions, answers, questions with an accepted answer on Q and A websites, '
                      'and the percent of questions with an accepted answer.'},
          {'name': 'Karma',
           'chart': charts.get_karma_chart,
@@ -121,7 +121,7 @@ STRUCTURE = [
           },
          {'name': 'ROS Distro',
           'chart': charts.get_answers_distro_chart,
-          'caption': 'Relative usage of ROS distros by question tags on answers.ros.org.'
+          'caption': 'Relative usage of ROS distros by question tags on answers on Q and A websites.'
           },
          {'name': 'Top Answerers',
           'template': 'top.html',
