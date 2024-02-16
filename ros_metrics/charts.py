@@ -39,7 +39,9 @@ SOME_COLORS = ['#4dc9f6',
                '#166a8f',
                '#00a950',
                '#58595b',
-               '#8549ba']
+               '#8549ba',
+               '#a03232',
+               '#ffeb3b']
 
 
 class BaseChart(dict):
@@ -140,27 +142,31 @@ def get_users_plot():
     chart = Chart('line', title='Number of ROS Users')
 
     manual = get_manual_stats('users subscribers')
-    chart.add('ros-users subscribers', sorted(manual.items()))
-    chart.add('ros-users posters', get_regular_unique_series(users_db, 'posts', 'created_at', 'user_id'))
+    chart.add('ros-users subscribers', sorted(manual.items()), color='#4dc9f6')
+    chart.add('ros-users posters',
+              get_regular_unique_series(users_db, 'posts', 'created_at', 'user_id'), color='#9ee1fa')
 
     manual_wiki = get_manual_stats('wiki.ros.org users')
-    chart.add('wiki.ros.org users', sorted(manual_wiki.items()))
-    chart.add('wiki.ros.org editors', get_regular_unique_series(wiki_db, 'revisions', 'date', 'user'))
+    chart.add('wiki.ros.org users', sorted(manual_wiki.items()), color='#f67019')
+    chart.add('wiki.ros.org editors', get_regular_unique_series(wiki_db, 'revisions', 'date', 'user'), color='#f9aa76')
 
-    chart.add('answers.ros.org users', get_regular_aggregate_series(answers_db, 'users', 'created_at'))
+    chart.add('answers.ros.org users', get_regular_aggregate_series(answers_db, 'users', 'created_at'), color='#f53794')
     chart.add('answers.ros.org questioners',
-              get_regular_unique_series(answers_db, 'questions', 'created_at', 'user_id'))
-    chart.add('answers.ros.org answerers', get_regular_unique_series(answers_db, 'answers', 'created_at', 'user_id'))
+              get_regular_unique_series(answers_db, 'questions', 'created_at', 'user_id'), color='#f98bc0')
+    chart.add('answers.ros.org answerers',
+              get_regular_unique_series(answers_db, 'answers', 'created_at', 'user_id'), color='#e90c77')
+
+    chart.add('robotics.stackexchange.com ros users',
+              get_regular_aggregate_series(stack_db, 'users', 'created_at'), color='#537bc4')
 
     total, active = rosdistro.get_people_data(rosdistro_db, None)
-    chart.add('rosdistro committers', round_series(total))
+    chart.add('rosdistro committers', round_series(total), color='#acc236')
 
-    chart.add('repo committers', round_series(commits.get_people_data(commits_db)))
+    chart.add('repo committers', round_series(commits.get_people_data(commits_db)), color='#166a8f')
 
-    chart.add('Discourse users', get_regular_aggregate_series(discourse_db, 'users', 'created_at'))
-    chart.add('Discourse posters', get_regular_unique_series(discourse_db, 'posts', 'created_at', 'user_id'))
-
-    chart.add('robotics.stackexchange.com ros users', get_regular_aggregate_series(stack_db, 'users', 'created_at'))
+    chart.add('Discourse users', get_regular_aggregate_series(discourse_db, 'users', 'created_at'), color='#00a950')
+    chart.add('Discourse posters',
+              get_regular_unique_series(discourse_db, 'posts', 'created_at', 'user_id'), color='#0aff7c')
 
     return chart
 
