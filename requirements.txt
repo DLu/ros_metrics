@@ -8,6 +8,6 @@ oauth2client
 Py-StackExchange
 PyGithub
 requests
-scholarly==0.5.0
+scholarly==1.7.11
 tabulate
 tqdm
