@@ -268,7 +268,7 @@ REPOS_FOLDER = OUTPUT_FOLDER / 'repos'
 REPOS_FOLDER.mkdir(exist_ok=True)
 for repo_id, repo_dict in tqdm(github_repos.items()):
     name = '{org}/{repo}'.format(**repo_dict)
-    template = j2_env.get_template(subpage.get('template', 'basic_chart.html'))
+    template = j2_env.get_template('basic_chart.html')
     filename = '{org}_{repo}.html'.format(**repo_dict)
 
     repo_page = {'name': name, 'chart': charts.get_repo_issues(repos_db, name, repo_id)}
