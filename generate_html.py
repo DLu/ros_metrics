@@ -7,7 +7,7 @@ import pathlib
 from jinja2 import Environment, FileSystemLoader
 
 from ros_metrics import analytics, answers, packages, repos, wiki
-from ros_metrics import charts, tables
+from ros_metrics import charts, tables, scholar
 from ros_metrics.constants import distros, os_list
 from ros_metrics.metric_db import MetricDB
 
@@ -183,7 +183,11 @@ STRUCTURE = [
           },
          {'name': 'Citations',
           'chart': charts.get_scholar_plot,
-          'caption': 'Number of citations to "ROS: an open-source Robot Operating System"'
+          'template': 'scholar.html',
+          'caption': scholar.generate_caption(),
+          'replacements': {
+              '"y_display"': 'y_display'
+          }
           }
      ]
      },
@@ -247,8 +251,12 @@ for blob in STRUCTURE:
             subpage['level2'] = level2
             subpage['menu'] = menu
             subpage['submenu'] = blob['submenu']
+            html_contents = template.render(**subpage)
+            for k, v in subpage.get('replacements', {}).items():
+                html_contents = html_contents.replace(k, v)
+
             with open(OUTPUT_FOLDER / level2, 'w') as f:
-                f.write(template.render(**subpage))
+                f.write(html_contents)
 
 if args.filter and args.filter != 'repos':
     exit(0)

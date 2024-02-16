@@ -233,8 +233,14 @@ def get_package_os_chart():
 
 def get_scholar_plot():
     scholar_db = MetricDB('scholar')
-    chart = Chart('line', title='Citations to Original ROS Paper')
-    chart.add('Citations', scholar.get_report(scholar_db), fill=True)
+
+    scholar_options = copy.deepcopy(BASIC_TIME_OPTIONS)
+    scholar_options['scales']['xAxes'][0]['time'] = {'unit': 'year'}
+    scholar_options['scales']['yAxes'] = [{'type': 'logarithmic', 'ticks': {'callback': 'y_display'}}]
+
+    chart = Chart('line', scholar_options, title='Citations')
+    for title, series in scholar.get_report(scholar_db).items():
+        chart.add(title, series)
     return chart
 
 

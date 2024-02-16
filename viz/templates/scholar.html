@@ -1,0 +1,10 @@
+{% extends "basic_chart.html" %}
+
+{% block header %}
+<script>
+function y_display(val)
+{
+    return [10, 100, 1000, 10000].includes(val) ? val : undefined;
+}
+</script>
+{%- endblock %}

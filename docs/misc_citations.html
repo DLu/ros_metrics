@@ -5,7 +5,12 @@
     <link rel="stylesheet" href="ros_metrics.css">
     <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
     <title>Citations - ROS Metrics</title>
-    <script src="chart.js"></script>
+<script>
+function y_display(val)
+{
+    return [10, 100, 1000, 10000].includes(val) ? val : undefined;
+}
+</script>
 </head>
 <body>
     <div class="navbar navbar0">
@@ -28,7 +33,17 @@
         <div style="width: 75%">
             <canvas id="chart"></canvas>
         </div>
-        <div class="caption">Number of citations to "ROS: an open-source Robot Operating System"</div>
+        <div class="caption"><table>
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=fMDLYCUAAAAJ:u5HHmVD_uO8C">ROS: an open-source Robot Operating System</a><td>11955
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=n6zUuaQAAAAJ:qjMakFHDy7sC">The open motion planning library</a><td>1758
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=2wD-piwAAAAJ:9yKSN-GCB0IC">A generalized extended kalman filter implementation for the robot operating system</a><td>545
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=MGZmVmwAAAAJ:8k81kl-MbHgC">Robot Operating System 2: Design, architecture, and uses in the wild</a><td>421
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=6l6_0CAAAAAJ:Zph67rFs4hoC">An evaluation of 2D SLAM techniques available in robot operating system</a><td>343
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=bfksbjAAAAAJ:_FxGoFyzp5QC">Layered costmaps for context-sensitive navigation</a><td>309
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=1_DPNNMAAAAJ:3fE2CSJIrl8C">Model predictive control for trajectory tracking of unmanned aerial vehicles using robot operating system</a><td>270
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=hyEds7sAAAAJ:Tyk-4Ss8FVUC">Rosbridge: Ros for non-ros users</a><td>266
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=S2vB4tAAAAAJ:pyW8ca7W8N0C">ros_control: A generic and simple control framework for ROS</a><td>256
+<tr><td><a href="https://scholar.google.com/citations?view_op=view_citation&citation_for_view=Wmz1aEIAAAAJ:Y0pCki6q_DkC">Robot web tools: Efficient messaging for cloud robotics</a><td>111</table></div>
 
         <script>
             Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
@@ -41,11 +56,11 @@
 "data": [
 {
 "x": "2010-12-31",
-"y": 96
+"y": 95
 },
 {
 "x": "2011-12-31",
-"y": 281
+"y": 280
 },
 {
 "x": "2012-12-31",
@@ -57,7 +72,7 @@
 },
 {
 "x": "2014-12-31",
-"y": 1853
+"y": 1854
 },
 {
 "x": "2015-12-31",
@@ -69,39 +84,446 @@
 },
 {
 "x": "2017-12-31",
-"y": 4456
+"y": 4457
 },
 {
 "x": "2018-12-31",
-"y": 5591
+"y": 5593
 },
 {
 "x": "2019-12-31",
-"y": 6947
+"y": 6949
 },
 {
 "x": "2020-12-31",
-"y": 8240
+"y": 8244
 },
 {
 "x": "2021-12-31",
-"y": 9464
+"y": 9469
 },
 {
 "x": "2022-12-31",
-"y": 10727
+"y": 10730
 },
 {
 "x": "2023-12-31",
-"y": 11851
+"y": 11858
 },
 {
 "x": "2024-02-05",
-"y": 11923
+"y": 11955
 }
 ],
-"fill": true,
-"label": "Citations"
+"fill": false,
+"label": "ROS: an open-source Robot Operating System"
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2012-12-31",
+"y": 12
+},
+{
+"x": "2013-12-31",
+"y": 78
+},
+{
+"x": "2014-12-31",
+"y": 156
+},
+{
+"x": "2015-12-31",
+"y": 258
+},
+{
+"x": "2016-12-31",
+"y": 370
+},
+{
+"x": "2017-12-31",
+"y": 507
+},
+{
+"x": "2018-12-31",
+"y": 694
+},
+{
+"x": "2019-12-31",
+"y": 862
+},
+{
+"x": "2020-12-31",
+"y": 1078
+},
+{
+"x": "2021-12-31",
+"y": 1305
+},
+{
+"x": "2022-12-31",
+"y": 1517
+},
+{
+"x": "2023-12-31",
+"y": 1740
+},
+{
+"x": "2024-02-05",
+"y": 1758
+}
+],
+"fill": false,
+"label": "The open motion planning library"
+},
+{
+"backgroundColor": "#f53794",
+"data": [
+{
+"x": "2015-12-31",
+"y": 2
+},
+{
+"x": "2016-12-31",
+"y": 22
+},
+{
+"x": "2017-12-31",
+"y": 54
+},
+{
+"x": "2018-12-31",
+"y": 100
+},
+{
+"x": "2019-12-31",
+"y": 177
+},
+{
+"x": "2020-12-31",
+"y": 259
+},
+{
+"x": "2021-12-31",
+"y": 349
+},
+{
+"x": "2022-12-31",
+"y": 453
+},
+{
+"x": "2023-12-31",
+"y": 538
+},
+{
+"x": "2024-02-05",
+"y": 545
+}
+],
+"fill": false,
+"label": "A generalized extended kalman filter implementation for the robot operating system"
+},
+{
+"backgroundColor": "#537bc4",
+"data": [
+{
+"x": "2021-12-31",
+"y": 1
+},
+{
+"x": "2022-12-31",
+"y": 64
+},
+{
+"x": "2023-12-31",
+"y": 397
+},
+{
+"x": "2024-02-05",
+"y": 421
+}
+],
+"fill": false,
+"label": "Robot Operating System 2: Design, architecture, and uses in the wild"
+},
+{
+"backgroundColor": "#acc236",
+"data": [
+{
+"x": "2013-12-31",
+"y": 2
+},
+{
+"x": "2014-12-31",
+"y": 10
+},
+{
+"x": "2015-12-31",
+"y": 22
+},
+{
+"x": "2016-12-31",
+"y": 45
+},
+{
+"x": "2017-12-31",
+"y": 86
+},
+{
+"x": "2018-12-31",
+"y": 134
+},
+{
+"x": "2019-12-31",
+"y": 185
+},
+{
+"x": "2020-12-31",
+"y": 229
+},
+{
+"x": "2021-12-31",
+"y": 284
+},
+{
+"x": "2022-12-31",
+"y": 321
+},
+{
+"x": "2023-12-31",
+"y": 342
+},
+{
+"x": "2024-02-05",
+"y": 343
+}
+],
+"fill": false,
+"label": "An evaluation of 2D SLAM techniques available in robot operating system"
+},
+{
+"backgroundColor": "#166a8f",
+"data": [
+{
+"x": "2015-12-31",
+"y": 11
+},
+{
+"x": "2016-12-31",
+"y": 35
+},
+{
+"x": "2017-12-31",
+"y": 45
+},
+{
+"x": "2018-12-31",
+"y": 67
+},
+{
+"x": "2019-12-31",
+"y": 96
+},
+{
+"x": "2020-12-31",
+"y": 140
+},
+{
+"x": "2021-12-31",
+"y": 201
+},
+{
+"x": "2022-12-31",
+"y": 259
+},
+{
+"x": "2023-12-31",
+"y": 307
+},
+{
+"x": "2024-02-05",
+"y": 309
+}
+],
+"fill": false,
+"label": "Layered costmaps for context-sensitive navigation"
+},
+{
+"backgroundColor": "#00a950",
+"data": [
+{
+"x": "2016-12-31",
+"y": 4
+},
+{
+"x": "2017-12-31",
+"y": 19
+},
+{
+"x": "2018-12-31",
+"y": 52
+},
+{
+"x": "2019-12-31",
+"y": 90
+},
+{
+"x": "2020-12-31",
+"y": 154
+},
+{
+"x": "2021-12-31",
+"y": 199
+},
+{
+"x": "2022-12-31",
+"y": 235
+},
+{
+"x": "2023-12-31",
+"y": 268
+},
+{
+"x": "2024-02-05",
+"y": 270
+}
+],
+"fill": false,
+"label": "Model predictive control for trajectory tracking of unmanned aerial vehicles using robot operating system"
+},
+{
+"backgroundColor": "#58595b",
+"data": [
+{
+"x": "2012-12-31",
+"y": 6
+},
+{
+"x": "2013-12-31",
+"y": 10
+},
+{
+"x": "2014-12-31",
+"y": 21
+},
+{
+"x": "2015-12-31",
+"y": 30
+},
+{
+"x": "2016-12-31",
+"y": 46
+},
+{
+"x": "2017-12-31",
+"y": 69
+},
+{
+"x": "2018-12-31",
+"y": 95
+},
+{
+"x": "2019-12-31",
+"y": 129
+},
+{
+"x": "2020-12-31",
+"y": 158
+},
+{
+"x": "2021-12-31",
+"y": 202
+},
+{
+"x": "2022-12-31",
+"y": 231
+},
+{
+"x": "2023-12-31",
+"y": 264
+},
+{
+"x": "2024-02-05",
+"y": 266
+}
+],
+"fill": false,
+"label": "Rosbridge: Ros for non-ros users"
+},
+{
+"backgroundColor": "#8549ba",
+"data": [
+{
+"x": "2018-12-31",
+"y": 11
+},
+{
+"x": "2019-12-31",
+"y": 57
+},
+{
+"x": "2020-12-31",
+"y": 96
+},
+{
+"x": "2021-12-31",
+"y": 139
+},
+{
+"x": "2022-12-31",
+"y": 204
+},
+{
+"x": "2023-12-31",
+"y": 252
+},
+{
+"x": "2024-02-05",
+"y": 256
+}
+],
+"fill": false,
+"label": "ros_control: A generic and simple control framework for ROS"
+},
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2016-12-31",
+"y": 9
+},
+{
+"x": "2017-12-31",
+"y": 24
+},
+{
+"x": "2018-12-31",
+"y": 35
+},
+{
+"x": "2019-12-31",
+"y": 50
+},
+{
+"x": "2020-12-31",
+"y": 70
+},
+{
+"x": "2021-12-31",
+"y": 87
+},
+{
+"x": "2022-12-31",
+"y": 98
+},
+{
+"x": "2023-12-31",
+"y": 111
+}
+],
+"fill": false,
+"label": "Robot web tools: Efficient messaging for cloud robotics"
 }
 ]
 },
@@ -111,14 +533,25 @@
 "xAxes": [
 {
 "display": true,
+"time": {
+"unit": "year"
+},
 "type": "time"
+}
+],
+"yAxes": [
+{
+"ticks": {
+"callback": y_display
+},
+"type": "logarithmic"
 }
 ]
 },
 "title": {
 "display": true,
 "fontSize": 24,
-"text": "Citations to Original ROS Paper"
+"text": "Citations"
 },
 "tooltips": {
 "intersect": false,
