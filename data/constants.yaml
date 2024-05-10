@@ -1,59 +1,66 @@
 ros1:
-  - boxturtle
-  - cturtle
-  - diamondback
-  - electric
-  - fuerte
-  - groovy
-  - hydro
-  - indigo
-  - jade
-  - kinetic
-  - lunar
-  - melodic
-  - noetic
+- boxturtle
+- cturtle
+- diamondback
+- electric
+- fuerte
+- groovy
+- hydro
+- indigo
+- jade
+- kinetic
+- lunar
+- melodic
+- noetic
 ros2:
-  - ardent
-  - bouncy
-  - crystal
-  - dashing
-  - eloquent
-  - foxy
-  - galactic
-  - humble
-  - iron
-  - rolling
+- ardent
+- bouncy
+- crystal
+- dashing
+- eloquent
+- foxy
+- galactic
+- humble
+- iron
+- jazzy
+- rolling
 ubuntu:
-  - lucid
-  - maverick
-  - natty
-  - oneiric
-  - precise
-  - quantal
-  - raring
-  - saucy
-  - trusty
-  - utopic
-  - vivid
-  - wily
-  - xenial
-  - yakkety
-  - zesty
-  - artful
-  - bionic
-  - cosmic
-  - disco
-  - eoan
-  - focal
-  - impish
-  - jammy
+- lucid
+- maverick
+- natty
+- oneiric
+- precise
+- quantal
+- raring
+- saucy
+- trusty
+- utopic
+- vivid
+- wily
+- xenial
+- yakkety
+- zesty
+- artful
+- bionic
+- cosmic
+- disco
+- eoan
+- focal
+- impish
+- jammy
+- manic
+- noble
+- oracular
 debian:
-  - stretch
-  - jessie
-  - buster
-  - wheezy
+- wheezy
+- jessie
+- stretch
+- buster
+- bullseye
+- bookworm
+- trixie
 architectures:
-  - i386
-  - amd64
-  - armhf
-  - arm64
+- i386
+- amd64
+- armhf
+- arm64
