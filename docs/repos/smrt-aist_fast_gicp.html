@@ -1,0 +1,386 @@
+<html>
+<head>
+    <script src="https://momentjs.com/downloads/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <link rel="stylesheet" href="../ros_metrics.css">
+    <link href="https://fonts.googleapis.com/css?family=Overpass" rel="stylesheet">
+    <title>smrt-aist/fast_gicp - ROS Metrics</title>
+    <script src="../chart.js"></script>
+</head>
+<body>
+    <div class="navbar navbar0">
+        <img src="../metrics.png" alt="ros metrics" />
+        <a href="../index.html" >Users</a>
+        <a href="../packages_top.html" >Packages</a>
+        <a href="../rosdistro_rosdistro.html" >ROS Distro</a>
+        <a href="../repos_table.html" >Repos</a>
+        <a href="../answers_questions.html" >Answers</a>
+        <a href="../analytics_pageviews.html" >Analytics</a>
+        <a href="../wiki_activity.html" >Wiki</a>
+        <a href="../misc_emails.html" >Misc</a>
+        <a href="https://github.com/DLu/ros_metrics" id="gh"><img src="../ghw.png" alt="github" /></a>
+    </div>
+    <div class="main" style="margin-top: 60px">
+        <div style="width: 75%">
+            <canvas id="chart"></canvas>
+        </div>
+        <div class="caption"></div>
+
+        <script>
+            Chart.defaults.global.defaultFontFamily = 'Overpass, sans-serif';
+            var ctx = document.getElementById('chart').getContext('2d');
+            var myChart = new Chart(ctx, {
+"data": {
+"datasets": [
+{
+"backgroundColor": "#4dc9f6",
+"data": [
+{
+"x": "2020-01-31",
+"y": 0
+},
+{
+"x": "2020-02-29",
+"y": 2
+},
+{
+"x": "2020-03-31",
+"y": 5
+},
+{
+"x": "2020-04-30",
+"y": 6
+},
+{
+"x": "2020-06-30",
+"y": 7
+},
+{
+"x": "2020-07-31",
+"y": 9
+},
+{
+"x": "2020-08-31",
+"y": 11
+},
+{
+"x": "2020-09-30",
+"y": 13
+},
+{
+"x": "2020-10-31",
+"y": 15
+},
+{
+"x": "2020-11-30",
+"y": 15
+},
+{
+"x": "2021-01-31",
+"y": 19
+},
+{
+"x": "2021-02-28",
+"y": 20
+},
+{
+"x": "2021-03-31",
+"y": 19
+},
+{
+"x": "2021-05-31",
+"y": 21
+},
+{
+"x": "2021-06-30",
+"y": 23
+},
+{
+"x": "2021-07-31",
+"y": 24
+},
+{
+"x": "2021-08-31",
+"y": 24
+},
+{
+"x": "2021-09-30",
+"y": 26
+},
+{
+"x": "2021-10-31",
+"y": 28
+},
+{
+"x": "2021-11-30",
+"y": 30
+},
+{
+"x": "2021-12-31",
+"y": 32
+},
+{
+"x": "2022-01-31",
+"y": 32
+},
+{
+"x": "2022-02-28",
+"y": 36
+},
+{
+"x": "2022-03-31",
+"y": 38
+},
+{
+"x": "2022-04-30",
+"y": 38
+},
+{
+"x": "2022-06-30",
+"y": 40
+},
+{
+"x": "2022-07-31",
+"y": 42
+},
+{
+"x": "2022-08-31",
+"y": 44
+},
+{
+"x": "2022-09-30",
+"y": 43
+},
+{
+"x": "2022-10-31",
+"y": 45
+},
+{
+"x": "2022-11-30",
+"y": 45
+},
+{
+"x": "2022-12-31",
+"y": 46
+},
+{
+"x": "2023-01-31",
+"y": 46
+},
+{
+"x": "2023-02-28",
+"y": 46
+},
+{
+"x": "2023-03-31",
+"y": 50
+},
+{
+"x": "2023-04-30",
+"y": 49
+},
+{
+"x": "2023-06-30",
+"y": 50
+},
+{
+"x": "2023-08-31",
+"y": 51
+},
+{
+"x": "2023-09-30",
+"y": 54
+},
+{
+"x": "2023-12-31",
+"y": 55
+},
+{
+"x": "2024-01-31",
+"y": 56
+},
+{
+"x": "2024-02-29",
+"y": 58
+},
+{
+"x": "2024-03-31",
+"y": 58
+},
+{
+"x": "2024-04-30",
+"y": 59
+},
+{
+"x": "2024-05-31",
+"y": 61
+},
+{
+"x": "2024-06-30",
+"y": 63
+},
+{
+"x": "2024-07-31",
+"y": 65
+}
+],
+"fill": false,
+"label": "Open Issues",
+"lineTension": 0
+},
+{
+"backgroundColor": "#f67019",
+"data": [
+{
+"x": "2020-01-31",
+"y": 0
+},
+{
+"x": "2020-02-29",
+"y": 0
+},
+{
+"x": "2020-10-31",
+"y": 0
+},
+{
+"x": "2020-11-30",
+"y": 0
+},
+{
+"x": "2020-12-31",
+"y": 0
+},
+{
+"x": "2021-01-31",
+"y": 0
+},
+{
+"x": "2021-02-28",
+"y": 0
+},
+{
+"x": "2021-03-31",
+"y": 1
+},
+{
+"x": "2021-04-30",
+"y": 1
+},
+{
+"x": "2021-05-31",
+"y": 0
+},
+{
+"x": "2021-06-30",
+"y": 0
+},
+{
+"x": "2021-07-31",
+"y": 1
+},
+{
+"x": "2022-01-31",
+"y": 0
+},
+{
+"x": "2022-02-28",
+"y": 1
+},
+{
+"x": "2022-04-30",
+"y": 0
+},
+{
+"x": "2022-05-31",
+"y": 1
+},
+{
+"x": "2022-06-30",
+"y": 0
+},
+{
+"x": "2022-10-31",
+"y": 0
+},
+{
+"x": "2022-12-31",
+"y": 0
+},
+{
+"x": "2023-01-31",
+"y": 0
+},
+{
+"x": "2023-02-28",
+"y": 0
+},
+{
+"x": "2023-06-30",
+"y": 1
+},
+{
+"x": "2023-08-31",
+"y": 2
+},
+{
+"x": "2023-09-30",
+"y": 3
+},
+{
+"x": "2023-10-31",
+"y": 3
+},
+{
+"x": "2023-11-30",
+"y": 2
+},
+{
+"x": "2023-12-31",
+"y": 4
+},
+{
+"x": "2024-02-29",
+"y": 5
+},
+{
+"x": "2024-04-30",
+"y": 5
+},
+{
+"x": "2024-07-31",
+"y": 5
+}
+],
+"fill": false,
+"label": "Open PRs",
+"lineTension": 0
+}
+]
+},
+"options": {
+"responsive": true,
+"scales": {
+"xAxes": [
+{
+"display": true,
+"type": "time"
+}
+]
+},
+"title": {
+"display": true,
+"fontSize": 24,
+"text": "smrt-aist/fast_gicp Backlog Size"
+},
+"tooltips": {
+"intersect": false,
+"mode": "xfirst"
+}
+},
+"type": "line"
+});
+        </script>
+    </div>
+</body>
+</html>
