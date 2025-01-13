@@ -23,6 +23,7 @@ ros2:
 - humble
 - iron
 - jazzy
+- kilted
 - rolling
 ubuntu:
 - lucid
