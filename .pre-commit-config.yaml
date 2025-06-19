@@ -1,7 +1,7 @@
 exclude: ^docs/
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v5.0.0
   hooks:
   - id: check-yaml
   - id: end-of-file-fixer
@@ -17,12 +17,12 @@ repos:
   - id: destroyed-symlinks
   - id: check-symlinks
   - id: check-case-conflict
-- repo: https://github.com/pre-commit/mirrors-autopep8
-  rev: v2.0.2
+- repo: https://github.com/hhatto/autopep8
+  rev: v2.3.2
   hooks:
   - id: autopep8
 - repo: https://github.com/PyCQA/flake8
-  rev: 6.1.0
+  rev: 7.2.0
   hooks:
   - id: flake8
 - repo: https://github.com/codespell-project/codespell
@@ -30,8 +30,8 @@ repos:
   - id: codespell
     args:
     - --write-changes
-    - --skip=data/countries.yaml
-  rev: v2.2.5
+    - --skip=data/countries.yaml,data/people.yaml
+  rev: v2.4.1
 - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
   hooks:
   - id: yamlfmt

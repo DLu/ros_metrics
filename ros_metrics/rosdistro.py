@@ -536,7 +536,7 @@ def check_tags(db, commit_id, repositories, timestamp):
         entry = load_repository_info(db, distro, distro_dict)
 
         query = f'SELECT repo_id, tag, max(date), is_release FROM tags ' \
-                f'WHERE distro="{distro}" and date <= {timestamp} GROUP BY repo_id'
+            f'WHERE distro="{distro}" and date <= {timestamp} GROUP BY repo_id'
         previous_list = db.query(query)
         previous_dict = {}
         for row in previous_list:
