@@ -195,6 +195,9 @@ def get_package_ratio_chart(field, title=None, values=None, other_limit=None):
 def get_package_country_chart(N=15):
     packages_db = MetricDB('packages')
     cc_list, by_country = packages.get_package_buckets(packages_db, 'countries', 'cc')
+    if 'ip' in cc_list:
+        cc_list.remove('ip')
+
     buckets = time_buckets(packages_db, 'countries', cc_list, 'year, month', 'cc', 'hits', months=False)
 
     options = {'style': {'labelOverall': {'text': 'Overall'}}}
